@@ -350,8 +350,8 @@ def test_video_Movie_reload_kwargs(movie):
     assert len(movie.media)
     assert movie.summary is not None
     movie.reload(includeFields=False, **movie._EXCLUDES)
-    assert movie.__dict__.get('media') == []
-    assert movie.__dict__.get('summary') is None
+    assert movie.media == []
+    assert movie.summary is None
 
 
 def test_video_movie_watched(movie):
