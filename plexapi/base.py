@@ -39,7 +39,42 @@ OPERATORS = {
 }
 
 
-class PlexObject:
+class cached_data_property(cached_property):
+    """Caching for PlexObject data properties.
+
+    This decorator creates properties that cache their values with
+    automatic invalidation on data changes.
+    """
+
+    def __set_name__(self, owner, name):
+        """Register the annotated property in the parent class's _cached_data_properties set."""
+        super().__set_name__(owner, name)
+        if not hasattr(owner, '_cached_data_properties'):
+            owner._cached_data_properties = set()
+        owner._cached_data_properties.add(name)
+
+
+class PlexObjectMeta(type):
+    """Metaclass for PlexObject to handle cached_data_properties."""
+    def __new__(mcs, name, bases, attrs):
+        cached_data_props = set()
+
+        # Merge all _cached_data_properties from parent classes
+        for base in bases:
+            if hasattr(base, '_cached_data_properties'):
+                cached_data_props.update(base._cached_data_properties)
+
+        # Find all properties annotated with cached_data_property in the current class
+        for attr_name, attr_value in attrs.items():
+            if isinstance(attr_value, cached_data_property):
+                cached_data_props.add(attr_name)
+
+        attrs['_cached_data_properties'] = cached_data_props
+
+        return super().__new__(mcs, name, bases, attrs)
+
+
+class PlexObject(metaclass=PlexObjectMeta):
     """ Base class for all Plex objects.
 
         Parameters:
@@ -54,7 +89,7 @@ class PlexObject:
 
     def __init__(self, server, data, initpath=None, parent=None):
         self._server = server
-        self._data = data
+        PlexObject._loadData(self, data)
         self._initpath = initpath or self.key
         self._parent = weakref.ref(parent) if parent is not None else None
         self._details_key = None
@@ -497,8 +532,23 @@ class PlexObject:
             return float(value)
         return value
 
+    def _invalidateCachedProperties(self):
+        """Invalidate all cached data property values."""
+        cached_props = getattr(self.__class__, '_cached_data_properties', set())
+
+        for prop_name in cached_props:
+            cache_name = f"_{prop_name}"
+            if cache_name in self.__dict__:
+                del self.__dict__[cache_name]
+
     def _loadData(self, data):
-        raise NotImplementedError('Abstract method not implemented.')
+        """Load attribute values from Plex XML response and invalidate cached properties."""
+        old_data_id = id(getattr(self, '_data', None))
+        self._data = data
+
+        # If the data's object ID has changed, invalidate cached properties
+        if id(data) != old_data_id:
+            self._invalidateCachedProperties()
 
     @property
     def _searchType(self):
