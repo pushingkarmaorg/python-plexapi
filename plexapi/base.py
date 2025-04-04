@@ -89,7 +89,7 @@ class PlexObject(metaclass=PlexObjectMeta):
 
     def __init__(self, server, data, initpath=None, parent=None):
         self._server = server
-        PlexObject._loadData(self, data)
+        self._data = data
         self._initpath = initpath or self.key
         self._parent = weakref.ref(parent) if parent is not None else None
         self._details_key = None
