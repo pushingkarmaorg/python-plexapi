@@ -102,7 +102,6 @@ class Collection(
         self.title = data.attrib.get('title')
         self.titleSort = data.attrib.get('titleSort', self.title)
         self.type = data.attrib.get('type')
-        self.ultraBlurColors = self.findItem(data, media.UltraBlurColors)
         self.updatedAt = utils.toDatetime(data.attrib.get('updatedAt'))
         self.userRating = utils.cast(float, data.attrib.get('userRating'))
         self._items = None  # cache for self.items
@@ -120,6 +119,10 @@ class Collection(
     @cached_data_property
     def labels(self):
         return self.findItems(self._data, media.Label)
+
+    @cached_data_property
+    def ultraBlurColors(self):
+        return self.findItem(self._data, media.UltraBlurColors)
 
     def __len__(self):  # pragma: no cover
         return len(self.items())

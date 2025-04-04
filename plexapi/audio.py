@@ -403,7 +403,6 @@ class Album(
         self.parentTitle = data.attrib.get('parentTitle')
         self.rating = utils.cast(float, data.attrib.get('rating'))
         self.studio = data.attrib.get('studio')
-        self.ultraBlurColors = self.findItem(data, media.UltraBlurColors)
         self.viewedLeafCount = utils.cast(int, data.attrib.get('viewedLeafCount'))
         self.year = utils.cast(int, data.attrib.get('year'))
 
@@ -434,6 +433,10 @@ class Album(
     @cached_data_property
     def subformats(self):
         return self.findItems(self._data, media.Subformat)
+
+    @cached_data_property
+    def ultraBlurColors(self):
+        return self.findItem(self._data, media.UltraBlurColors)
 
     def __iter__(self):
         for track in self.tracks():

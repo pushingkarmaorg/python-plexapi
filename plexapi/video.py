@@ -1055,7 +1055,6 @@ class Episode(
         self.rating = utils.cast(float, data.attrib.get('rating'))
         self.skipParent = utils.cast(bool, data.attrib.get('skipParent', '0'))
         self.sourceURI = data.attrib.get('source')  # remote playlist item
-        self.ultraBlurColors = self.findItem(data, media.UltraBlurColors)
         self.viewOffset = utils.cast(int, data.attrib.get('viewOffset', 0))
         self.year = utils.cast(int, data.attrib.get('year'))
 
@@ -1109,6 +1108,10 @@ class Episode(
     @cached_data_property
     def writers(self):
         return self.findItems(self._data, media.Writer)
+
+    @cached_data_property
+    def ultraBlurColors(self):
+        return self.findItem(self._data, media.UltraBlurColors)
 
     @cached_property
     def parentKey(self):
