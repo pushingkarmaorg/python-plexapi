@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib.parse import quote_plus
 
 from plexapi import media, utils
-from plexapi.base import PlexPartialObject, cached_data_property
+from plexapi.base import PlexObject, PlexPartialObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound, Unsupported
 from plexapi.library import LibrarySection, ManagedHub
 from plexapi.mixins import (
@@ -69,7 +69,7 @@ class Collection(
     TYPE = 'collection'
 
     def _loadData(self, data):
-        PlexPartialObject._loadData(self, data)
+        PlexObject._loadData(self, data)
         self.addedAt = utils.toDatetime(data.attrib.get('addedAt'))
         self.art = data.attrib.get('art')
         self.artBlurHash = data.attrib.get('artBlurHash')
