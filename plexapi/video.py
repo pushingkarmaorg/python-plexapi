@@ -855,23 +855,23 @@ class Season(
         self.viewedLeafCount = utils.cast(int, data.attrib.get('viewedLeafCount'))
         self.year = utils.cast(int, data.attrib.get('year'))
 
-    @cached_property
+    @cached_data_property
     def collections(self):
         return self.findItems(self._data, media.Collection)
 
-    @cached_property
+    @cached_data_property
     def guids(self):
         return self.findItems(self._data, media.Guid)
 
-    @cached_property
+    @cached_data_property
     def labels(self):
         return self.findItems(self._data, media.Label)
 
-    @cached_property
+    @cached_data_property
     def ratings(self):
         return self.findItems(self._data, media.Rating)
 
-    @cached_property
+    @cached_data_property
     def ultraBlurColors(self):
         return self.findItem(self._data, media.UltraBlurColors)
 
