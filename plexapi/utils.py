@@ -726,8 +726,8 @@ def parseXMLString(s: str):
     """ Parse an XML string and return an ElementTree object. """
     if not s.strip():
         return None
-    encoded_s = s.encode('utf-8')
     try:  # Attempt to parse the string as-is without cleaning (which is expensive)
-        return ElementTree.fromstring(encoded_s)
+        return ElementTree.fromstring(s.encode('utf-8'))
     except ElementTree.ParseError:  # If it fails, clean the string and try again
-        return ElementTree.fromstring(cleanXMLString(encoded_s))
+        cleaned_s = cleanXMLString(s).encode('utf-8')
+        return ElementTree.fromstring(cleaned_s) if cleaned_s.strip() else None
