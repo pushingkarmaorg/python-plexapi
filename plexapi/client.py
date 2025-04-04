@@ -197,8 +197,7 @@ class PlexClient(PlexObject):
                 raise NotFound(message)
             else:
                 raise BadRequest(message)
-        data = utils.cleanXMLString(response.text).encode('utf8')
-        return ElementTree.fromstring(data) if data.strip() else None
+        return utils.parseXMLString(response.text)
 
     def sendCommand(self, command, proxy=None, **params):
         """ Convenience wrapper around :func:`~plexapi.client.PlexClient.query` to more easily

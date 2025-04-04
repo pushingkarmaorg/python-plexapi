@@ -18,6 +18,8 @@ from hashlib import sha1
 from threading import Event, Thread
 from urllib.parse import quote
 
+from xml.etree import ElementTree
+
 import requests
 from requests.status_codes import _codes as codes
 
@@ -718,3 +720,13 @@ _illegal_XML_re = re.compile(fr'[{"".join(_illegal_XML_ranges)}]')
 
 def cleanXMLString(s):
     return _illegal_XML_re.sub('', s)
+
+
+def parseXMLString(s: str):
+    """ Parse an XML string and return an ElementTree object. """
+    if not s.strip():
+        return None
+    try:  # Attempt to parse the string as-is without cleaning (which is expensive)
+        return ElementTree.fromstring(s.encode('utf-8'))
+    except ElementTree.ParseError:  # If it fails, clean the string and try again
+        return ElementTree.fromstring(cleanXMLString(s).encode('utf-8'))
