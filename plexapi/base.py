@@ -537,7 +537,7 @@ class PlexObject(metaclass=PlexObjectMeta):
         cached_props = getattr(self.__class__, '_cached_data_properties', set())
 
         for prop_name in cached_props:
-            cache_name = f"_{prop_name}"
+            cache_name = prop_name
             if cache_name in self.__dict__:
                 del self.__dict__[cache_name]
 
