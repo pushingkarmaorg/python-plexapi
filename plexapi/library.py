@@ -10,7 +10,7 @@ from functools import cached_property
 from urllib.parse import parse_qs, quote_plus, urlencode, urlparse
 
 from plexapi import log, media, utils
-from plexapi.base import OPERATORS, PlexObject
+from plexapi.base import OPERATORS, PlexObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound
 from plexapi.mixins import (
     MovieEditMixins, ShowEditMixins, SeasonEditMixins, EpisodeEditMixins,
@@ -2224,7 +2224,6 @@ class Hub(PlexObject):
         self.context = data.attrib.get('context')
         self.hubKey = data.attrib.get('hubKey')
         self.hubIdentifier = data.attrib.get('hubIdentifier')
-        self.items = self.findItems(data)
         self.key = data.attrib.get('key')
         self.more = utils.cast(bool, data.attrib.get('more'))
         self.size = utils.cast(int, data.attrib.get('size'))
@@ -2232,6 +2231,10 @@ class Hub(PlexObject):
         self.title = data.attrib.get('title')
         self.type = data.attrib.get('type')
         self._section = None  # cache for self.section
+
+    @cached_data_property
+    def items(self):
+        return self.findItems(self._data)
 
     def __len__(self):
         return self.size
@@ -2279,7 +2282,7 @@ class LibraryMediaTag(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
+        PlexObject._loadData(self, data)
         self.count = utils.cast(int, data.attrib.get('count'))
         self.filter = data.attrib.get('filter')
         self.id = utils.cast(int, data.attrib.get('id'))
@@ -2668,22 +2671,25 @@ class FilteringType(PlexObject):
         return f"<{':'.join([p for p in [self.__class__.__name__, _type] if p])}>"
 
     def _loadData(self, data):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.active = utils.cast(bool, data.attrib.get('active', '0'))
-        self.fields = self.findItems(data, FilteringField)
-        self.filters = self.findItems(data, FilteringFilter)
         self.key = data.attrib.get('key')
-        self.sorts = self.findItems(data, FilteringSort)
         self.title = data.attrib.get('title')
         self.type = data.attrib.get('type')
 
         self._librarySectionID = self._parent().key
 
-        # Add additional manual filters, sorts, and fields which are available
-        # but not exposed on the Plex server
-        self.filters += self._manualFilters()
-        self.sorts += self._manualSorts()
-        self.fields += self._manualFields()
+    @cached_data_property
+    def fields(self):
+        return self.findItems(self._data, FilteringField) + self._manualFields()
+
+    @cached_data_property
+    def filters(self):
+        return self.findItems(self._data, FilteringFilter) + self._manualFilters()
+
+    @cached_data_property
+    def sorts(self):
+        return self.findItems(self._data, FilteringSort) + self._manualSorts()
 
     def _manualFilters(self):
         """ Manually add additional filters which are available
@@ -2937,9 +2943,12 @@ class FilteringFieldType(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
+        PlexObject._loadData(self, data)
         self.type = data.attrib.get('type')
-        self.operators = self.findItems(data, FilteringOperator)
+
+    @cached_data_property
+    def operators(self):
+        return self.findItems(self._data, FilteringOperator)
 
 
 class FilteringOperator(PlexObject):
@@ -3268,40 +3277,82 @@ class Common(PlexObject):
     TAG = 'Common'
 
     def _loadData(self, data):
-        self._data = data
-        self.collections = self.findItems(data, media.Collection)
+        PlexObject._loadData(self, data)
         self.contentRating = data.attrib.get('contentRating')
-        self.countries = self.findItems(data, media.Country)
-        self.directors = self.findItems(data, media.Director)
         self.editionTitle = data.attrib.get('editionTitle')
-        self.fields = self.findItems(data, media.Field)
-        self.genres = self.findItems(data, media.Genre)
         self.grandparentRatingKey = utils.cast(int, data.attrib.get('grandparentRatingKey'))
         self.grandparentTitle = data.attrib.get('grandparentTitle')
         self.guid = data.attrib.get('guid')
-        self.guids = self.findItems(data, media.Guid)
         self.index = utils.cast(int, data.attrib.get('index'))
         self.key = data.attrib.get('key')
-        self.labels = self.findItems(data, media.Label)
         self.mixedFields = data.attrib.get('mixedFields').split(',')
-        self.moods = self.findItems(data, media.Mood)
         self.originallyAvailableAt = utils.toDatetime(data.attrib.get('originallyAvailableAt'))
         self.parentRatingKey = utils.cast(int, data.attrib.get('parentRatingKey'))
         self.parentTitle = data.attrib.get('parentTitle')
-        self.producers = self.findItems(data, media.Producer)
         self.ratingKey = utils.cast(int, data.attrib.get('ratingKey'))
-        self.ratings = self.findItems(data, media.Rating)
-        self.roles = self.findItems(data, media.Role)
         self.studio = data.attrib.get('studio')
-        self.styles = self.findItems(data, media.Style)
         self.summary = data.attrib.get('summary')
         self.tagline = data.attrib.get('tagline')
-        self.tags = self.findItems(data, media.Tag)
         self.title = data.attrib.get('title')
         self.titleSort = data.attrib.get('titleSort')
         self.type = data.attrib.get('type')
-        self.writers = self.findItems(data, media.Writer)
         self.year = utils.cast(int, data.attrib.get('year'))
+
+    @cached_data_property
+    def collections(self):
+        return self.findItems(self._data, media.Collection)
+
+    @cached_data_property
+    def countries(self):
+        return self.findItems(self._data, media.Country)
+
+    @cached_data_property
+    def directors(self):
+        return self.findItems(self._data, media.Director)
+
+    @cached_data_property
+    def fields(self):
+        return self.findItems(self._data, media.Field)
+
+    @cached_data_property
+    def genres(self):
+        return self.findItems(self._data, media.Genre)
+
+    @cached_data_property
+    def guids(self):
+        return self.findItems(self._data, media.Guid)
+
+    @cached_data_property
+    def labels(self):
+        return self.findItems(self._data, media.Label)
+
+    @cached_data_property
+    def moods(self):
+        return self.findItems(self._data, media.Mood)
+
+    @cached_data_property
+    def producers(self):
+        return self.findItems(self._data, media.Producer)
+
+    @cached_data_property
+    def ratings(self):
+        return self.findItems(self._data, media.Rating)
+
+    @cached_data_property
+    def roles(self):
+        return self.findItems(self._data, media.Role)
+
+    @cached_data_property
+    def styles(self):
+        return self.findItems(self._data, media.Style)
+
+    @cached_data_property
+    def tags(self):
+        return self.findItems(self._data, media.Tag)
+
+    @cached_data_property
+    def writers(self):
+        return self.findItems(self._data, media.Writer)
 
     def __repr__(self):
         return '<%s:%s:%s>' % (

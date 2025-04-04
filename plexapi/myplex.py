@@ -10,7 +10,7 @@ import requests
 
 from plexapi import (BASE_HEADERS, CONFIG, TIMEOUT, X_PLEX_ENABLE_FAST_CONNECT, X_PLEX_IDENTIFIER,
                      log, logfilter, utils)
-from plexapi.base import PlexObject
+from plexapi.base import PlexObject, cached_data_property
 from plexapi.client import PlexClient
 from plexapi.exceptions import BadRequest, NotFound, Unauthorized, TwoFactorRequired
 from plexapi.library import LibrarySection
@@ -144,7 +144,7 @@ class MyPlexAccount(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
+        PlexObject._loadData(self, data)
         self._token = logfilter.add_secret(data.attrib.get('authToken'))
         self._webhooks = []
 
@@ -185,7 +185,6 @@ class MyPlexAccount(PlexObject):
         subscription = data.find('subscription')
         self.subscriptionActive = utils.cast(bool, subscription.attrib.get('active'))
         self.subscriptionDescription = data.attrib.get('subscriptionDescription')
-        self.subscriptionFeatures = self.listAttrs(subscription, 'id', rtag='features', etag='feature')
         self.subscriptionPaymentService = subscription.attrib.get('paymentService')
         self.subscriptionPlan = subscription.attrib.get('plan')
         self.subscriptionStatus = subscription.attrib.get('status')
@@ -201,11 +200,21 @@ class MyPlexAccount(PlexObject):
         self.profileDefaultSubtitleAccessibility = utils.cast(int, profile.attrib.get('defaultSubtitleAccessibility'))
         self.profileDefaultSubtitleForces = utils.cast(int, profile.attrib.get('defaultSubtitleForces'))
 
-        self.entitlements = self.listAttrs(data, 'id', rtag='entitlements', etag='entitlement')
-        self.roles = self.listAttrs(data, 'id', rtag='roles', etag='role')
-
         # TODO: Fetch missing MyPlexAccount services
         self.services = None
+
+    @cached_data_property
+    def subscriptionFeatures(self):
+        subscription = self._data.find('subscription')
+        return self.listAttrs(subscription, 'id', rtag='features', etag='feature')
+
+    @cached_data_property
+    def entitlements(self):
+        return self.listAttrs(self._data, 'id', rtag='entitlements', etag='entitlement')
+
+    @cached_data_property
+    def roles(self):
+        return self.listAttrs(self._data, 'id', rtag='roles', etag='role')
 
     @property
     def authenticationToken(self):
@@ -1206,7 +1215,7 @@ class MyPlexUser(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
+        PlexObject._loadData(self, data)
         self.friend = self._initpath == self.key
         self.allowCameraUpload = utils.cast(bool, data.attrib.get('allowCameraUpload'))
         self.allowChannels = utils.cast(bool, data.attrib.get('allowChannels'))
@@ -1225,9 +1234,12 @@ class MyPlexUser(PlexObject):
         self.thumb = data.attrib.get('thumb')
         self.title = data.attrib.get('title', '')
         self.username = data.attrib.get('username', '')
-        self.servers = self.findItems(data, MyPlexServerShare)
         for server in self.servers:
             server.accountID = self.id
+
+    @cached_data_property
+    def servers(self):
+        return self.findItems(self._data, MyPlexServerShare)
 
     def get_token(self, machineIdentifier):
         try:
@@ -1283,7 +1295,7 @@ class MyPlexInvite(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
+        PlexObject._loadData(self, data)
         self.createdAt = utils.toDatetime(data.attrib.get('createdAt'))
         self.email = data.attrib.get('email')
         self.friend = utils.cast(bool, data.attrib.get('friend'))
@@ -1291,11 +1303,14 @@ class MyPlexInvite(PlexObject):
         self.home = utils.cast(bool, data.attrib.get('home'))
         self.id = utils.cast(int, data.attrib.get('id'))
         self.server = utils.cast(bool, data.attrib.get('server'))
-        self.servers = self.findItems(data, MyPlexServerShare)
         self.thumb = data.attrib.get('thumb')
         self.username = data.attrib.get('username', '')
         for server in self.servers:
             server.accountID = self.id
+
+    @cached_data_property
+    def servers(self):
+        return self.findItems(self._data, MyPlexServerShare)
 
 
 class Section(PlexObject):
@@ -1437,10 +1452,9 @@ class MyPlexResource(PlexObject):
     DEFAULT_SCHEME_ORDER = ['https', 'http']
 
     def _loadData(self, data):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.accessToken = logfilter.add_secret(data.attrib.get('accessToken'))
         self.clientIdentifier = data.attrib.get('clientIdentifier')
-        self.connections = self.findItems(data, ResourceConnection, rtag='connections')
         self.createdAt = utils.toDatetime(data.attrib.get('createdAt'), "%Y-%m-%dT%H:%M:%SZ")
         self.device = data.attrib.get('device')
         self.dnsRebindingProtection = utils.cast(bool, data.attrib.get('dnsRebindingProtection'))
@@ -1461,6 +1475,10 @@ class MyPlexResource(PlexObject):
         self.relay = utils.cast(bool, data.attrib.get('relay'))
         self.sourceTitle = data.attrib.get('sourceTitle')
         self.synced = utils.cast(bool, data.attrib.get('synced'))
+
+    @cached_data_property
+    def connections(self):
+        return self.findItems(self._data, ResourceConnection, rtag='connections')
 
     def preferred_connections(
         self,
@@ -1598,7 +1616,7 @@ class MyPlexDevice(PlexObject):
     key = 'https://plex.tv/devices.xml'
 
     def _loadData(self, data):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.name = data.attrib.get('name')
         self.publicAddress = data.attrib.get('publicAddress')
         self.product = data.attrib.get('product')
@@ -1617,7 +1635,10 @@ class MyPlexDevice(PlexObject):
         self.screenDensity = data.attrib.get('screenDensity')
         self.createdAt = utils.toDatetime(data.attrib.get('createdAt'))
         self.lastSeenAt = utils.toDatetime(data.attrib.get('lastSeenAt'))
-        self.connections = self.listAttrs(data, 'uri', etag='Connection')
+
+    @cached_data_property
+    def connections(self):
+        return self.listAttrs(self._data, 'uri', etag='Connection')
 
     def connect(self, timeout=None):
         """ Returns a new :class:`~plexapi.client.PlexClient` or :class:`~plexapi.server.PlexServer`

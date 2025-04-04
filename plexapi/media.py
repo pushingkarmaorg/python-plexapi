@@ -4,7 +4,7 @@ from pathlib import Path
 from urllib.parse import quote_plus
 
 from plexapi import log, settings, utils
-from plexapi.base import PlexObject
+from plexapi.base import PlexObject, cached_data_property
 from plexapi.exceptions import BadRequest
 from plexapi.utils import deprecated
 
@@ -51,7 +51,7 @@ class Media(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
+        PlexObject._loadData(self, data)
         self.aspectRatio = utils.cast(float, data.attrib.get('aspectRatio'))
         self.audioChannels = utils.cast(int, data.attrib.get('audioChannels'))
         self.audioCodec = data.attrib.get('audioCodec')
@@ -64,7 +64,6 @@ class Media(PlexObject):
         self.has64bitOffsets = utils.cast(bool, data.attrib.get('has64bitOffsets'))
         self.hasVoiceActivity = utils.cast(bool, data.attrib.get('hasVoiceActivity', '0'))
         self.optimizedForStreaming = utils.cast(bool, data.attrib.get('optimizedForStreaming'))
-        self.parts = self.findItems(data, MediaPart)
         self.proxyType = utils.cast(int, data.attrib.get('proxyType'))
         self.selected = utils.cast(bool, data.attrib.get('selected'))
         self.target = data.attrib.get('target')
@@ -86,6 +85,10 @@ class Media(PlexObject):
 
         parent = self._parent()
         self._parentKey = parent.key
+
+    @cached_data_property
+    def parts(self):
+        return self.findItems(self._data, MediaPart)
 
     @property
     def isOptimizedVersion(self):
@@ -1291,9 +1294,12 @@ class AgentMediaType(Agent):
         return f"<{':'.join([p for p in [self.__class__.__name__, uid] if p])}>"
 
     def _loadData(self, data):
-        self.languageCodes = self.listAttrs(data, 'code', etag='Language')
         self.mediaType = utils.cast(int, data.attrib.get('mediaType'))
         self.name = data.attrib.get('name')
+
+    @cached_data_property
+    def languageCodes(self):
+        return self.listAttrs(self._data, 'code', etag='Language')
 
     @property
     @deprecated('use "languageCodes" instead')
