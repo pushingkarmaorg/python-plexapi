@@ -2,7 +2,6 @@
 import os
 from functools import cached_property
 from urllib.parse import urlencode
-from xml.etree import ElementTree
 
 import requests
 
