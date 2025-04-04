@@ -259,7 +259,8 @@ class MyPlexAccount(PlexObject):
             return response.json()
         elif 'text/plain' in response.headers.get('Content-Type', ''):
             return response.text.strip()
-        return utils.parseXMLString(response.text)
+        data = utils.cleanXMLString(response.text).encode('utf8')
+        return ElementTree.fromstring(data) if data.strip() else None
 
     def ping(self):
         """ Ping the Plex.tv API.

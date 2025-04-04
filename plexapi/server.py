@@ -768,7 +768,8 @@ class PlexServer(PlexObject):
                 raise NotFound(message)
             else:
                 raise BadRequest(message)
-        return utils.parseXMLString(response.text)
+        data = utils.cleanXMLString(response.text).encode('utf8')
+        return ElementTree.fromstring(data) if data.strip() else None
 
     def search(self, query, mediatype=None, limit=None, sectionId=None):
         """ Returns a list of media items or filter categories from the resulting
