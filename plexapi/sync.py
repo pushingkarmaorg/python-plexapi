@@ -63,7 +63,7 @@ class SyncItem(PlexObject):
         self.clientIdentifier = clientIdentifier
 
     def _loadData(self, data):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.id = plexapi.utils.cast(int, data.attrib.get('id'))
         self.version = plexapi.utils.cast(int, data.attrib.get('version'))
         self.rootTitle = data.attrib.get('rootTitle')
@@ -118,7 +118,7 @@ class SyncList(PlexObject):
     TAG = 'SyncList'
 
     def _loadData(self, data):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.clientId = data.attrib.get('clientIdentifier')
         self.items = []
 

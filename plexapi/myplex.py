@@ -1329,7 +1329,7 @@ class Section(PlexObject):
     TAG = 'Section'
 
     def _loadData(self, data):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.id = utils.cast(int, data.attrib.get('id'))
         self.key = utils.cast(int, data.attrib.get('key'))
         self.shared = utils.cast(bool, data.attrib.get('shared', '0'))
@@ -1368,7 +1368,7 @@ class MyPlexServerShare(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
+        PlexObject._loadData(self, data)
         self.id = utils.cast(int, data.attrib.get('id'))
         self.accountID = utils.cast(int, data.attrib.get('accountID'))
         self.serverId = utils.cast(int, data.attrib.get('serverId'))
@@ -1573,7 +1573,7 @@ class ResourceConnection(PlexObject):
     TAG = 'connection'
 
     def _loadData(self, data):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.address = data.attrib.get('address')
         self.ipv6 = utils.cast(bool, data.attrib.get('IPv6'))
         self.local = utils.cast(bool, data.attrib.get('local'))
@@ -2047,7 +2047,7 @@ class GeoLocation(PlexObject):
     TAG = 'location'
 
     def _loadData(self, data):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.city = data.attrib.get('city')
         self.code = data.attrib.get('code')
         self.continentCode = data.attrib.get('continent_code')

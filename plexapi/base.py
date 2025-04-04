@@ -1174,7 +1174,7 @@ class MediaContainer(
                 setattr(self, key, getattr(__iterable, key))
 
     def _loadData(self, data):
-        self._data = data
+        PlexPartialObject._loadData(self, data)
         self.allowSync = utils.cast(int, data.attrib.get('allowSync'))
         self.augmentationKey = data.attrib.get('augmentationKey')
         self.identifier = data.attrib.get('identifier')

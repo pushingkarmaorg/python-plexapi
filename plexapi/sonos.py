@@ -5,6 +5,7 @@ from plexapi import CONFIG, X_PLEX_IDENTIFIER, TIMEOUT
 from plexapi.client import PlexClient
 from plexapi.exceptions import BadRequest
 from plexapi.playqueue import PlayQueue
+from plexapi.base import PlexObject
 
 
 class PlexSonosClient(PlexClient):
@@ -47,7 +48,7 @@ class PlexSonosClient(PlexClient):
     """
 
     def __init__(self, account, data, timeout=None):
-        self._data = data
+        PlexObject._loadData(self, data)
         self.deviceClass = data.attrib.get("deviceClass")
         self.machineIdentifier = data.attrib.get("machineIdentifier")
         self.product = data.attrib.get("product")
