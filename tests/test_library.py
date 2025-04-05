@@ -959,3 +959,18 @@ def test_library_multiedit_exceptions(music, artist, album, photos):
         music.batchMultiEdits(artist).editEdition("test")
     with pytest.raises(AttributeError):
         music.batchMultiEdits(album).addCountry("test")
+
+
+def test_library_section_cache_invalidation(movies):
+    # locations is one of the cached properties
+    with pytest.raises(KeyError):
+        movies.__dict__["locations"]
+    before_locations = movies.locations
+    before_id = id(before_locations)
+    movies.reload()
+    with pytest.raises(KeyError):
+        movies.__dict__["locations"]
+    after_locations = movies.locations
+    after_id = id(after_locations)
+    assert before_id != after_id, "Locations should have a new object ID after a reload"
+    assert before_locations == after_locations, "Locations should not have changed content after a library reload"

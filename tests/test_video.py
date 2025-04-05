@@ -1540,3 +1540,18 @@ def test_video_Movie_matadataDirectory(movie):
     for art in movie.arts():
         if not art.ratingKey.startswith('http'):
             assert os.path.exists(os.path.join(utils.BOOTSTRAP_DATA_PATH, art.resourceFilepath))
+
+
+def test_video_cache_invalidation(movie):
+    # guids is one of the cached properties
+    with pytest.raises(KeyError):
+        movie.__dict__["guids"]
+    before_guids = movie.guids
+    before_id = id(before_guids)
+    movie.reload()
+    with pytest.raises(KeyError):
+        movie.__dict__["guids"]
+    after_guids = movie.guids
+    after_id = id(after_guids)
+    assert before_id != after_id, "GUIDs should have a new object ID after a reload"
+    assert before_guids == after_guids, "GUIDs should not have changed content after a reload"
