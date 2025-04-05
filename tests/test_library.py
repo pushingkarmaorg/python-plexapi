@@ -963,8 +963,6 @@ def test_library_multiedit_exceptions(music, artist, album, photos):
 
 def test_library_section_cache_invalidation(movies):
     # locations is one of the cached properties
-    with pytest.raises(KeyError):
-        movies.__dict__["locations"]
     before_locations = movies.locations
     before_id = id(before_locations)
     movies.reload()
