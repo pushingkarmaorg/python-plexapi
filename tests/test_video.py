@@ -350,8 +350,12 @@ def test_video_Movie_reload_kwargs(movie):
     assert len(movie.media)
     assert movie.summary is not None
     movie.reload(includeFields=False, **movie._EXCLUDES)
+    # Prevent auto reloading when using getattr on `media` and `summary`
+    original_auto_reload = movie._autoReload
+    movie._autoReload = False
     assert movie.media == []
     assert movie.summary is None
+    movie._autoReload = original_auto_reload
 
 
 def test_video_movie_watched(movie):
