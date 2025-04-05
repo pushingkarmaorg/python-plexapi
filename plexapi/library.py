@@ -546,6 +546,7 @@ class LibrarySection(PlexObject):
         self._server.library._loadSections()
         newLibrary = self._server.library.sectionByID(self.key)
         self.__dict__.update(newLibrary.__dict__)
+        self._invalidateCachedProperties()
         return self
 
     def edit(self, agent=None, **kwargs):
