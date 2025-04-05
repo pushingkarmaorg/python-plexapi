@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.parse import quote_plus, unquote
 
 from plexapi import media, utils
-from plexapi.base import Playable, PlexPartialObject, cached_data_property
+from plexapi.base import Playable, PlexObject, PlexPartialObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound, Unsupported
 from plexapi.library import LibrarySection, MusicSection
 from plexapi.mixins import SmartFilterMixin, ArtMixin, PosterMixin, PlaylistEditMixins
@@ -53,6 +53,7 @@ class Playlist(
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
+        PlexObject._loadData(self, data)
         Playable._loadData(self, data)
         self.addedAt = utils.toDatetime(data.attrib.get('addedAt'))
         self.allowSync = utils.cast(bool, data.attrib.get('allowSync'))

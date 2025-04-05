@@ -4,7 +4,7 @@ from pathlib import Path
 from urllib.parse import quote_plus
 
 from plexapi import media, utils, video
-from plexapi.base import Playable, PlexPartialObject, PlexSession, cached_data_property
+from plexapi.base import Playable, PlexObject, PlexPartialObject, PlexSession, cached_data_property
 from plexapi.exceptions import BadRequest
 from plexapi.mixins import (
     RatingMixin,
@@ -53,6 +53,7 @@ class Photoalbum(
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
+        PlexObject._loadData(self, data)
         self.addedAt = utils.toDatetime(data.attrib.get('addedAt'))
         self.art = data.attrib.get('art')
         self.composite = data.attrib.get('composite')
@@ -207,6 +208,7 @@ class Photo(
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
+        PlexObject._loadData(self, data)
         Playable._loadData(self, data)
         self.addedAt = utils.toDatetime(data.attrib.get('addedAt'))
         self.createdAtAccuracy = data.attrib.get('createdAtAccuracy')

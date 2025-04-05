@@ -1129,6 +1129,7 @@ class Release(PlexObject):
     key = '/updater/status'
 
     def _loadData(self, data):
+        PlexObject._loadData(self, data)
         self.download_key = data.attrib.get('key')
         self.version = data.attrib.get('version')
         self.added = data.attrib.get('added')

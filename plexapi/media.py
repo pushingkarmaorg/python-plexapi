@@ -526,6 +526,7 @@ class Session(PlexObject):
     TAG = 'Session'
 
     def _loadData(self, data):
+        PlexObject._loadData(self, data)
         self.id = data.attrib.get('id')
         self.bandwidth = utils.cast(int, data.attrib.get('bandwidth'))
         self.location = data.attrib.get('location')
@@ -1295,6 +1296,7 @@ class AgentMediaType(Agent):
         return f"<{':'.join([p for p in [self.__class__.__name__, uid] if p])}>"
 
     def _loadData(self, data):
+        PlexObject._loadData(self, data)
         self.mediaType = utils.cast(int, data.attrib.get('mediaType'))
         self.name = data.attrib.get('name')
 
