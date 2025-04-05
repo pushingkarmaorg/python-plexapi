@@ -971,4 +971,4 @@ def test_library_section_cache_invalidation(movies):
     after_locations = movies.locations
     after_id = id(after_locations)
     assert before_id != after_id, "Locations should have a new object ID after a reload"
-    assert before_locations == after_locations, "Locations should not have changed content after a library reload"
+    assert str(before_locations) == str(after_locations), "Locations should not have changed content after a library reload"

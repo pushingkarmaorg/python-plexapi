@@ -1554,4 +1554,4 @@ def test_video_cache_invalidation(movie):
     after_guids = movie.guids
     after_id = id(after_guids)
     assert before_id != after_id, "GUIDs should have a new object ID after a reload"
-    assert before_guids == after_guids, "GUIDs should not have changed content after a reload"
+    assert str(before_guids) == str(after_guids), "GUIDs should not have changed content after a reload"
