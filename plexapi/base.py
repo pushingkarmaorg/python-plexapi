@@ -532,14 +532,6 @@ class PlexObject(metaclass=PlexObjectMeta):
             return float(value)
         return value
 
-    def _invalidateCachedProperties(self):
-        """Invalidate all cached data property values."""
-        cached_props = getattr(self.__class__, '_cached_data_properties', set())
-
-        for prop_name in cached_props:
-            if prop_name in self.__dict__:
-                del self.__dict__[prop_name]
-
     def _invalidateCacheAndLoadData(self, data):
         """Load attribute values from Plex XML response and invalidate cached properties."""
         old_data_id = id(getattr(self, '_data', None))
@@ -550,6 +542,14 @@ class PlexObject(metaclass=PlexObjectMeta):
             self._invalidateCachedProperties()
 
         self._loadData(data)
+
+    def _invalidateCachedProperties(self):
+        """Invalidate all cached data property values."""
+        cached_props = getattr(self.__class__, '_cached_data_properties', set())
+
+        for prop_name in cached_props:
+            if prop_name in self.__dict__:
+                del self.__dict__[prop_name]
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
