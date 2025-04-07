@@ -5,7 +5,6 @@ from plexapi import CONFIG, X_PLEX_IDENTIFIER, TIMEOUT
 from plexapi.client import PlexClient
 from plexapi.exceptions import BadRequest
 from plexapi.playqueue import PlayQueue
-from plexapi.base import PlexObject
 
 
 class PlexSonosClient(PlexClient):
