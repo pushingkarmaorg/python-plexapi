@@ -809,9 +809,11 @@ class PlexPartialObject(PlexObject):
 
 
 class Playable:
-    """ This is a general place to store functions specific to media that is Playable.
+    """ This is a mixin to store functions specific to media that is Playable.
         Things were getting mixed up a bit when dealing with Shows, Season, Artists,
         Albums which are all not playable.
+
+        This class 
 
         Attributes:
             playlistItemID (int): Playlist item ID (only populated for :class:`~plexapi.playlist.Playlist` items).
@@ -988,7 +990,7 @@ class Playable:
 
 
 class PlexSession:
-    """ This is a general place to store functions specific to media that is a Plex Session.
+    """ This is a mixin to store functions specific to media that is a Plex Session.
 
         Attributes:
             live (bool): True if this is a live tv session.
@@ -1091,7 +1093,7 @@ class PlexSession:
 
 
 class PlexHistory:
-    """ This is a general place to store functions specific to media that is a Plex history item.
+    """ This is a mixin to store functions specific to media that is a Plex history item.
 
         Attributes:
             accountID (int): The associated :class:`~plexapi.server.SystemAccount` ID.
