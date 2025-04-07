@@ -1260,13 +1260,17 @@ class Agent(PlexObject):
         self.primary = data.attrib.get('primary')
         self.shortIdentifier = self.identifier.rsplit('.', 1)[1]
 
-        # TODO: How should the cached data property be handled here?
+    @cached_data_property
+    def languageCodes(self):
         if 'mediaType' in self._initpath:
-            self.languageCodes = self.listAttrs(data, 'code', etag='Language')
-            self.mediaTypes = []
-        else:
-            self.languageCodes = []
-            self.mediaTypes = self.findItems(data, cls=AgentMediaType)
+            return self.listAttrs(self._data, 'code', etag='Language')
+        return []
+
+    @cached_data_property
+    def mediaTypes(self):
+        if 'mediaType' not in self._initpath:
+            return self.findItems(self._data, cls=AgentMediaType)
+        return []
 
     @property
     @deprecated('use "languageCodes" instead')
