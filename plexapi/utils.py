@@ -17,14 +17,12 @@ from getpass import getpass
 from hashlib import sha1
 from threading import Event, Thread
 from urllib.parse import quote
+from xml.etree import ElementTree
 
 import requests
 from requests.status_codes import _codes as codes
 
 from plexapi.exceptions import BadRequest, NotFound, Unauthorized
-
-from xml.etree import ElementTree
-
 try:
     from tqdm import tqdm
 except ImportError:

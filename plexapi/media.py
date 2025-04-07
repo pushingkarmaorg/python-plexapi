@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import xml
 from pathlib import Path
 from urllib.parse import quote_plus
+from xml.etree import ElementTree
 
 from plexapi import log, settings, utils
 from plexapi.base import PlexObject
