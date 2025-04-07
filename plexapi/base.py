@@ -987,7 +987,7 @@ class Playable:
         return self
 
 
-class PlexSession(object):
+class PlexSession:
     """ This is a general place to store functions specific to media that is a Plex Session.
 
         Attributes:
@@ -1067,7 +1067,7 @@ class PlexSession(object):
         return self._server.query(key, params=params)
 
 
-class PlexHistory(object):
+class PlexHistory:
     """ This is a general place to store functions specific to media that is a Plex history item.
 
         Attributes:
