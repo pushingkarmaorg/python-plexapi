@@ -1075,7 +1075,7 @@ class BaseResource(PlexObject):
         data = f'{key}?url={quote_plus(self.ratingKey)}'
         try:
             self._server.query(data, method=self._server._session.put)
-        except xml.etree.ElementTree.ParseError:
+        except ElementTree.ParseError:
             pass
 
     @property
