@@ -1013,10 +1013,33 @@ class PlexSession:
         self._userId = utils.cast(int, user.attrib.get('id'))
 
         # For backwards compatibility
-        self.players = [self.player] if self.player else []
-        self.sessions = [self.session] if self.session else []
-        self.transcodeSessions = [self.transcodeSession] if self.transcodeSession else []
         self.usernames = [self._username] if self._username else []
+        # `players`, `sessions`, and `transcodeSessions` are returned with properties
+        # to support lazy loading. See PR #1510
+
+    @cached_data_property
+    def player(self):
+        return self.findItem(self.data, etag='Player')
+
+    @cached_data_property
+    def session(self):
+        return self.findItem(self.data, etag='Session')
+
+    @cached_data_property
+    def transcodeSession(self):
+        return self.findItem(self.data, etag='TranscodeSession')
+
+    @property
+    def players(self):
+        return [self.player] if self.player else []
+
+    @property
+    def sessions(self):
+        return [self.session] if self.session else []
+
+    @property
+    def transcodeSessions(self):
+        return [self.transcodeSession] if self.transcodeSession else []
 
     @cached_property
     def user(self):
