@@ -115,7 +115,7 @@ class PlexClient(PlexObject):
                 )
         else:
             client = data[0]
-        self._loadData(client)
+        self._invalidateCacheAndLoadData(client)
         return self
 
     def reload(self):

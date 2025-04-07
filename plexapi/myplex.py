@@ -223,7 +223,7 @@ class MyPlexAccount(PlexObject):
     def _reload(self, key=None, **kwargs):
         """ Perform the actual reload. """
         data = self.query(self.key)
-        self._loadData(data)
+        self._invalidateCacheAndLoadData(data)
         return self
 
     def _headers(self, **kwargs):
