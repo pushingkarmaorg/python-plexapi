@@ -124,7 +124,6 @@ class PlexClient(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.deviceClass = data.attrib.get('deviceClass')
         self.machineIdentifier = data.attrib.get('machineIdentifier')
         self.product = data.attrib.get('product')
@@ -606,7 +605,7 @@ class ClientTimeline(PlexObject):
     key = 'timeline/poll'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.address = data.attrib.get('address')
         self.audioStreamId = utils.cast(int, data.attrib.get('audioStreamId'))
         self.autoPlay = utils.cast(bool, data.attrib.get('autoPlay'))

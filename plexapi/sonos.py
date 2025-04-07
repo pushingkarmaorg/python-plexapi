@@ -48,7 +48,6 @@ class PlexSonosClient(PlexClient):
     """
 
     def __init__(self, account, data, timeout=None):
-        PlexObject._loadData(self, data)
         self.deviceClass = data.attrib.get("deviceClass")
         self.machineIdentifier = data.attrib.get("machineIdentifier")
         self.product = data.attrib.get("product")

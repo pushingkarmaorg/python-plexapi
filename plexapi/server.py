@@ -118,7 +118,6 @@ class PlexServer(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.allowCameraUpload = utils.cast(bool, data.attrib.get('allowCameraUpload'))
         self.allowChannelAccess = utils.cast(bool, data.attrib.get('allowChannelAccess'))
         self.allowMediaDeletion = utils.cast(bool, data.attrib.get('allowMediaDeletion'))
@@ -1093,7 +1092,7 @@ class Account(PlexObject):
     key = '/myplex/account'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.authToken = data.attrib.get('authToken')
         self.username = data.attrib.get('username')
         self.mappingState = data.attrib.get('mappingState')
@@ -1114,7 +1113,7 @@ class Activity(PlexObject):
     key = '/activities'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.cancellable = utils.cast(bool, data.attrib.get('cancellable'))
         self.progress = utils.cast(int, data.attrib.get('progress'))
         self.title = data.attrib.get('title')
@@ -1129,7 +1128,7 @@ class Release(PlexObject):
     key = '/updater/status'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.download_key = data.attrib.get('key')
         self.version = data.attrib.get('version')
         self.added = data.attrib.get('added')
@@ -1155,7 +1154,7 @@ class SystemAccount(PlexObject):
     TAG = 'Account'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.autoSelectAudio = utils.cast(bool, data.attrib.get('autoSelectAudio'))
         self.defaultAudioLanguage = data.attrib.get('defaultAudioLanguage')
         self.defaultSubtitleLanguage = data.attrib.get('defaultSubtitleLanguage')
@@ -1184,7 +1183,7 @@ class SystemDevice(PlexObject):
     TAG = 'Device'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.clientIdentifier = data.attrib.get('clientIdentifier')
         self.createdAt = utils.toDatetime(data.attrib.get('createdAt'))
         self.id = utils.cast(int, data.attrib.get('id'))
@@ -1210,7 +1209,7 @@ class StatisticsBandwidth(PlexObject):
     TAG = 'StatisticsBandwidth'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.accountID = utils.cast(int, data.attrib.get('accountID'))
         self.at = utils.toDatetime(data.attrib.get('at'))
         self.bytes = utils.cast(int, data.attrib.get('bytes'))
@@ -1252,7 +1251,7 @@ class StatisticsResources(PlexObject):
     TAG = 'StatisticsResources'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.at = utils.toDatetime(data.attrib.get('at'))
         self.hostCpuUtilization = utils.cast(float, data.attrib.get('hostCpuUtilization'))
         self.hostMemoryUtilization = utils.cast(float, data.attrib.get('hostMemoryUtilization'))
@@ -1280,7 +1279,7 @@ class ButlerTask(PlexObject):
     TAG = 'ButlerTask'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.description = data.attrib.get('description')
         self.enabled = utils.cast(bool, data.attrib.get('enabled'))
         self.interval = utils.cast(int, data.attrib.get('interval'))
@@ -1302,7 +1301,7 @@ class Identity(PlexObject):
         return f"<{self.__class__.__name__}:{self.machineIdentifier}>"
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.claimed = utils.cast(bool, data.attrib.get('claimed'))
         self.machineIdentifier = data.attrib.get('machineIdentifier')
         self.version = data.attrib.get('version')

@@ -144,7 +144,6 @@ class MyPlexAccount(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self._token = logfilter.add_secret(data.attrib.get('authToken'))
         self._webhooks = []
 
@@ -1215,7 +1214,6 @@ class MyPlexUser(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.friend = self._initpath == self.key
         self.allowCameraUpload = utils.cast(bool, data.attrib.get('allowCameraUpload'))
         self.allowChannels = utils.cast(bool, data.attrib.get('allowChannels'))
@@ -1295,7 +1293,6 @@ class MyPlexInvite(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.createdAt = utils.toDatetime(data.attrib.get('createdAt'))
         self.email = data.attrib.get('email')
         self.friend = utils.cast(bool, data.attrib.get('friend'))
@@ -1329,7 +1326,7 @@ class Section(PlexObject):
     TAG = 'Section'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.id = utils.cast(int, data.attrib.get('id'))
         self.key = utils.cast(int, data.attrib.get('key'))
         self.shared = utils.cast(bool, data.attrib.get('shared', '0'))
@@ -1368,7 +1365,6 @@ class MyPlexServerShare(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.id = utils.cast(int, data.attrib.get('id'))
         self.accountID = utils.cast(int, data.attrib.get('accountID'))
         self.serverId = utils.cast(int, data.attrib.get('serverId'))
@@ -1452,7 +1448,7 @@ class MyPlexResource(PlexObject):
     DEFAULT_SCHEME_ORDER = ['https', 'http']
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.accessToken = logfilter.add_secret(data.attrib.get('accessToken'))
         self.clientIdentifier = data.attrib.get('clientIdentifier')
         self.createdAt = utils.toDatetime(data.attrib.get('createdAt'), "%Y-%m-%dT%H:%M:%SZ")
@@ -1573,7 +1569,7 @@ class ResourceConnection(PlexObject):
     TAG = 'connection'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.address = data.attrib.get('address')
         self.ipv6 = utils.cast(bool, data.attrib.get('IPv6'))
         self.local = utils.cast(bool, data.attrib.get('local'))
@@ -1616,7 +1612,7 @@ class MyPlexDevice(PlexObject):
     key = 'https://plex.tv/devices.xml'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.name = data.attrib.get('name')
         self.publicAddress = data.attrib.get('publicAddress')
         self.product = data.attrib.get('product')
@@ -1960,7 +1956,7 @@ class AccountOptOut(PlexObject):
     CHOICES = {'opt_in', 'opt_out', 'opt_out_managed'}
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.key = data.attrib.get('key')
         self.value = data.attrib.get('value')
 
@@ -2019,7 +2015,7 @@ class UserState(PlexObject):
         return f'<{self.__class__.__name__}:{self.ratingKey}>'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.lastViewedAt = utils.toDatetime(data.attrib.get('lastViewedAt'))
         self.ratingKey = data.attrib.get('ratingKey')
         self.type = data.attrib.get('type')
@@ -2049,7 +2045,7 @@ class GeoLocation(PlexObject):
     TAG = 'location'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.city = data.attrib.get('city')
         self.code = data.attrib.get('code')
         self.continentCode = data.attrib.get('continent_code')

@@ -34,7 +34,6 @@ class Settings(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         for elem in data:
             id = utils.lowerFirst(elem.attrib['id'])
             if id in self._settings:
@@ -113,7 +112,6 @@ class Setting(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.type = data.attrib.get('type')
         self.advanced = utils.cast(bool, data.attrib.get('advanced'))
         self.default = self._cast(data.attrib.get('default'))

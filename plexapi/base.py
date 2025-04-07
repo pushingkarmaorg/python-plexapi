@@ -470,7 +470,7 @@ class PlexObject(metaclass=PlexObjectMeta):
         self._initpath = key
         data = self._server.query(key)
         self._overwriteNone = _overwriteNone
-        self._loadData(data[0])
+        self._invalidateCacheAndLoadData(data[0])
         self._overwriteNone = True
         return self
 
@@ -540,7 +540,7 @@ class PlexObject(metaclass=PlexObjectMeta):
             if prop_name in self.__dict__:
                 del self.__dict__[prop_name]
 
-    def _loadData(self, data):
+    def _invalidateCacheAndLoadData(self, data):
         """Load attribute values from Plex XML response and invalidate cached properties."""
         old_data_id = id(getattr(self, '_data', None))
         self._data = data
@@ -548,6 +548,12 @@ class PlexObject(metaclass=PlexObjectMeta):
         # If the data's object ID has changed, invalidate cached properties
         if id(data) != old_data_id:
             self._invalidateCachedProperties()
+
+        self._loadData(data)
+
+    def _loadData(self, data):
+        """ Load attribute values from Plex XML response. """
+        raise NotImplementedError('Abstract method not implemented.')
 
     @property
     def _searchType(self):
@@ -813,6 +819,7 @@ class Playable:
     """
 
     def _loadData(self, data):
+        """ Load attribute values from Plex XML response. """
         self.playlistItemID = utils.cast(int, data.attrib.get('playlistItemID'))    # playlist
         self.playQueueItemID = utils.cast(int, data.attrib.get('playQueueItemID'))  # playqueue
 
@@ -994,6 +1001,7 @@ class PlexSession(object):
     """
 
     def _loadData(self, data):
+        """ Load attribute values from Plex XML response. """
         self.live = utils.cast(bool, data.attrib.get('live', '0'))
         self.player = self.findItem(data, etag='Player')
         self.session = self.findItem(data, etag='Session')
@@ -1037,7 +1045,7 @@ class PlexSession(object):
         data = self._server.query(key)
         for elem in data:
             if elem.attrib.get('sessionKey') == str(self.sessionKey):
-                self._loadData(elem)
+                self._invalidateCacheAndLoadData(elem)
                 break
         return self
 
@@ -1070,6 +1078,7 @@ class PlexHistory(object):
     """
 
     def _loadData(self, data):
+        """ Load attribute values from Plex XML response. """
         self.accountID = utils.cast(int, data.attrib.get('accountID'))
         self.deviceID = utils.cast(int, data.attrib.get('deviceID'))
         self.historyKey = data.attrib.get('historyKey')
@@ -1173,7 +1182,7 @@ class MediaContainer(
                 setattr(self, key, getattr(__iterable, key))
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.allowSync = utils.cast(int, data.attrib.get('allowSync'))
         self.augmentationKey = data.attrib.get('augmentationKey')
         self.identifier = data.attrib.get('identifier')

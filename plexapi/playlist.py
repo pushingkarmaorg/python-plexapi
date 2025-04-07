@@ -53,7 +53,6 @@ class Playlist(
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         Playable._loadData(self, data)
         self.addedAt = utils.toDatetime(data.attrib.get('addedAt'))
         self.allowSync = utils.cast(bool, data.attrib.get('allowSync'))

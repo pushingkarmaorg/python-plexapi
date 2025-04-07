@@ -36,7 +36,7 @@ class PlayQueue(PlexObject):
     TYPE = "playqueue"
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.identifier = data.attrib.get("identifier")
         self.mediaTagPrefix = data.attrib.get("mediaTagPrefix")
         self.mediaTagVersion = utils.cast(int, data.attrib.get("mediaTagVersion"))

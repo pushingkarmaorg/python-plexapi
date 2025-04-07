@@ -51,7 +51,6 @@ class Media(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.aspectRatio = utils.cast(float, data.attrib.get('aspectRatio'))
         self.audioChannels = utils.cast(int, data.attrib.get('audioChannels'))
         self.audioCodec = data.attrib.get('audioCodec')
@@ -141,7 +140,6 @@ class MediaPart(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.accessible = utils.cast(bool, data.attrib.get('accessible'))
         self.audioProfile = data.attrib.get('audioProfile')
         self.container = data.attrib.get('container')
@@ -271,7 +269,6 @@ class MediaPartStream(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.bitrate = utils.cast(int, data.attrib.get('bitrate'))
         self.codec = data.attrib.get('codec')
         self.decision = data.attrib.get('decision')
@@ -526,7 +523,7 @@ class Session(PlexObject):
     TAG = 'Session'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.id = data.attrib.get('id')
         self.bandwidth = utils.cast(int, data.attrib.get('bandwidth'))
         self.location = data.attrib.get('location')
@@ -573,7 +570,6 @@ class TranscodeSession(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.audioChannels = utils.cast(int, data.attrib.get('audioChannels'))
         self.audioCodec = data.attrib.get('audioCodec')
         self.audioDecision = data.attrib.get('audioDecision')
@@ -614,7 +610,7 @@ class TranscodeJob(PlexObject):
     TAG = 'TranscodeJob'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.generatorID = data.attrib.get('generatorID')
         self.key = data.attrib.get('key')
         self.progress = data.attrib.get('progress')
@@ -633,7 +629,7 @@ class Optimized(PlexObject):
     TAG = 'Item'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.id = data.attrib.get('id')
         self.composite = data.attrib.get('composite')
         self.title = data.attrib.get('title')
@@ -671,7 +667,7 @@ class Conversion(PlexObject):
     TAG = 'Video'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.addedAt = data.attrib.get('addedAt')
         self.art = data.attrib.get('art')
         self.chapterSource = data.attrib.get('chapterSource')
@@ -747,7 +743,6 @@ class MediaTag(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.filter = data.attrib.get('filter')
         self.id = utils.cast(int, data.attrib.get('id'))
         self.key = data.attrib.get('key')
@@ -958,7 +953,6 @@ class Guid(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.id = data.attrib.get('id')
 
 
@@ -976,7 +970,6 @@ class Image(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.alt = data.attrib.get('alt')
         self.type = data.attrib.get('type')
         self.url = data.attrib.get('url')
@@ -998,7 +991,6 @@ class Rating(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.image = data.attrib.get('image')
         self.type = data.attrib.get('type')
         self.value = utils.cast(float, data.attrib.get('value'))
@@ -1021,7 +1013,7 @@ class Review(PlexObject):
     TAG = 'Review'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.filter = data.attrib.get('filter')
         self.id = utils.cast(int, data.attrib.get('id', 0))
         self.image = data.attrib.get('image')
@@ -1046,7 +1038,6 @@ class UltraBlurColors(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        PlexObject._loadData(self, data)
         self.bottomLeft = data.attrib.get('bottomLeft')
         self.bottomRight = data.attrib.get('bottomRight')
         self.topLeft = data.attrib.get('topLeft')
@@ -1067,7 +1058,7 @@ class BaseResource(PlexObject):
     """
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.key = data.attrib.get('key')
         self.provider = data.attrib.get('provider')
         self.ratingKey = data.attrib.get('ratingKey')
@@ -1142,7 +1133,7 @@ class Chapter(PlexObject):
         return f"<{':'.join([self.__class__.__name__, name, offsets])}>"
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.end = utils.cast(int, data.attrib.get('endTimeOffset'))
         self.filter = data.attrib.get('filter')
         self.id = utils.cast(int, data.attrib.get('id', 0))
@@ -1176,7 +1167,7 @@ class Marker(PlexObject):
         return f"<{':'.join([self.__class__.__name__, name, offsets])}>"
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.end = utils.cast(int, data.attrib.get('endTimeOffset'))
         self.final = utils.cast(bool, data.attrib.get('final'))
         self.id = utils.cast(int, data.attrib.get('id'))
@@ -1210,7 +1201,7 @@ class Field(PlexObject):
     TAG = 'Field'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.locked = utils.cast(bool, data.attrib.get('locked'))
         self.name = data.attrib.get('name')
 
@@ -1230,7 +1221,7 @@ class SearchResult(PlexObject):
         return f"<{':'.join([p for p in [self.__class__.__name__, name, score] if p])}>"
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.guid = data.attrib.get('guid')
         self.lifespanEnded = data.attrib.get('lifespanEnded')
         self.name = data.attrib.get('name')
@@ -1252,7 +1243,7 @@ class Agent(PlexObject):
         return f"<{':'.join([p for p in [self.__class__.__name__, uid] if p])}>"
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.hasAttribution = data.attrib.get('hasAttribution')
         self.hasPrefs = data.attrib.get('hasPrefs')
         self.identifier = data.attrib.get('identifier')
@@ -1300,7 +1291,7 @@ class AgentMediaType(Agent):
         return f"<{':'.join([p for p in [self.__class__.__name__, uid] if p])}>"
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.mediaType = utils.cast(int, data.attrib.get('mediaType'))
         self.name = data.attrib.get('name')
 
@@ -1338,7 +1329,7 @@ class Availability(PlexObject):
         return f'<{self.__class__.__name__}:{self.platform}:{self.offerType}>'
 
     def _loadData(self, data):
-        PlexObject._loadData(self, data)
+        """ Load attribute values from Plex XML response. """
         self.country = data.attrib.get('country')
         self.offerType = data.attrib.get('offerType')
         self.platform = data.attrib.get('platform')
