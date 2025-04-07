@@ -813,8 +813,6 @@ class Playable:
         Things were getting mixed up a bit when dealing with Shows, Season, Artists,
         Albums which are all not playable.
 
-        This class 
-
         Attributes:
             playlistItemID (int): Playlist item ID (only populated for :class:`~plexapi.playlist.Playlist` items).
             playQueueItemID (int): PlayQueue item ID (only populated for :class:`~plexapi.playlist.PlayQueue` items).
@@ -1005,10 +1003,7 @@ class PlexSession:
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
         self.live = utils.cast(bool, data.attrib.get('live', '0'))
-        self.player = self.findItem(data, etag='Player')
-        self.session = self.findItem(data, etag='Session')
         self.sessionKey = utils.cast(int, data.attrib.get('sessionKey'))
-        self.transcodeSession = self.findItem(data, etag='TranscodeSession')
 
         user = data.find('User')
         self._username = user.attrib.get('title')
