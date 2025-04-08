@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib.parse import quote_plus
 
 from plexapi import media, utils
-from plexapi.base import PlexObject, PlexPartialObject, cached_data_property
+from plexapi.base import PlexPartialObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound, Unsupported
 from plexapi.library import LibrarySection, ManagedHub
 from plexapi.mixins import (

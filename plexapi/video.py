@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.parse import quote_plus
 
 from plexapi import media, utils
-from plexapi.base import Playable, PlexObject, PlexPartialObject, PlexHistory, PlexSession, cached_data_property
+from plexapi.base import Playable, PlexPartialObject, PlexHistory, PlexSession, cached_data_property
 from plexapi.exceptions import BadRequest
 from plexapi.mixins import (
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, PlayedUnplayedMixin, RatingMixin,
