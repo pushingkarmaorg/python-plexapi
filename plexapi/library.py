@@ -6,7 +6,6 @@ from typing import Any, TYPE_CHECKING
 import warnings
 from collections import defaultdict
 from datetime import datetime
-from functools import cached_property
 from urllib.parse import parse_qs, quote_plus, urlencode, urlparse
 
 from plexapi import log, media, utils
@@ -44,9 +43,8 @@ class Library(PlexObject):
         self.mediaTagVersion = data.attrib.get('mediaTagVersion')
         self.title1 = data.attrib.get('title1')
         self.title2 = data.attrib.get('title2')
-        self._sectionsByID = {}  # cached sections by key
-        self._sectionsByTitle = {}  # cached sections by title
 
+    @cached_data_property
     def _loadSections(self):
         """ Loads and caches all the library sections. """
         key = '/library/sections'
@@ -64,15 +62,23 @@ class Library(PlexObject):
             sectionsByID[section.key] = section
             sectionsByTitle[section.title.lower().strip()].append(section)
 
-        self._sectionsByID = sectionsByID
-        self._sectionsByTitle = dict(sectionsByTitle)
+        return sectionsByID, dict(sectionsByTitle)
+
+    @property
+    def _sectionsByID(self):
+        """ Returns a dictionary of all library sections by ID. """
+        return self._loadSections[0]
+
+    @property
+    def _sectionsByTitle(self):
+        """ Returns a dictionary of all library sections by title. """
+        return self._loadSections[1]
 
     def sections(self):
         """ Returns a list of all media sections in this library. Library sections may be any of
             :class:`~plexapi.library.MovieSection`, :class:`~plexapi.library.ShowSection`,
             :class:`~plexapi.library.MusicSection`, :class:`~plexapi.library.PhotoSection`.
         """
-        self._loadSections()
         return list(self._sectionsByID.values())
 
     def section(self, title):
@@ -87,8 +93,6 @@ class Library(PlexObject):
                 :exc:`~plexapi.exceptions.NotFound`: The library section title is not found on the server.
         """
         normalized_title = title.lower().strip()
-        if not self._sectionsByTitle or normalized_title not in self._sectionsByTitle:
-            self._loadSections()
         try:
             sections = self._sectionsByTitle[normalized_title]
         except KeyError:
@@ -110,8 +114,6 @@ class Library(PlexObject):
             Raises:
                 :exc:`~plexapi.exceptions.NotFound`: The library section ID is not found on the server.
         """
-        if not self._sectionsByID or sectionID not in self._sectionsByID:
-            self._loadSections()
         try:
             return self._sectionsByID[sectionID]
         except KeyError:
@@ -448,18 +450,12 @@ class LibrarySection(PlexObject):
         self.type = data.attrib.get('type')
         self.updatedAt = utils.toDatetime(data.attrib.get('updatedAt'))
         self.uuid = data.attrib.get('uuid')
-        # Private attrs as we don't want a reload.
-        self._filterTypes = None
-        self._fieldTypes = None
-        self._totalViewSize = None
-        self._totalDuration = None
-        self._totalStorage = None
 
     @cached_data_property
     def locations(self):
         return self.listAttrs(self._data, 'path', etag='Location')
 
-    @cached_property
+    @cached_data_property
     def totalSize(self):
         """ Returns the total number of items in the library for the default library type. """
         return self.totalViewSize(includeCollections=False)
@@ -467,16 +463,12 @@ class LibrarySection(PlexObject):
     @property
     def totalDuration(self):
         """ Returns the total duration (in milliseconds) of items in the library. """
-        if self._totalDuration is None:
-            self._getTotalDurationStorage()
-        return self._totalDuration
+        return self._getTotalDurationStorage[0]
 
     @property
     def totalStorage(self):
         """ Returns the total storage (in bytes) of items in the library. """
-        if self._totalStorage is None:
-            self._getTotalDurationStorage()
-        return self._totalStorage
+        return self._getTotalDurationStorage[1]
 
     def __getattribute__(self, attr):
         # Intercept to call EditFieldMixin and EditTagMixin methods
@@ -492,6 +484,7 @@ class LibrarySection(PlexObject):
                 )
         return value
 
+    @cached_data_property
     def _getTotalDurationStorage(self):
         """ Queries the Plex server for the total library duration and storage and caches the values. """
         data = self._server.query('/media/providers?includeStorage=1')
@@ -502,8 +495,10 @@ class LibrarySection(PlexObject):
         )
         directory = next(iter(data.findall(xpath)), None)
         if directory:
-            self._totalDuration = utils.cast(int, directory.attrib.get('durationTotal'))
-            self._totalStorage = utils.cast(int, directory.attrib.get('storageTotal'))
+            totalDuration = utils.cast(int, directory.attrib.get('durationTotal'))
+            totalStorage = utils.cast(int, directory.attrib.get('storageTotal'))
+            return totalDuration, totalStorage
+        return None, None
 
     def totalViewSize(self, libtype=None, includeCollections=True):
         """ Returns the total number of items in the library for a specified libtype.
@@ -875,6 +870,7 @@ class LibrarySection(PlexObject):
         self._server.query(key, method=self._server._session.delete)
         return self
 
+    @cached_data_property
     def _loadFilters(self):
         """ Retrieves and caches the list of :class:`~plexapi.library.FilteringType` and
             list of :class:`~plexapi.library.FilteringFieldType` for this library section.
@@ -884,23 +880,23 @@ class LibrarySection(PlexObject):
 
         key = _key.format(key=self.key, filter='all')
         data = self._server.query(key)
-        self._filterTypes = self.findItems(data, FilteringType, rtag='Meta')
-        self._fieldTypes = self.findItems(data, FilteringFieldType, rtag='Meta')
+        filterTypes = self.findItems(data, FilteringType, rtag='Meta')
+        fieldTypes = self.findItems(data, FilteringFieldType, rtag='Meta')
 
         if self.TYPE != 'photo':  # No collections for photo library
             key = _key.format(key=self.key, filter='collections')
             data = self._server.query(key)
-            self._filterTypes.extend(self.findItems(data, FilteringType, rtag='Meta'))
+            filterTypes.extend(self.findItems(data, FilteringType, rtag='Meta'))
 
         # Manually add guid field type, only allowing "is" operator
         guidFieldType = '<FieldType type="guid"><Operator key="=" title="is"/></FieldType>'
-        self._fieldTypes.append(self._manuallyLoadXML(guidFieldType, FilteringFieldType))
+        fieldTypes.append(self._manuallyLoadXML(guidFieldType, FilteringFieldType))
+
+        return filterTypes, fieldTypes
 
     def filterTypes(self):
         """ Returns a list of available :class:`~plexapi.library.FilteringType` for this library section. """
-        if self._filterTypes is None:
-            self._loadFilters()
-        return self._filterTypes
+        return self._loadFilters[0]
 
     def getFilterType(self, libtype=None):
         """ Returns a :class:`~plexapi.library.FilteringType` for a specified libtype.
@@ -922,9 +918,7 @@ class LibrarySection(PlexObject):
 
     def fieldTypes(self):
         """ Returns a list of available :class:`~plexapi.library.FilteringFieldType` for this library section. """
-        if self._fieldTypes is None:
-            self._loadFilters()
-        return self._fieldTypes
+        return self._loadFilters[1]
 
     def getFieldType(self, fieldType):
         """ Returns a :class:`~plexapi.library.FilteringFieldType` for a specified fieldType.
@@ -2233,10 +2227,13 @@ class Hub(PlexObject):
         self.style = data.attrib.get('style')
         self.title = data.attrib.get('title')
         self.type = data.attrib.get('type')
-        self._section = None  # cache for self.section
+
+    def __len__(self):
+        return self.size
 
     @cached_data_property
-    def items(self):
+    def _items(self):
+        """ Cache for items. """
         if self.more and self.key:  # If there are more items to load, fetch them
             items = self.fetchItems(self.key)
             self.more = False
@@ -2245,8 +2242,9 @@ class Hub(PlexObject):
         # Otherwise, all the data is in the initial _data XML response
         return self.findItems(self._data)
 
-    def __len__(self):
-        return self.size
+    def items(self):
+        """ Returns a list of all items in the hub. """
+        return self._items
 
     def reload(self):
         """ Delete cached data to allow reloading of hub items. """
@@ -2255,11 +2253,14 @@ class Hub(PlexObject):
             self.more = utils.cast(bool, self._data.attrib.get('more'))
             self.size = utils.cast(int, self._data.attrib.get('size'))
 
+    @cached_data_property
+    def _section(self):
+        """ Cache for section. """
+        return self._server.library.sectionByID(self.librarySectionID)
+
     def section(self):
         """ Returns the :class:`~plexapi.library.LibrarySection` this hub belongs to.
         """
-        if self._section is None:
-            self._section = self._server.library.sectionByID(self.librarySectionID)
         return self._section
 
 
