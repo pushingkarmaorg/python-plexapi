@@ -37,7 +37,7 @@ class Settings(PlexObject):
         for elem in data:
             id = utils.lowerFirst(elem.attrib['id'])
             if id in self._settings:
-                self._settings[id]._loadData(elem)
+                self._settings[id]._invalidateCacheAndLoadData(elem)
                 continue
             self._settings[id] = Setting(self._server, elem, self._initpath)
 
