@@ -219,7 +219,7 @@ class MyPlexAccount(PlexObject):
         """ Returns the authentication token for the account. Alias for ``authToken``. """
         return self.authToken
 
-    def _reload(self, key=None, **kwargs):
+    def _reload(self, **kwargs):
         """ Perform the actual reload. """
         data = self.query(self.key)
         self._invalidateCacheAndLoadData(data)
