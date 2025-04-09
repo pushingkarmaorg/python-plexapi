@@ -104,9 +104,6 @@ class Collection(
         self.type = data.attrib.get('type')
         self.updatedAt = utils.toDatetime(data.attrib.get('updatedAt'))
         self.userRating = utils.cast(float, data.attrib.get('userRating'))
-        self._items = None  # cache for self.items
-        self._section = None  # cache for self.section
-        self._filters = None  # cache for self.filters
 
     @cached_data_property
     def fields(self):
@@ -174,20 +171,26 @@ class Collection(
     def children(self):
         return self.items()
 
+    @cached_data_property
+    def _filters(self):
+        """ Cache for filters. """
+        return self._parseFilters(self.content)
+
     def filters(self):
         """ Returns the search filter dict for smart collection.
             The filter dict be passed back into :func:`~plexapi.library.LibrarySection.search`
             to get the list of items.
         """
-        if self.smart and self._filters is None:
-            self._filters = self._parseFilters(self.content)
         return self._filters
+
+    @cached_data_property
+    def _section(self):
+        """ Cache for section. """
+        return super(Collection, self).section()
 
     def section(self):
         """ Returns the :class:`~plexapi.library.LibrarySection` this collection belongs to.
         """
-        if self._section is None:
-            self._section = super(Collection, self).section()
         return self._section
 
     def item(self, title):
@@ -204,12 +207,14 @@ class Collection(
                 return item
         raise NotFound(f'Item with title "{title}" not found in the collection')
 
+    @cached_data_property
+    def _items(self):
+        """ Cache for the items. """
+        key = f'{self.key}/children'
+        return self.fetchItems(key)
+
     def items(self):
         """ Returns a list of all items in the collection. """
-        if self._items is None:
-            key = f'{self.key}/children'
-            items = self.fetchItems(key)
-            self._items = items
         return self._items
 
     def visibility(self):
