@@ -2247,7 +2247,7 @@ class Hub(PlexObject):
         return self.size
 
     def reload(self):
-        """ Reloads the hub to fetch all items in the hub. """
+        """ Delete cached data to allow reloading of hub items. """
         self._invalidateCachedProperties()
         if self._data is not None:
             self.more = utils.cast(bool, self._data.attrib.get('more'))
