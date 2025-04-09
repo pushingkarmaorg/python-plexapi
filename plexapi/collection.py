@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib.parse import quote_plus
 
 from plexapi import media, utils
-from plexapi.base import PlexPartialObject
+from plexapi.base import PlexPartialObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound, Unsupported
 from plexapi.library import LibrarySection, ManagedHub
 from plexapi.mixins import (
@@ -69,7 +69,7 @@ class Collection(
     TYPE = 'collection'
 
     def _loadData(self, data):
-        self._data = data
+        """ Load attribute values from Plex XML response. """
         self.addedAt = utils.toDatetime(data.attrib.get('addedAt'))
         self.art = data.attrib.get('art')
         self.artBlurHash = data.attrib.get('artBlurHash')
@@ -81,12 +81,9 @@ class Collection(
         self.collectionSort = utils.cast(int, data.attrib.get('collectionSort', '0'))
         self.content = data.attrib.get('content')
         self.contentRating = data.attrib.get('contentRating')
-        self.fields = self.findItems(data, media.Field)
         self.guid = data.attrib.get('guid')
-        self.images = self.findItems(data, media.Image)
         self.index = utils.cast(int, data.attrib.get('index'))
         self.key = data.attrib.get('key', '').replace('/children', '')  # FIX_BUG_50
-        self.labels = self.findItems(data, media.Label)
         self.lastRatedAt = utils.toDatetime(data.attrib.get('lastRatedAt'))
         self.librarySectionID = utils.cast(int, data.attrib.get('librarySectionID'))
         self.librarySectionKey = data.attrib.get('librarySectionKey')
@@ -105,12 +102,27 @@ class Collection(
         self.title = data.attrib.get('title')
         self.titleSort = data.attrib.get('titleSort', self.title)
         self.type = data.attrib.get('type')
-        self.ultraBlurColors = self.findItem(data, media.UltraBlurColors)
         self.updatedAt = utils.toDatetime(data.attrib.get('updatedAt'))
         self.userRating = utils.cast(float, data.attrib.get('userRating'))
         self._items = None  # cache for self.items
         self._section = None  # cache for self.section
         self._filters = None  # cache for self.filters
+
+    @cached_data_property
+    def fields(self):
+        return self.findItems(self._data, media.Field)
+
+    @cached_data_property
+    def images(self):
+        return self.findItems(self._data, media.Image)
+
+    @cached_data_property
+    def labels(self):
+        return self.findItems(self._data, media.Label)
+
+    @cached_data_property
+    def ultraBlurColors(self):
+        return self.findItem(self._data, media.UltraBlurColors)
 
     def __len__(self):  # pragma: no cover
         return len(self.items())

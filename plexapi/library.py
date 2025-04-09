@@ -10,7 +10,7 @@ from functools import cached_property
 from urllib.parse import parse_qs, quote_plus, urlencode, urlparse
 
 from plexapi import log, media, utils
-from plexapi.base import OPERATORS, PlexObject
+from plexapi.base import OPERATORS, PlexObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound
 from plexapi.mixins import (
     MovieEditMixins, ShowEditMixins, SeasonEditMixins, EpisodeEditMixins,
@@ -39,7 +39,7 @@ class Library(PlexObject):
     key = '/library'
 
     def _loadData(self, data):
-        self._data = data
+        """ Load attribute values from Plex XML response. """
         self.identifier = data.attrib.get('identifier')
         self.mediaTagVersion = data.attrib.get('mediaTagVersion')
         self.title1 = data.attrib.get('title1')
@@ -432,7 +432,7 @@ class LibrarySection(PlexObject):
     """
 
     def _loadData(self, data):
-        self._data = data
+        """ Load attribute values from Plex XML response. """
         self.agent = data.attrib.get('agent')
         self.allowSync = utils.cast(bool, data.attrib.get('allowSync'))
         self.art = data.attrib.get('art')
@@ -441,7 +441,6 @@ class LibrarySection(PlexObject):
         self.filters = utils.cast(bool, data.attrib.get('filters'))
         self.key = utils.cast(int, data.attrib.get('key'))
         self.language = data.attrib.get('language')
-        self.locations = self.listAttrs(data, 'path', etag='Location')
         self.refreshing = utils.cast(bool, data.attrib.get('refreshing'))
         self.scanner = data.attrib.get('scanner')
         self.thumb = data.attrib.get('thumb')
@@ -455,6 +454,10 @@ class LibrarySection(PlexObject):
         self._totalViewSize = None
         self._totalDuration = None
         self._totalStorage = None
+
+    @cached_data_property
+    def locations(self):
+        return self.listAttrs(self._data, 'path', etag='Location')
 
     @cached_property
     def totalSize(self):
@@ -543,6 +546,7 @@ class LibrarySection(PlexObject):
         self._server.library._loadSections()
         newLibrary = self._server.library.sectionByID(self.key)
         self.__dict__.update(newLibrary.__dict__)
+        self._invalidateCachedProperties()
         return self
 
     def edit(self, agent=None, **kwargs):
@@ -2165,7 +2169,6 @@ class LibraryTimeline(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.size = utils.cast(int, data.attrib.get('size'))
         self.allowSync = utils.cast(bool, data.attrib.get('allowSync'))
         self.art = data.attrib.get('art')
@@ -2194,7 +2197,6 @@ class Location(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.id = utils.cast(int, data.attrib.get('id'))
         self.path = data.attrib.get('path')
 
@@ -2221,11 +2223,9 @@ class Hub(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.context = data.attrib.get('context')
         self.hubKey = data.attrib.get('hubKey')
         self.hubIdentifier = data.attrib.get('hubIdentifier')
-        self.items = self.findItems(data)
         self.key = data.attrib.get('key')
         self.more = utils.cast(bool, data.attrib.get('more'))
         self.random = utils.cast(bool, data.attrib.get('random', '0'))
@@ -2235,15 +2235,25 @@ class Hub(PlexObject):
         self.type = data.attrib.get('type')
         self._section = None  # cache for self.section
 
+    @cached_data_property
+    def items(self):
+        if self.more and self.key:  # If there are more items to load, fetch them
+            items = self.fetchItems(self.key)
+            self.more = False
+            self.size = len(items)
+            return items
+        # Otherwise, all the data is in the initial _data XML response
+        return self.findItems(self._data)
+
     def __len__(self):
         return self.size
 
     def reload(self):
-        """ Reloads the hub to fetch all items in the hub. """
-        if self.more and self.key:
-            self.items = self.fetchItems(self.key)
-            self.more = False
-            self.size = len(self.items)
+        """ Delete cached data to allow reloading of hub items. """
+        self._invalidateCachedProperties()
+        if self._data is not None:
+            self.more = utils.cast(bool, self._data.attrib.get('more'))
+            self.size = utils.cast(int, self._data.attrib.get('size'))
 
     def section(self):
         """ Returns the :class:`~plexapi.library.LibrarySection` this hub belongs to.
@@ -2281,7 +2291,6 @@ class LibraryMediaTag(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.count = utils.cast(int, data.attrib.get('count'))
         self.filter = data.attrib.get('filter')
         self.id = utils.cast(int, data.attrib.get('id'))
@@ -2670,22 +2679,25 @@ class FilteringType(PlexObject):
         return f"<{':'.join([p for p in [self.__class__.__name__, _type] if p])}>"
 
     def _loadData(self, data):
-        self._data = data
+        """ Load attribute values from Plex XML response. """
         self.active = utils.cast(bool, data.attrib.get('active', '0'))
-        self.fields = self.findItems(data, FilteringField)
-        self.filters = self.findItems(data, FilteringFilter)
         self.key = data.attrib.get('key')
-        self.sorts = self.findItems(data, FilteringSort)
         self.title = data.attrib.get('title')
         self.type = data.attrib.get('type')
 
         self._librarySectionID = self._parent().key
 
-        # Add additional manual filters, sorts, and fields which are available
-        # but not exposed on the Plex server
-        self.filters += self._manualFilters()
-        self.sorts += self._manualSorts()
-        self.fields += self._manualFields()
+    @cached_data_property
+    def fields(self):
+        return self.findItems(self._data, FilteringField) + self._manualFields()
+
+    @cached_data_property
+    def filters(self):
+        return self.findItems(self._data, FilteringFilter) + self._manualFilters()
+
+    @cached_data_property
+    def sorts(self):
+        return self.findItems(self._data, FilteringSort) + self._manualSorts()
 
     def _manualFilters(self):
         """ Manually add additional filters which are available
@@ -2865,7 +2877,7 @@ class FilteringFilter(PlexObject):
     TAG = 'Filter'
 
     def _loadData(self, data):
-        self._data = data
+        """ Load attribute values from Plex XML response. """
         self.filter = data.attrib.get('filter')
         self.filterType = data.attrib.get('filterType')
         self.key = data.attrib.get('key')
@@ -2891,7 +2903,6 @@ class FilteringSort(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.active = utils.cast(bool, data.attrib.get('active', '0'))
         self.activeDirection = data.attrib.get('activeDirection')
         self.default = data.attrib.get('default')
@@ -2916,7 +2927,6 @@ class FilteringField(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.key = data.attrib.get('key')
         self.title = data.attrib.get('title')
         self.type = data.attrib.get('type')
@@ -2939,9 +2949,11 @@ class FilteringFieldType(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.type = data.attrib.get('type')
-        self.operators = self.findItems(data, FilteringOperator)
+
+    @cached_data_property
+    def operators(self):
+        return self.findItems(self._data, FilteringOperator)
 
 
 class FilteringOperator(PlexObject):
@@ -2978,7 +2990,6 @@ class FilterChoice(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.fastKey = data.attrib.get('fastKey')
         self.key = data.attrib.get('key')
         self.thumb = data.attrib.get('thumb')
@@ -3008,7 +3019,6 @@ class ManagedHub(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.deletable = utils.cast(bool, data.attrib.get('deletable', True))
         self.homeVisibility = data.attrib.get('homeVisibility', 'none')
         self.identifier = data.attrib.get('identifier')
@@ -3172,7 +3182,6 @@ class FirstCharacter(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self._data = data
         self.key = data.attrib.get('key')
         self.size = data.attrib.get('size')
         self.title = data.attrib.get('title')
@@ -3193,6 +3202,7 @@ class Path(PlexObject):
     TAG = 'Path'
 
     def _loadData(self, data):
+        """ Load attribute values from Plex XML response. """
         self.home = utils.cast(bool, data.attrib.get('home'))
         self.key = data.attrib.get('key')
         self.network = utils.cast(bool, data.attrib.get('network'))
@@ -3222,6 +3232,7 @@ class File(PlexObject):
     TAG = 'File'
 
     def _loadData(self, data):
+        """ Load attribute values from Plex XML response. """
         self.key = data.attrib.get('key')
         self.path = data.attrib.get('path')
         self.title = data.attrib.get('title')
@@ -3270,40 +3281,82 @@ class Common(PlexObject):
     TAG = 'Common'
 
     def _loadData(self, data):
-        self._data = data
-        self.collections = self.findItems(data, media.Collection)
+        """ Load attribute values from Plex XML response. """
         self.contentRating = data.attrib.get('contentRating')
-        self.countries = self.findItems(data, media.Country)
-        self.directors = self.findItems(data, media.Director)
         self.editionTitle = data.attrib.get('editionTitle')
-        self.fields = self.findItems(data, media.Field)
-        self.genres = self.findItems(data, media.Genre)
         self.grandparentRatingKey = utils.cast(int, data.attrib.get('grandparentRatingKey'))
         self.grandparentTitle = data.attrib.get('grandparentTitle')
         self.guid = data.attrib.get('guid')
-        self.guids = self.findItems(data, media.Guid)
         self.index = utils.cast(int, data.attrib.get('index'))
         self.key = data.attrib.get('key')
-        self.labels = self.findItems(data, media.Label)
         self.mixedFields = data.attrib.get('mixedFields').split(',')
-        self.moods = self.findItems(data, media.Mood)
         self.originallyAvailableAt = utils.toDatetime(data.attrib.get('originallyAvailableAt'))
         self.parentRatingKey = utils.cast(int, data.attrib.get('parentRatingKey'))
         self.parentTitle = data.attrib.get('parentTitle')
-        self.producers = self.findItems(data, media.Producer)
         self.ratingKey = utils.cast(int, data.attrib.get('ratingKey'))
-        self.ratings = self.findItems(data, media.Rating)
-        self.roles = self.findItems(data, media.Role)
         self.studio = data.attrib.get('studio')
-        self.styles = self.findItems(data, media.Style)
         self.summary = data.attrib.get('summary')
         self.tagline = data.attrib.get('tagline')
-        self.tags = self.findItems(data, media.Tag)
         self.title = data.attrib.get('title')
         self.titleSort = data.attrib.get('titleSort')
         self.type = data.attrib.get('type')
-        self.writers = self.findItems(data, media.Writer)
         self.year = utils.cast(int, data.attrib.get('year'))
+
+    @cached_data_property
+    def collections(self):
+        return self.findItems(self._data, media.Collection)
+
+    @cached_data_property
+    def countries(self):
+        return self.findItems(self._data, media.Country)
+
+    @cached_data_property
+    def directors(self):
+        return self.findItems(self._data, media.Director)
+
+    @cached_data_property
+    def fields(self):
+        return self.findItems(self._data, media.Field)
+
+    @cached_data_property
+    def genres(self):
+        return self.findItems(self._data, media.Genre)
+
+    @cached_data_property
+    def guids(self):
+        return self.findItems(self._data, media.Guid)
+
+    @cached_data_property
+    def labels(self):
+        return self.findItems(self._data, media.Label)
+
+    @cached_data_property
+    def moods(self):
+        return self.findItems(self._data, media.Mood)
+
+    @cached_data_property
+    def producers(self):
+        return self.findItems(self._data, media.Producer)
+
+    @cached_data_property
+    def ratings(self):
+        return self.findItems(self._data, media.Rating)
+
+    @cached_data_property
+    def roles(self):
+        return self.findItems(self._data, media.Role)
+
+    @cached_data_property
+    def styles(self):
+        return self.findItems(self._data, media.Style)
+
+    @cached_data_property
+    def tags(self):
+        return self.findItems(self._data, media.Tag)
+
+    @cached_data_property
+    def writers(self):
+        return self.findItems(self._data, media.Writer)
 
     def __repr__(self):
         return '<%s:%s:%s>' % (

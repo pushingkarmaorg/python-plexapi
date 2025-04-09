@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.parse import quote_plus, unquote
 
 from plexapi import media, utils
-from plexapi.base import Playable, PlexPartialObject
+from plexapi.base import Playable, PlexPartialObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound, Unsupported
 from plexapi.library import LibrarySection, MusicSection
 from plexapi.mixins import SmartFilterMixin, ArtMixin, PosterMixin, PlaylistEditMixins
@@ -60,7 +60,6 @@ class Playlist(
         self.content = data.attrib.get('content')
         self.duration = utils.cast(int, data.attrib.get('duration'))
         self.durationInSeconds = utils.cast(int, data.attrib.get('durationInSeconds'))
-        self.fields = self.findItems(data, media.Field)
         self.guid = data.attrib.get('guid')
         self.icon = data.attrib.get('icon')
         self.key = data.attrib.get('key', '').replace('/items', '')  # FIX_BUG_50
@@ -80,6 +79,10 @@ class Playlist(
         self._items = None  # cache for self.items
         self._section = None  # cache for self.section
         self._filters = None  # cache for self.filters
+
+    @cached_data_property
+    def fields(self):
+        return self.findItems(self._data, media.Field)
 
     def __len__(self):  # pragma: no cover
         return len(self.items())
