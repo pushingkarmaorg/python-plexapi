@@ -2249,6 +2249,9 @@ class Hub(PlexObject):
     def reload(self):
         """ Reloads the hub to fetch all items in the hub. """
         self._invalidateCachedProperties()
+        if self._data is not None:
+            self.more = utils.cast(bool, self._data.attrib.get('more'))
+            self.size = utils.cast(int, self._data.attrib.get('size'))
 
     def section(self):
         """ Returns the :class:`~plexapi.library.LibrarySection` this hub belongs to.
