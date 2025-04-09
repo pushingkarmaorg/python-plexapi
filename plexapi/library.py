@@ -2211,6 +2211,7 @@ class Hub(PlexObject):
             items (list): List of items in the hub.
             key (str): API URL for the hub.
             more (bool): True if there are more items to load (call reload() to fetch all items).
+            random (bool): True if the items in the hub are randomized.
             size (int): The number of items in the hub.
             style (str): The style of the hub.
             title (str): The title of the hub.
@@ -2227,6 +2228,7 @@ class Hub(PlexObject):
         self.items = self.findItems(data)
         self.key = data.attrib.get('key')
         self.more = utils.cast(bool, data.attrib.get('more'))
+        self.random = utils.cast(bool, data.attrib.get('random', '0'))
         self.size = utils.cast(int, data.attrib.get('size'))
         self.style = data.attrib.get('style')
         self.title = data.attrib.get('title')
