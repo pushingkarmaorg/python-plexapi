@@ -2235,6 +2235,12 @@ class Hub(PlexObject):
 
     @cached_data_property
     def items(self):
+        if self.more and self.key:  # If there are more items to load, fetch them
+            items = self.fetchItems(self.key)
+            self.more = False
+            self.size = len(items)
+            return items
+        # Otherwise, all the data is in the initial _data XML response
         return self.findItems(self._data)
 
     def __len__(self):
@@ -2242,10 +2248,7 @@ class Hub(PlexObject):
 
     def reload(self):
         """ Reloads the hub to fetch all items in the hub. """
-        if self.more and self.key:
-            self.items = self.fetchItems(self.key)
-            self.more = False
-            self.size = len(self.items)
+        self._invalidateCachedProperties()
 
     def section(self):
         """ Returns the :class:`~plexapi.library.LibrarySection` this hub belongs to.
