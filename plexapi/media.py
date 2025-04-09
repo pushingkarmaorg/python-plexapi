@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import xml
 from pathlib import Path
 from urllib.parse import quote_plus
+from xml.etree import ElementTree
 
 from plexapi import log, settings, utils
 from plexapi.base import PlexObject
@@ -1077,7 +1077,7 @@ class BaseResource(PlexObject):
         data = f'{key}?url={quote_plus(self.ratingKey)}'
         try:
             self._server.query(data, method=self._server._session.put)
-        except xml.etree.ElementTree.ParseError:
+        except ElementTree.ParseError:
             pass
 
     @property

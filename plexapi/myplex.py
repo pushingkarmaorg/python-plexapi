@@ -4,7 +4,6 @@ import html
 import threading
 import time
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
-from xml.etree import ElementTree
 
 import requests
 
@@ -250,8 +249,7 @@ class MyPlexAccount(PlexObject):
             return response.json()
         elif 'text/plain' in response.headers.get('Content-Type', ''):
             return response.text.strip()
-        data = utils.cleanXMLString(response.text).encode('utf8')
-        return ElementTree.fromstring(data) if data.strip() else None
+        return utils.parseXMLString(response.text)
 
     def ping(self):
         """ Ping the Plex.tv API.
@@ -1879,8 +1877,7 @@ class MyPlexPinLogin:
             codename = codes.get(response.status_code)[0]
             errtext = response.text.replace('\n', ' ')
             raise BadRequest(f'({response.status_code}) {codename} {response.url}; {errtext}')
-        data = response.text.encode('utf8')
-        return ElementTree.fromstring(data) if data.strip() else None
+        return utils.parseXMLString(response.text)
 
 
 def _connect(cls, url, token, session, timeout, results, i, job_is_done_event=None):
