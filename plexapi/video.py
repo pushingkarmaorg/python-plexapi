@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from functools import cached_property
 from pathlib import Path
 from urllib.parse import quote_plus
 
@@ -1112,7 +1111,7 @@ class Episode(
     def ultraBlurColors(self):
         return self.findItem(self._data, media.UltraBlurColors)
 
-    @cached_property
+    @cached_data_property
     def parentKey(self):
         """ Returns the parentKey. Refer to the Episode attributes. """
         if self._parentKey:
@@ -1121,7 +1120,7 @@ class Episode(
             return f'/library/metadata/{self.parentRatingKey}'
         return None
 
-    @cached_property
+    @cached_data_property
     def parentRatingKey(self):
         """ Returns the parentRatingKey. Refer to the Episode attributes. """
         if self._parentRatingKey is not None:
@@ -1134,7 +1133,7 @@ class Episode(
             return self._season.ratingKey
         return None
 
-    @cached_property
+    @cached_data_property
     def parentThumb(self):
         """ Returns the parentThumb. Refer to the Episode attributes. """
         if self._parentThumb:
@@ -1143,7 +1142,7 @@ class Episode(
             return self._season.thumb
         return None
 
-    @cached_property
+    @cached_data_property
     def _season(self):
         """ Returns the :class:`~plexapi.video.Season` object by querying for the show's children. """
         if self.grandparentKey and self.parentIndex is not None:
@@ -1183,7 +1182,7 @@ class Episode(
         """ Returns the episode number. """
         return self.index
 
-    @cached_property
+    @cached_data_property
     def seasonNumber(self):
         """ Returns the episode's season number. """
         if isinstance(self.parentIndex, int):

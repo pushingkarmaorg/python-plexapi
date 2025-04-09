@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from functools import cached_property
 from urllib.parse import urlencode
 
 import requests
@@ -167,7 +166,7 @@ class PlexServer(PlexObject):
     def _uriRoot(self):
         return f'server://{self.machineIdentifier}/com.plexapp.plugins.library'
 
-    @cached_property
+    @cached_data_property
     def library(self):
         """ Library to browse or search your media. """
         try:
@@ -178,7 +177,7 @@ class PlexServer(PlexObject):
             data = self.query('/library/sections/')
         return Library(self, data)
 
-    @cached_property
+    @cached_data_property
     def settings(self):
         """ Returns a list of all server settings. """
         data = self.query(Settings.key)
