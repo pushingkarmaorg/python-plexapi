@@ -570,7 +570,7 @@ def test_video_Movie_hubs(movies):
     assert hub.context == "hub.movie.similar"
     assert utils.is_metadata(hub.hubKey)
     assert hub.hubIdentifier == "movie.similar"
-    assert len(hub.items) == hub.size
+    assert len(hub._partialItems) == hub.size
     assert utils.is_metadata(hub.key)
     assert hub.more is False
     assert hub.random is False
@@ -582,7 +582,7 @@ def test_video_Movie_hubs(movies):
     # Force hub reload
     hub.more = True
     hub.reload()
-    assert len(hub.items) == hub.size
+    assert len(hub.items()) == hub.size
     assert hub.more is False
     assert hub.size == 1
 

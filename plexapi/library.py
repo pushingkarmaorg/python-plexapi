@@ -1967,7 +1967,7 @@ class MusicSection(LibrarySection, ArtistEditMixins, AlbumEditMixins, TrackEditM
 
     def stations(self):
         """ Returns a list of :class:`~plexapi.playlist.Playlist` stations in this section. """
-        return next((hub.items for hub in self.hubs() if hub.context == 'hub.music.stations'), None)
+        return next((hub._partialItems for hub in self.hubs() if hub.context == 'hub.music.stations'), None)
 
     def searchArtists(self, **kwargs):
         """ Search for an artist. See :func:`~plexapi.library.LibrarySection.search` for usage. """
@@ -2232,6 +2232,11 @@ class Hub(PlexObject):
         return self.size
 
     @cached_data_property
+    def _partialItems(self):
+        """ Cache for partial items. """
+        return self.findItems(self._data)
+
+    @cached_data_property
     def _items(self):
         """ Cache for items. """
         if self.more and self.key:  # If there are more items to load, fetch them
@@ -2240,7 +2245,7 @@ class Hub(PlexObject):
             self.size = len(items)
             return items
         # Otherwise, all the data is in the initial _data XML response
-        return self.findItems(self._data)
+        return self._partialItems
 
     def items(self):
         """ Returns a list of all items in the hub. """

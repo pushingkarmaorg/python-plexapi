@@ -806,9 +806,9 @@ class PlexServer(PlexObject):
         for hub in self.fetchItems(key, Hub):
             if mediatype:
                 if hub.type == mediatype:
-                    return hub.items
+                    return hub._partialItems
             else:
-                results += hub.items
+                results += hub._partialItems
         return results
 
     def continueWatching(self):
