@@ -184,7 +184,7 @@ def test_video_Movie_attrs(movies):  # noqa: C901
     assert video.colorSpace is None
     assert video.colorTrc is None
     assert video.default is True
-    assert video.displayTitle == "1080p (H.264)"
+    assert video.displayTitle == "1080p"
     assert video.DOVIBLCompatID is None
     assert video.DOVIBLPresent is None
     assert video.DOVIELPresent is None
