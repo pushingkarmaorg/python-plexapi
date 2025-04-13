@@ -387,7 +387,9 @@ class Library(PlexObject):
         if kwargs:
             prefs_params = {f'prefs[{k}]': v for k, v in kwargs.items()}
             part += f'&{urlencode(prefs_params)}'
-        return self._server.query(part, method=self._server._session.post)
+        data = self._server.query(part, method=self._server._session.post)
+        self._invalidateCachedProperties()
+        return data
 
     def history(self, maxresults=None, mindate=None):
         """ Get Play History for all library Sections for the owner.
@@ -529,7 +531,9 @@ class LibrarySection(PlexObject):
     def delete(self):
         """ Delete a library section. """
         try:
-            return self._server.query(f'/library/sections/{self.key}', method=self._server._session.delete)
+            data = self._server.query(f'/library/sections/{self.key}', method=self._server._session.delete)
+            self._server.library._invalidateCachedProperties()
+            return data
         except BadRequest:  # pragma: no cover
             msg = f'Failed to delete library {self.key}'
             msg += 'You may need to allow this permission in your Plex settings.'
