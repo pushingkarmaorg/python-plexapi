@@ -133,9 +133,9 @@ jobs:
         echo "Digest: $digest"
         echo "digest=$digest" >> $GITHUB_OUTPUT
 
-    - name: Cache PMS Docker image
+    - name: Restore cached PMS Docker image
       id: docker-cache
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: ~/.cache/docker/plexinc
         key: ${{ runner.os }}-docker-pms-${{ steps.docker-digest.outputs.digest }}
@@ -208,6 +208,12 @@ jobs:
         name: coverage-${{ matrix.plex }}-${{ steps.python.outputs.python-version }}
         path: .coverage
 
+    - name: Save PMS Docker image cache
+      if: always() && steps.docker-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.docker-cache.outputs.cache-primary-key }}
+        path: ~/.cache/docker/plexinc
 
   coverage:
     name: Process test coverage (${{ matrix.plex }})
