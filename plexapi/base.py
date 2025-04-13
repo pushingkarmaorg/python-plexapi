@@ -1016,15 +1016,15 @@ class PlexSession:
 
     @cached_data_property
     def player(self):
-        return self.findItem(self.data, etag='Player')
+        return self.findItem(self._data, etag='Player')
 
     @cached_data_property
     def session(self):
-        return self.findItem(self.data, etag='Session')
+        return self.findItem(self._data, etag='Session')
 
     @cached_data_property
     def transcodeSession(self):
-        return self.findItem(self.data, etag='TranscodeSession')
+        return self.findItem(self._data, etag='TranscodeSession')
 
     @property
     def players(self):
