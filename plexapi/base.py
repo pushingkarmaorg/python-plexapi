@@ -422,7 +422,7 @@ class PlexObject(metaclass=PlexObjectMeta):
         return results
 
     def reload(self, key=None, **kwargs):
-        """ Reload the data for this object from self.key.
+        """ Reload the data for this object.
 
             Parameters:
                 key (string, optional): Override the key to reload.
@@ -554,6 +554,12 @@ class PlexObject(metaclass=PlexObjectMeta):
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
         raise NotImplementedError('Abstract method not implemented.')
+
+    def _findAndLoadElem(self, data, **kwargs):
+        """ Find and load the first element in the data that matches the specified attributes. """
+        for elem in data:
+            if self._checkAttrs(elem, **kwargs):
+                self._invalidateCacheAndLoadData(elem)
 
     @property
     def _searchType(self):
@@ -1016,15 +1022,15 @@ class PlexSession:
 
     @cached_data_property
     def player(self):
-        return self.findItem(self.data, etag='Player')
+        return self.findItem(self._data, etag='Player')
 
     @cached_data_property
     def session(self):
-        return self.findItem(self.data, etag='Session')
+        return self.findItem(self._data, etag='Session')
 
     @cached_data_property
     def transcodeSession(self):
-        return self.findItem(self.data, etag='TranscodeSession')
+        return self.findItem(self._data, etag='TranscodeSession')
 
     @property
     def players(self):
@@ -1055,18 +1061,11 @@ class PlexSession:
         """
         return self._reload()
 
-    def _reload(self, _autoReload=False, **kwargs):
-        """ Perform the actual reload. """
-        # Do not auto reload sessions
-        if _autoReload:
-            return self
-
+    def _reload(self, **kwargs):
+        """ Reload the data for the session. """
         key = self._initpath
         data = self._server.query(key)
-        for elem in data:
-            if elem.attrib.get('sessionKey') == str(self.sessionKey):
-                self._invalidateCacheAndLoadData(elem)
-                break
+        self._findAndLoadElem(data, sessionKey=str(self.sessionKey))
         return self
 
     def source(self):

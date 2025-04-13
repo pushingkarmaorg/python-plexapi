@@ -536,12 +536,11 @@ class LibrarySection(PlexObject):
             log.error(msg)
             raise
 
-    def reload(self):
+    def _reload(self, **kwargs):
         """ Reload the data for the library section. """
-        self._server.library._loadSections()
-        newLibrary = self._server.library.sectionByID(self.key)
-        self.__dict__.update(newLibrary.__dict__)
-        self._invalidateCachedProperties()
+        key = self._initpath
+        data = self._server.query(key)
+        self._findAndLoadElem(data, key=str(self.key))
         return self
 
     def edit(self, agent=None, **kwargs):
@@ -2204,10 +2203,10 @@ class Hub(PlexObject):
             context (str): The context of the hub.
             hubKey (str): API URL for these specific hub items.
             hubIdentifier (str): The identifier of the hub.
-            items (list): List of items in the hub.
+            items (list): List of items in the hub (automatically loads all items if more is True).
             key (str): API URL for the hub.
-            more (bool): True if there are more items to load (call reload() to fetch all items).
             random (bool): True if the items in the hub are randomized.
+            more (bool): True if there are more items to load (call items to fetch all items).
             size (int): The number of items in the hub.
             style (str): The style of the hub.
             title (str): The title of the hub.
@@ -2251,13 +2250,6 @@ class Hub(PlexObject):
         """ Returns a list of all items in the hub. """
         return self._items
 
-    def reload(self):
-        """ Delete cached data to allow reloading of hub items. """
-        self._invalidateCachedProperties()
-        if self._data is not None:
-            self.more = utils.cast(bool, self._data.attrib.get('more'))
-            self.size = utils.cast(int, self._data.attrib.get('size'))
-
     @cached_data_property
     def _section(self):
         """ Cache for section. """
@@ -2267,6 +2259,13 @@ class Hub(PlexObject):
         """ Returns the :class:`~plexapi.library.LibrarySection` this hub belongs to.
         """
         return self._section
+
+    def _reload(self, **kwargs):
+        """ Reload the data for the hub. """
+        key = self._initpath
+        data = self._server.query(key)
+        self._findAndLoadElem(data, hubIdentifier=self.hubIdentifier)
+        return self
 
 
 class LibraryMediaTag(PlexObject):
@@ -3038,11 +3037,11 @@ class ManagedHub(PlexObject):
         parent = self._parent()
         self.librarySectionID = parent.key if isinstance(parent, LibrarySection) else parent.librarySectionID
 
-    def reload(self):
+    def _reload(self, **kwargs):
         """ Reload the data for this managed hub. """
         key = f'/hubs/sections/{self.librarySectionID}/manage'
-        hub = self.fetchItem(key, self.__class__, identifier=self.identifier)
-        self.__dict__.update(hub.__dict__)
+        data = self._server.query(key)
+        self._findAndLoadElem(data, identifier=self.identifier)
         return self
 
     def move(self, after=None):
