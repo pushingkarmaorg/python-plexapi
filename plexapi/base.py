@@ -1044,7 +1044,7 @@ class PlexSession:
     def transcodeSessions(self):
         return [self.transcodeSession] if self.transcodeSession else []
 
-    @cached_property
+    @cached_data_property
     def user(self):
         """ Returns the :class:`~plexapi.myplex.MyPlexAccount` object (for admin)
             or :class:`~plexapi.myplex.MyPlexUser` object (for users) for this session.

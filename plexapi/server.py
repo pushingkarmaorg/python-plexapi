@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from functools import cached_property
 from urllib.parse import urlencode
 
 import requests
@@ -8,7 +7,7 @@ import requests
 from plexapi import BASE_HEADERS, CONFIG, TIMEOUT, log, logfilter
 from plexapi import utils
 from plexapi.alert import AlertListener
-from plexapi.base import PlexObject
+from plexapi.base import PlexObject, cached_data_property
 from plexapi.client import PlexClient
 from plexapi.collection import Collection
 from plexapi.exceptions import BadRequest, NotFound, Unauthorized
@@ -109,9 +108,6 @@ class PlexServer(PlexObject):
         self._showSecrets = CONFIG.get('log.show_secrets', '').lower() == 'true'
         self._session = session or requests.Session()
         self._timeout = timeout or TIMEOUT
-        self._myPlexAccount = None   # cached myPlexAccount
-        self._systemAccounts = None   # cached list of SystemAccount
-        self._systemDevices = None   # cached list of SystemDevice
         data = self.query(self.key, timeout=self._timeout)
         super(PlexServer, self).__init__(self, data, self.key)
 
@@ -170,7 +166,7 @@ class PlexServer(PlexObject):
     def _uriRoot(self):
         return f'server://{self.machineIdentifier}/com.plexapp.plugins.library'
 
-    @cached_property
+    @cached_data_property
     def library(self):
         """ Library to browse or search your media. """
         try:
@@ -181,7 +177,7 @@ class PlexServer(PlexObject):
             data = self.query('/library/sections/')
         return Library(self, data)
 
-    @cached_property
+    @cached_data_property
     def settings(self):
         """ Returns a list of all server settings. """
         data = self.query(Settings.key)
@@ -274,11 +270,14 @@ class PlexServer(PlexObject):
             timeout = self._timeout
         return PlexServer(self._baseurl, token=userToken, session=session, timeout=timeout)
 
+    @cached_data_property
+    def _systemAccounts(self):
+        """ Cache for systemAccounts. """
+        key = '/accounts'
+        return self.fetchItems(key, SystemAccount)
+
     def systemAccounts(self):
         """ Returns a list of :class:`~plexapi.server.SystemAccount` objects this server contains. """
-        if self._systemAccounts is None:
-            key = '/accounts'
-            self._systemAccounts = self.fetchItems(key, SystemAccount)
         return self._systemAccounts
 
     def systemAccount(self, accountID):
@@ -292,11 +291,14 @@ class PlexServer(PlexObject):
         except StopIteration:
             raise NotFound(f'Unknown account with accountID={accountID}') from None
 
+    @cached_data_property
+    def _systemDevices(self):
+        """ Cache for systemDevices. """
+        key = '/devices'
+        return self.fetchItems(key, SystemDevice)
+
     def systemDevices(self):
         """ Returns a list of :class:`~plexapi.server.SystemDevice` objects this server contains. """
-        if self._systemDevices is None:
-            key = '/devices'
-            self._systemDevices = self.fetchItems(key, SystemDevice)
         return self._systemDevices
 
     def systemDevice(self, deviceID):
@@ -310,14 +312,17 @@ class PlexServer(PlexObject):
         except StopIteration:
             raise NotFound(f'Unknown device with deviceID={deviceID}') from None
 
+    @cached_data_property
+    def _myPlexAccount(self):
+        """ Cache for myPlexAccount. """
+        from plexapi.myplex import MyPlexAccount
+        return MyPlexAccount(token=self._token, session=self._session)
+
     def myPlexAccount(self):
         """ Returns a :class:`~plexapi.myplex.MyPlexAccount` object using the same
             token to access this server. If you are not the owner of this PlexServer
             you're likely to receive an authentication error calling this.
         """
-        if self._myPlexAccount is None:
-            from plexapi.myplex import MyPlexAccount
-            self._myPlexAccount = MyPlexAccount(token=self._token, session=self._session)
         return self._myPlexAccount
 
     def _myPlexClientPorts(self):
@@ -801,9 +806,9 @@ class PlexServer(PlexObject):
         for hub in self.fetchItems(key, Hub):
             if mediatype:
                 if hub.type == mediatype:
-                    return hub.items
+                    return hub._partialItems
             else:
-                results += hub.items
+                results += hub._partialItems
         return results
 
     def continueWatching(self):
