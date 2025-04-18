@@ -329,7 +329,7 @@ class PlexServer(PlexObject):
         """ Sometimes the PlexServer does not properly advertise port numbers required
             to connect. This attempts to look up device port number from plex.tv.
             See issue #126: Make PlexServer.clients() more user friendly.
-              https://github.com/pkkid/python-plexapi/issues/126
+              https://github.com/pushingkarmaorg/python-plexapi/issues/126
         """
         try:
             ports = {}

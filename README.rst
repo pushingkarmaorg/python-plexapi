@@ -1,17 +1,17 @@
 Python-PlexAPI
 ==============
-.. image:: https://github.com/pkkid/python-plexapi/workflows/CI/badge.svg
-    :target: https://github.com/pkkid/python-plexapi/actions?query=workflow%3ACI
+.. image:: https://github.com/pushingkarmaorg/python-plexapi/workflows/CI/badge.svg
+    :target: https://github.com/pushingkarmaorg/python-plexapi/actions?query=workflow%3ACI
 .. image:: https://readthedocs.org/projects/python-plexapi/badge/?version=latest
     :target: http://python-plexapi.readthedocs.io/en/latest/?badge=latest
-.. image:: https://codecov.io/gh/pkkid/python-plexapi/branch/master/graph/badge.svg?token=fOECznuMtw
-    :target: https://codecov.io/gh/pkkid/python-plexapi
-.. image:: https://img.shields.io/github/tag/pkkid/python-plexapi.svg?label=github+release
-    :target: https://github.com/pkkid/python-plexapi/releases
+.. image:: https://codecov.io/gh/pushingkarmaorg/python-plexapi/branch/master/graph/badge.svg?token=fOECznuMtw
+    :target: https://codecov.io/gh/pushingkarmaorg/python-plexapi
+.. image:: https://img.shields.io/github/tag/pushingkarmaorg/python-plexapi.svg?label=github+release
+    :target: https://github.com/pushingkarmaorg/python-plexapi/releases
 .. image:: https://badge.fury.io/py/PlexAPI.svg
     :target: https://badge.fury.io/py/PlexAPI
-.. image:: https://img.shields.io/github/last-commit/pkkid/python-plexapi.svg
-    :target: https://img.shields.io/github/last-commit/pkkid/python-plexapi.svg
+.. image:: https://img.shields.io/github/last-commit/pushingkarmaorg/python-plexapi.svg
+    :target: https://img.shields.io/github/last-commit/pushingkarmaorg/python-plexapi.svg
 
 
 Overview
