@@ -4,6 +4,7 @@ from plexapi.playqueue import PlayQueue
 import pytest
 
 
+@pytest.mark.xfail(reason="Plex regression `playQueueTotalCount` value incorrect when item removed from PlayQueue")
 def test_create_playqueue(plex, show):
     # create the playlist
     episodes = show.episodes()

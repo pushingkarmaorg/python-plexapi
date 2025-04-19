@@ -881,7 +881,7 @@ def _test_library_search(library, obj):  # noqa: C901
             elif field.type == "date":
                 searchValue = searchValue.strftime("%Y-%m-%d")
                 _do_test_library_search(library, obj, field, operator, searchValue)
-                searchValue = "1s"
+                searchValue = "0s"
                 _do_test_library_search(library, obj, field, operator, searchValue)
 
 
@@ -889,7 +889,7 @@ def _do_test_library_search(library, obj, field, operator, searchValue):
     searchFilter = {field.key + operator.key[:-1]: searchValue}
     results = library.search(libtype=obj.type, filters=searchFilter)
 
-    if operator.key.startswith("!") or operator.key.startswith(">>") and (searchValue == 1 or searchValue == "1s"):
+    if operator.key.startswith("!") or operator.key.startswith(">>") and (searchValue == 1 or searchValue == "0s"):
         assert obj not in results
     else:
         assert obj in results, f"Unable to search {obj.type} by {field.key} using {operator.key} and value {searchValue}."
