@@ -71,7 +71,11 @@ def test_server_transcodeImage(tmpdir, plex, movie):
     opacity_background_url = plex.transcodeImage(original_url, height, width, opacity=0, background=background, blur=100)
     blend_url = plex.transcodeImage(original_url, height, width, blendColor=blend, blur=1000)
     online_no_upscale_url = plex.transcodeImage(
-        "https://raw.githubusercontent.com/pkkid/python-plexapi/master/tests/data/cute_cat.jpg", 1000, 1000, upscale=False)
+        "https://raw.githubusercontent.com/pushingkarmaorg/python-plexapi/master/tests/data/cute_cat.jpg",
+        1000,
+        1000,
+        upscale=False
+    )
 
     original_img = download(
         original_url, plex._token, savepath=str(tmpdir), filename="original_img",

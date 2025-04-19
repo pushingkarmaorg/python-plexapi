@@ -220,7 +220,7 @@ class PlexClient(PlexObject):
         proxy = self._proxyThroughServer if proxy is None else proxy
         query = self._server.query if proxy else self.query
 
-        # Workaround for ptp. See https://github.com/pkkid/python-plexapi/issues/244
+        # Workaround for ptp. See https://github.com/pushingkarmaorg/python-plexapi/issues/244
         t = time.time()
         if command == 'timeline/poll':
             self._last_call = t
