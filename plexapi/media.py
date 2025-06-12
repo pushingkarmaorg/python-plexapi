@@ -433,9 +433,33 @@ class AudioStream(MediaPartStream):
         """
         return self._parent().setSelectedAudioStream(self)
 
+    def levels(self, subSample=128):
+        """ Load time series loudness levels.
+
+            Attributes:
+                subSample: (int): the number of loudness segments to load        
+        """
+
+        key = f'/library/streams/{self.id}/levels'
+        params = {'subsample': subSample}
+
+        levels = self.fetchItems(ekey=key, cls=Level, params=params)
+        return levels
+
     @deprecated('Use "setSelected" instead.')
     def setDefault(self):
         return self.setSelected()
+
+@utils.registerPlexObject
+class Level(PlexObject):
+    """ Represents an instance of loudness for an audio stream.
+
+        Attributes:
+            loudness (float): loudness level in db
+    """
+    def _loadData(self, data):  
+        """ Load attribute values from Plex XML response. """
+        self.loudness = data.attrib.get('v')
 
 
 @utils.registerPlexObject
