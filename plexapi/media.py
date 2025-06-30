@@ -447,17 +447,7 @@ class AudioStream(MediaPartStream):
     @deprecated('Use "setSelected" instead.')
     def setDefault(self):
         return self.setSelected()
-
-@utils.registerPlexObject
-class Level(PlexObject):
-    """ Represents a single loudness Level sample for an AudioStream.
-
-        Attributes:
-            loudness (float): Loudness level value
-    """
-    def _loadData(self, data):  
-        """ Load attribute values from Plex XML response. """
-        self.loudness = utils.cast(float, data.attrib.get('v'))
+    
 
 @utils.registerPlexObject
 class SubtitleStream(MediaPartStream):
@@ -1364,3 +1354,15 @@ class Availability(PlexObject):
         self.quality = data.attrib.get('quality')
         self.title = data.attrib.get('title')
         self.url = data.attrib.get('url')
+
+
+@utils.registerPlexObject
+class Level(PlexObject):
+    """ Represents a single loudness Level sample for an AudioStream.
+
+        Attributes:
+            loudness (float): Loudness level value
+    """
+    def _loadData(self, data):  
+        """ Load attribute values from Plex XML response. """
+        self.loudness = utils.cast(float, data.attrib.get('v'))
