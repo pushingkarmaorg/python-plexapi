@@ -397,7 +397,8 @@ def test_audio_Track_attrs(album):
     assert stream.lra is None
     assert stream.peak is None
     assert stream.startRamp is None
-    assert len(stream.levels(subSample=32)) == 32
+    if stream.loudness is not None:
+        assert len(stream.levels(subSample=32)) == 32
 
 
 def test_audio_Track_album(album):
