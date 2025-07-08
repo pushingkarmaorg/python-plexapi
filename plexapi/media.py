@@ -433,6 +433,17 @@ class AudioStream(MediaPartStream):
         """
         return self._parent().setSelectedAudioStream(self)
 
+    def levels(self, subSample=128):
+        """ Returns a list of :class:`~plexapi.media.Level` objects for this AudioStream.
+            Only available for Tracks which have been analyzed for loudness.
+
+            Attributes:
+                subSample (int): The number of loudness samples to return. Default 128.
+        """
+        key = f'/library/streams/{self.id}/levels'
+        params = {'subsample': subSample}
+        return self.fetchItems(key, params=params)
+
     @deprecated('Use "setSelected" instead.')
     def setDefault(self):
         return self.setSelected()
@@ -1343,3 +1354,15 @@ class Availability(PlexObject):
         self.quality = data.attrib.get('quality')
         self.title = data.attrib.get('title')
         self.url = data.attrib.get('url')
+
+
+@utils.registerPlexObject
+class Level(PlexObject):
+    """ Represents a single loudness Level sample for an AudioStream.
+
+        Attributes:
+            loudness (float): Loudness level value
+    """
+    def _loadData(self, data):
+        """ Load attribute values from Plex XML response. """
+        self.loudness = utils.cast(float, data.attrib.get('v'))
