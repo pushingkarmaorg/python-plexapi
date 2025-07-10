@@ -565,7 +565,8 @@ class MyPlexAccount(PlexObject):
         """
         invite = user if isinstance(user, MyPlexInvite) else self.pendingInvite(user, includeSent=False)
 
-        url = f"https://plex.tv/api/v2/shared_servers/{invite.id}/accept"
+
+        url = MyPlexInvite.REQUESTS + f'/{invite.id}' + "/accept"
         return self.query(url, self._session.post)
 
     def cancelInvite(self, user):
