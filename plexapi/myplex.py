@@ -1281,8 +1281,8 @@ class MyPlexInvite(PlexObject):
             username (str): User's username.
     """
     TAG = 'Invite'
-    REQUESTS = 'https://plex.tv/api/invites/requests'
-    REQUESTED = 'https://plex.tv/api/invites/requested'
+    REQUESTS = 'https://clients.plex.tv/api/v2/shared_servers/invites/received/pending'
+    REQUESTED = 'https://clients.plex.tv/api/v2/shared_servers/invites/owned/pending'
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
