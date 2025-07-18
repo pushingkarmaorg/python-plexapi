@@ -1,0 +1,56 @@
+name: Refresh CI Plex Account Token
+
+on:
+  workflow_dispatch: ~
+  schedule:
+    - cron: '52 04 * * *'
+
+env:
+  CACHE_VERSION: 1
+  DEFAULT_PYTHON: 3.9
+
+jobs:
+  refresh-token:
+    name: Refresh Token
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code from Github
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+      id: python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.DEFAULT_PYTHON }}
+
+    - name: Restore Python ${{ steps.python.outputs.python-version }} virtual environment
+      id: cache-venv
+      uses: actions/cache@v4
+      with:
+        path: venv
+        key: >-
+          ${{ env.CACHE_VERSION }}-${{ runner.os }}-venv-${{
+          steps.python.outputs.python-version }}-${{
+          hashFiles('requirements_dev.txt') }}
+        restore-keys: >-
+          ${{ env.CACHE_VERSION }}-${{ runner.os }}-venv-${{
+          steps.python.outputs.python-version }}-
+
+    - name: Create Python virtual environment
+      if: steps.cache-venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv venv
+        . venv/bin/activate
+        pip install -U pip
+        pip install -r requirements_dev.txt
+        pip install -e .
+
+    - name: Set Plex credentials
+      run: |
+        echo "PLEXAPI_AUTH_SERVER_TOKEN=${{ secrets.PLEXAPI_AUTH_SERVER_TOKEN }}" >> $GITHUB_ENV
+
+    - name: Refresh account token
+      run: |
+        . venv/bin/activate
+        python \
+          -u tools/plex-refreshtoken.py
