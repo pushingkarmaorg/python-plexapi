@@ -949,7 +949,7 @@ class MyPlexAccount(PlexObject):
 
         params.update(kwargs)
 
-        key = f'{self.METADATA}/library/sections/watchlist/{filter}{utils.joinArgs(params)}'
+        key = f'{self.DISCOVER}/library/sections/watchlist/{filter}{utils.joinArgs(params)}'
         return self._toOnlineMetadata(self.fetchItems(key, maxresults=maxresults), **kwargs)
 
     def onWatchlist(self, item):
@@ -979,7 +979,7 @@ class MyPlexAccount(PlexObject):
             if self.onWatchlist(item):
                 raise BadRequest(f'"{item.title}" is already on the watchlist')
             ratingKey = item.guid.rsplit('/', 1)[-1]
-            self.query(f'{self.METADATA}/actions/addToWatchlist?ratingKey={ratingKey}', method=self._session.put)
+            self.query(f'{self.DISCOVER}/actions/addToWatchlist?ratingKey={ratingKey}', method=self._session.put)
         return self
 
     def removeFromWatchlist(self, items):
@@ -1000,7 +1000,7 @@ class MyPlexAccount(PlexObject):
             if not self.onWatchlist(item):
                 raise BadRequest(f'"{item.title}" is not on the watchlist')
             ratingKey = item.guid.rsplit('/', 1)[-1]
-            self.query(f'{self.METADATA}/actions/removeFromWatchlist?ratingKey={ratingKey}', method=self._session.put)
+            self.query(f'{self.DISCOVER}/actions/removeFromWatchlist?ratingKey={ratingKey}', method=self._session.put)
         return self
 
     def userState(self, item):
@@ -1010,7 +1010,7 @@ class MyPlexAccount(PlexObject):
                 item (:class:`~plexapi.video.Movie` or :class:`~plexapi.video.Show`): Item to return the user state.
         """
         ratingKey = item.guid.rsplit('/', 1)[-1]
-        data = self.query(f"{self.METADATA}/library/metadata/{ratingKey}/userState")
+        data = self.query(f"{self.DISCOVER}/library/metadata/{ratingKey}/userState")
         return self.findItem(data, cls=UserState)
 
     def isPlayed(self, item):
@@ -1034,7 +1034,7 @@ class MyPlexAccount(PlexObject):
                 :class:`~plexapi.video.Episode`): Object from searchDiscover().
                 Can be also result from Plex Movie or Plex TV Series agent.
         """
-        key = f'{self.METADATA}/actions/scrobble'
+        key = f'{self.DISCOVER}/actions/scrobble'
         ratingKey = item.guid.rsplit('/', 1)[-1]
         params = {'key': ratingKey, 'identifier': 'com.plexapp.plugins.library'}
         self.query(key, params=params)
@@ -1049,7 +1049,7 @@ class MyPlexAccount(PlexObject):
                 :class:`~plexapi.video.Episode`): Object from searchDiscover().
                 Can be also result from Plex Movie or Plex TV Series agent.
         """
-        key = f'{self.METADATA}/actions/unscrobble'
+        key = f'{self.DISCOVER}/actions/unscrobble'
         ratingKey = item.guid.rsplit('/', 1)[-1]
         params = {'key': ratingKey, 'identifier': 'com.plexapp.plugins.library'}
         self.query(key, params=params)
