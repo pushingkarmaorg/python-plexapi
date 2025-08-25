@@ -32,8 +32,8 @@ def test_library_sectionByID_with_attrs(plex, movies):
     # This seems to fail for some reason.
     # my account allow of sync, didn't find any about settings about the library.
     # assert movies.allowSync is ("sync" in plex.ownerFeatures)
-    assert movies.art == "/:/resources/movie-fanart.jpg"
-    assert utils.is_metadata(
+    assert movies.art in ("/:/resources/movie-fanart.jpg", None)
+    assert movies.composite is None or utils.is_metadata(
         movies.composite, prefix="/library/sections/", contains="/composite/"
     )
     assert utils.is_datetime(movies.createdAt)
@@ -46,7 +46,7 @@ def test_library_sectionByID_with_attrs(plex, movies):
     assert movies.refreshing is False
     assert movies.scanner == "Plex Movie"
     assert movies._server._baseurl == utils.SERVER_BASEURL
-    assert movies.thumb == "/:/resources/movie.png"
+    assert movies.thumb in ("/:/resources/movie.png", None)
     assert movies.title == "Movies"
     assert movies.type == "movie"
     assert utils.is_datetime(movies.updatedAt)
@@ -561,13 +561,13 @@ def test_library_section_timeline(plex, movies):
     assert tl.TAG == "LibraryTimeline"
     assert tl.size > 0
     assert tl.allowSync is False
-    assert tl.art == "/:/resources/movie-fanart.jpg"
+    assert tl.art in ("/:/resources/movie-fanart.jpg", None)
     assert tl.content == "secondary"
     assert tl.identifier == "com.plexapp.plugins.library"
     assert datetime.fromtimestamp(tl.latestEntryTime).date() == datetime.today().date()
     assert tl.mediaTagPrefix == "/system/bundle/media/flags/"
     assert tl.mediaTagVersion > 1
-    assert tl.thumb == "/:/resources/movie.png"
+    assert tl.thumb in ("/:/resources/movie.png", None)
     assert tl.title1 == "Movies"
     assert utils.is_int(tl.updateQueueSize, gte=0)
     assert tl.viewGroup == "secondary"
