@@ -1010,7 +1010,7 @@ class MyPlexAccount(PlexObject):
                 item (:class:`~plexapi.video.Movie` or :class:`~plexapi.video.Show`): Item to return the user state.
         """
         ratingKey = item.guid.rsplit('/', 1)[-1]
-        data = self.query(f"{self.DISCOVER}/library/metadata/{ratingKey}/userState")
+        data = self.query(f"{self.METADATA}/library/metadata/{ratingKey}/userState")
         return self.findItem(data, cls=UserState)
 
     def isPlayed(self, item):
@@ -1034,7 +1034,7 @@ class MyPlexAccount(PlexObject):
                 :class:`~plexapi.video.Episode`): Object from searchDiscover().
                 Can be also result from Plex Movie or Plex TV Series agent.
         """
-        key = f'{self.DISCOVER}/actions/scrobble'
+        key = f'{self.METADATA}/actions/scrobble'
         ratingKey = item.guid.rsplit('/', 1)[-1]
         params = {'key': ratingKey, 'identifier': 'com.plexapp.plugins.library'}
         self.query(key, params=params)
@@ -1049,7 +1049,7 @@ class MyPlexAccount(PlexObject):
                 :class:`~plexapi.video.Episode`): Object from searchDiscover().
                 Can be also result from Plex Movie or Plex TV Series agent.
         """
-        key = f'{self.DISCOVER}/actions/unscrobble'
+        key = f'{self.METADATA}/actions/unscrobble'
         ratingKey = item.guid.rsplit('/', 1)[-1]
         params = {'key': ratingKey, 'identifier': 'com.plexapp.plugins.library'}
         self.query(key, params=params)
