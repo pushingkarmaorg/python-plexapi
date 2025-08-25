@@ -421,7 +421,7 @@ def test_server_system_accounts(plex):
     assert account.defaultSubtitleLanguage == "en"
     assert utils.is_int(account.id, gte=0)
     assert len(account.key)
-    assert len(account.name)
+    assert "" if account.id == 0 else len(account.name)
     assert account.subtitleMode == 0
     assert account.thumb == ""
     assert account.accountID == account.id
