@@ -314,6 +314,22 @@ def test_myplex_watchlist(account, movie, show, artist):
         account.addToWatchlist(artist)
 
 
+def test_myplex_watchlist_uses_discover_endpoint(account, mocker):
+    """Test that watchlist method uses DISCOVER endpoint instead of METADATA."""
+    # Mock the fetchItems method to capture the URL being called
+    mock_fetchItems = mocker.patch.object(account, 'fetchItems', return_value=[])
+    mock_toOnlineMetadata = mocker.patch.object(account, '_toOnlineMetadata', return_value=[])
+    
+    # Call watchlist method
+    account.watchlist()
+    
+    # Verify that fetchItems was called with a URL that starts with DISCOVER endpoint
+    assert mock_fetchItems.called
+    url_arg = mock_fetchItems.call_args[0][0]
+    assert url_arg.startswith(account.DISCOVER), f"Expected URL to start with {account.DISCOVER}, got {url_arg}"
+    assert account.METADATA not in url_arg, f"URL should not contain METADATA endpoint: {url_arg}"
+
+
 def test_myplex_searchDiscover(account, movie, show):
     guids = lambda x: [r.guid for r in x]
 

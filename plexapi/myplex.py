@@ -949,7 +949,7 @@ class MyPlexAccount(PlexObject):
 
         params.update(kwargs)
 
-        key = f'{self.METADATA}/library/sections/watchlist/{filter}{utils.joinArgs(params)}'
+        key = f'{self.DISCOVER}/library/sections/watchlist/{filter}{utils.joinArgs(params)}'
         return self._toOnlineMetadata(self.fetchItems(key, maxresults=maxresults), **kwargs)
 
     def onWatchlist(self, item):
