@@ -949,7 +949,7 @@ class MyPlexAccount(PlexObject):
 
         params.update(kwargs)
 
-        key = f'{self.METADATA}/library/sections/watchlist/{filter}{utils.joinArgs(params)}'
+        key = f'{self.DISCOVER}/library/sections/watchlist/{filter}{utils.joinArgs(params)}'
         return self._toOnlineMetadata(self.fetchItems(key, maxresults=maxresults), **kwargs)
 
     def onWatchlist(self, item):
@@ -979,7 +979,7 @@ class MyPlexAccount(PlexObject):
             if self.onWatchlist(item):
                 raise BadRequest(f'"{item.title}" is already on the watchlist')
             ratingKey = item.guid.rsplit('/', 1)[-1]
-            self.query(f'{self.METADATA}/actions/addToWatchlist?ratingKey={ratingKey}', method=self._session.put)
+            self.query(f'{self.DISCOVER}/actions/addToWatchlist?ratingKey={ratingKey}', method=self._session.put)
         return self
 
     def removeFromWatchlist(self, items):
@@ -1000,7 +1000,7 @@ class MyPlexAccount(PlexObject):
             if not self.onWatchlist(item):
                 raise BadRequest(f'"{item.title}" is not on the watchlist')
             ratingKey = item.guid.rsplit('/', 1)[-1]
-            self.query(f'{self.METADATA}/actions/removeFromWatchlist?ratingKey={ratingKey}', method=self._session.put)
+            self.query(f'{self.DISCOVER}/actions/removeFromWatchlist?ratingKey={ratingKey}', method=self._session.put)
         return self
 
     def userState(self, item):
