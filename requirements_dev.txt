@@ -9,7 +9,7 @@ pytest-cache==1.0
 pytest-cov==6.2.1
 pytest-mock==3.14.1
 recommonmark==0.7.1
-requests==2.32.3
+requests==2.32.5
 requests-mock==1.12.1
 sphinx==7.4.7
 sphinx-rtd-theme==3.0.2
