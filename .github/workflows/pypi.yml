@@ -53,6 +53,9 @@ jobs:
     steps:
     - name: Download builds
       uses: actions/download-artifact@v5
+      with:
+        name: dist
+        path: dist
 
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
