@@ -349,11 +349,12 @@ class Movie(
             TYPE (str): 'movie'
             audienceRating (float): Audience rating (usually from Rotten Tomatoes).
             audienceRatingImage (str): Key to audience rating image (rottentomatoes://image.rating.spilled).
-            chapters (List<:class:`~plexapi.media.Chapter`>): List of Chapter objects.
+            chapters (List<:class:`~plexapi.media.Chapter`>): List of chapter objects.
             chapterSource (str): Chapter source (agent; media; mixed).
             collections (List<:class:`~plexapi.media.Collection`>): List of collection objects.
+            commonSenseMedia (List<:class:`~plexapi.media.CommonSenseMedia`>): List of Common Sense Media objects.
             contentRating (str) Content rating (PG-13; NR; TV-G).
-            countries (List<:class:`~plexapi.media.Country`>): List of countries objects.
+            countries (List<:class:`~plexapi.media.Country`>): List of country objects.
             directors (List<:class:`~plexapi.media.Director`>): List of director objects.
             duration (int): Duration of the movie in milliseconds.
             editionTitle (str): The edition title of the movie (e.g. Director's Cut, Extended Edition, etc.).
@@ -425,6 +426,10 @@ class Movie(
     @cached_data_property
     def collections(self):
         return self.findItems(self._data, media.Collection)
+
+    @cached_data_property
+    def commonSenseMedia(self):
+        return self.findItems(self._data, media.CommonSenseMedia)
 
     @cached_data_property
     def countries(self):
@@ -566,6 +571,7 @@ class Show(
                 100 = On next refresh).
             childCount (int): Number of seasons (including Specials) in the show.
             collections (List<:class:`~plexapi.media.Collection`>): List of collection objects.
+            commonSenseMedia (List<:class:`~plexapi.media.CommonSenseMedia`>): List of Common Sense Media objects.
             contentRating (str) Content rating (PG-13; NR; TV-G).
             duration (int): Typical duration of the show episodes in milliseconds.
             enableCreditsMarkerGeneration (int): Setting that indicates if credits markers detection is enabled.
@@ -650,6 +656,10 @@ class Show(
     @cached_data_property
     def collections(self):
         return self.findItems(self._data, media.Collection)
+
+    @cached_data_property
+    def commonSenseMedia(self):
+        return self.findItems(self._data, media.CommonSenseMedia)
 
     @cached_data_property
     def genres(self):
@@ -984,7 +994,7 @@ class Episode(
             TYPE (str): 'episode'
             audienceRating (float): Audience rating (TMDB or TVDB).
             audienceRatingImage (str): Key to audience rating image (tmdb://image.rating).
-            chapters (List<:class:`~plexapi.media.Chapter`>): List of Chapter objects.
+            chapters (List<:class:`~plexapi.media.Chapter`>): List of chapter objects.
             chapterSource (str): Chapter source (agent; media; mixed).
             collections (List<:class:`~plexapi.media.Collection`>): List of collection objects.
             contentRating (str) Content rating (PG-13; NR; TV-G).
