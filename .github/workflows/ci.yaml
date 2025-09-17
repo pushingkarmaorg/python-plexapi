@@ -255,8 +255,7 @@ jobs:
     - name: Download all coverage artifacts
       uses: actions/download-artifact@v5
       with:
-        pattern: coverage-*
-        path: .coverage
+        pattern: coverage-${{ matrix.plex }}*
 
     - name: Combine ${{ matrix.plex }} coverage results
       run: |
