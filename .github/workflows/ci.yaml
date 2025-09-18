@@ -260,7 +260,7 @@ jobs:
     - name: Combine ${{ matrix.plex }} coverage results
       run: |
         . venv/bin/activate
-        coverage combine coverage-${{ matrix.plex }}*/.coverage*
+        coverage combine .coverage
         coverage report --fail-under=50
         coverage xml
 
