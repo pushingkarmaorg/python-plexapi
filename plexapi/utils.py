@@ -80,6 +80,7 @@ TAGTYPES = {
     'mood': 300,
     'style': 301,
     'format': 302,
+    'subformat': 303,
     'similar': 305,
     'concert': 306,
     'banner': 311,
@@ -92,7 +93,9 @@ TAGTYPES = {
     'network': 319,
     'showOrdering': 322,
     'clearLogo': 323,
+    'commonSenseMedia': 324,
     'place': 400,
+    'sharedWidth': 500,
 }
 REVERSETAGTYPES = {v: k for k, v in TAGTYPES.items()}
 
