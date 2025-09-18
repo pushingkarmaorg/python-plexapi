@@ -155,6 +155,7 @@ def test_myplex_onlineMediaSources_optOut(account):
         onlineMediaSources[0]._updateOptOut('unknown')
 
 
+@pytest.mark.xfail(reason="Missing sections in account server endpoint for some reason")
 def test_myplex_inviteFriend(account, plex, mocker):
     inv_user = "hellowlol"
     vid_filter = {"contentRating": ["G"], "label": ["foo"]}

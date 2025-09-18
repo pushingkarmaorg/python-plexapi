@@ -415,7 +415,7 @@ def test_server_allowMediaDeletion(account):
 def test_server_system_accounts(plex):
     accounts = plex.systemAccounts()
     assert len(accounts)
-    account = accounts[-1]
+    account = accounts[0]
     assert utils.is_bool(account.autoSelectAudio)
     assert account.defaultAudioLanguage == "en"
     assert account.defaultSubtitleLanguage == "en"
