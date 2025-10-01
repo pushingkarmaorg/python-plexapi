@@ -37,6 +37,7 @@ Installation & Documentation
 .. code-block:: python
 
     pip install plexapi[alert]  # Install with dependencies required for plexapi.alert
+    pip install plexapi[jwt]    # Install with dependencies required for Plex JWT authentication
 
 Documentation_ can be found at Read the Docs.
 
