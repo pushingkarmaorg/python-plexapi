@@ -1,11 +1,25 @@
 # -*- coding: utf-8 -*-
 import copy
+import hashlib
 import html
 import threading
 import time
+from datetime import datetime, timedelta
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import requests
+
+try:
+    import cryptography
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric import ed25519
+except ImportError:  # pragma: no cover
+    cryptography = None
+
+try:
+    import jwt
+except ImportError:  # pragma: no cover
+    jwt = None
 
 from plexapi import (BASE_HEADERS, CONFIG, TIMEOUT, X_PLEX_ENABLE_FAST_CONNECT, X_PLEX_IDENTIFIER,
                      log, logfilter, utils)
@@ -1686,7 +1700,7 @@ class MyPlexPinLogin:
 
         Parameters:
             session (requests.Session, optional): Use your own session object if you want to
-                cache the http responses from PMS
+                cache the http responses from Plex.
             requestTimeout (int): timeout in seconds on initial connect to plex.tv (default config.TIMEOUT).
             headers (dict): A dict of X-Plex headers to send with requests.
             oauth (bool): True to use Plex OAuth instead of PIN login.
@@ -1895,6 +1909,290 @@ class MyPlexPinLogin:
             errtext = response.text.replace('\n', ' ')
             raise BadRequest(f'({response.status_code}) {codename} {response.url}; {errtext}')
         return utils.parseXMLString(response.text)
+
+
+class MyPlexJWTAuth:
+    """ MyPlex JWT authentication class to obtain a Plex JWT (JSON Web Token) which can be used in place of a Plex token
+        when creating a :class:`~plexapi.myplex.MyPlexAccount` instance.
+        Requires the ``PyJWT`` with ``cryptography`` packages to be installed (``pyjwt[crypto]``).
+        See: https://developer.plex.tv/pms/#section/API-Info/Authenticating-with-Plex
+
+        Parameters:
+            session (requests.Session, optional): Use your own session object if you want to
+                cache the http responses from Plex.
+            requestTimeout (int): timeout in seconds on initial connect to plex.tv (default config.TIMEOUT).
+            headers (dict): A dict of X-Plex headers to send with requests.
+            token (str): Plex token only required to register the device initially.
+            jwtToken (str): Existing Plex JWT to verify or refresh.
+            keypair (tuple[str|bytes]): A tuple of the full file paths (str) to the ED25519 private and public key pair
+                or the raw keys themselves (bytes) to use for signing the JWT.
+
+        Attributes:
+            AUTH (str): 'https://clients.plex.tv/api/v2/auth'
+            SCOPES (list): List of all available scopes to request for the JWT.
+            jwtToken (str): The Plex JWT received after refreshing.
+
+        Example:
+
+                .. code-block:: python
+
+                    from plexapi.myplex import MyPlexAccount, MyPlexJWTAuth
+
+                    # Generate a new Plex JWT
+                    jwtauth = MyPlexJWTAuth(token='2ffLuB84dqLswk9skLos')
+                    jwtauth.generateKeypair(keyfiles=('private.key', 'public.key'))
+                    jwtauth.registerDevice()
+                    jwtToken = jwtauth.refreshJWT(scope=['username', 'email', 'friendly_name'])
+
+                    account = MyPlexAccount(token=jwtToken)
+
+                    # Refresh an existing Plex JWT
+                    jwtauth = MyPlexJWTAuth(jwtToken=jwtToken, keypair=('private.key', 'public.key'))
+                    if not jwtauth.verifyJWT():
+                        jwtToken = jwtauth.refreshJWT(scope=['username', 'email', 'friendly_name'])
+
+                    account = MyPlexAccount(token=jwtToken)
+
+    """
+    AUTH = 'https://clients.plex.tv/api/v2/auth'
+    SCOPES = ['username', 'email', 'friendly_name', 'restricted', 'anonymous', 'joinedAt']
+
+    def __init__(self, session=None, requestTimeout=None, headers=None, token=None, jwtToken=None, keypair=(None, None)):
+        super(MyPlexJWTAuth, self).__init__()
+        self._session = session or requests.Session()
+        self._requestTimeout = requestTimeout or TIMEOUT
+        self.headers = headers
+        self._token = token
+        self.jwtToken = jwtToken
+        self._privateKey = utils.openOrRead(keypair[0]) if keypair[0] else None
+        self._publicKey = utils.openOrRead(keypair[1]) if keypair[1] else None
+        self._clientJWT = None
+
+        if not jwt:
+            log.warning('PyJWT package is not installed, cannot use Plex JWT login')
+            return
+
+    def generateKeypair(self, keyfiles=(None, None)):
+        """ Generates a new ED25519 private/public keypair for signing the JWT and saves them to files.
+            Requires the ``cryptography`` package to be installed.
+
+            Parameters:
+                keyfiles (tuple[str]): A tuple of the full file paths to write the private and public keypair to.
+        """
+        if not cryptography:
+            log.warning('Cryptography package is not installed, cannot generate ED25519 keypair')
+            return
+
+        privateKey = ed25519.Ed25519PrivateKey.generate()
+        publicKey = privateKey.public_key()
+        self._privateKey = privateKey.private_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PrivateFormat.Raw,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+        self._publicKey = publicKey.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw
+        )
+
+        if keyfiles[0] and keyfiles[1]:
+            with open(keyfiles[0], 'wb') as privateFile, open(keyfiles[1], 'wb') as publicFile:
+                privateFile.write(self._privateKey)
+                publicFile.write(self._publicKey)
+
+    @cached_data_property
+    def _clientIdentifier(self):
+        """ Returns the client identifier from the headers. """
+        headers = self._headers()
+        return headers['X-Plex-Client-Identifier']
+
+    @cached_data_property
+    def _keyID(self):
+        """ Returns the key ID (thumbprint) for the ED25519 keypair. """
+        return hashlib.sha256(self._privateKey + self._publicKey).hexdigest()
+
+    @cached_data_property
+    def _privateJWK(self):
+        """ Returns the private JWK (JSON Web Key) for the ED25519 keypair."""
+        return jwt.PyJWK.from_dict({
+            'kty': 'OKP',
+            'crv': 'Ed25519',
+            'x': utils.base64urlEncode(self._publicKey),
+            'd': utils.base64urlEncode(self._privateKey),
+            'use': 'sig',
+            'alg': 'EdDSA',
+            'kid': self._keyID,
+        })
+
+    @cached_data_property
+    def _publicJWK(self):
+        """ Returns the public JWK (JSON Web Key) for the ED25519 keypair."""
+        return jwt.PyJWK.from_dict({
+            'kty': 'OKP',
+            'crv': 'Ed25519',
+            'x': utils.base64urlEncode(self._publicKey),
+            'use': 'sig',
+            'alg': 'EdDSA',
+            'kid': self._keyID,
+        })
+
+    def _encodeClientJWT(self, scope):
+        """ Encodes the client JWT using the private JWK.
+
+            Parameters:
+                scope (list[str]): List of scopes to request in the token.
+        """
+        payload = {
+            'nonce': self._getPlexNonce(),
+            'scope': ','.join(scope),
+            'aud': 'plex.tv',
+            'iss': self._clientIdentifier,
+            'iat': int(datetime.now().timestamp()),
+            'exp': int((datetime.now() + timedelta(minutes=5)).timestamp()),
+        }
+        headers = {
+            'kid': self._keyID
+        }
+        self._clientJWT = jwt.encode(
+            payload,
+            key=self._privateJWK,
+            algorithm='EdDSA',
+            headers=headers
+        )
+
+    def _decodePlexJWT(self):
+        """ Decodes and verifies the Plex JWT using the Plex public JWK. """
+        return jwt.decode(
+            self.jwtToken,
+            key=jwt.PyJWK.from_dict(self._getPlexPublicJWK()),
+            algorithms=['EdDSA'],
+            options={
+                'require': ['aud', 'iss', 'exp', 'iat', 'thumbprint']
+            },
+            audience=['plex.tv', self._clientIdentifier],
+            issuer='plex.tv',
+        )
+
+    def _registerPlexDevice(self):
+        """ Registers the public JWK with Plex. """
+        url = f'{self.AUTH}/jwk'
+        headers = self._headers(**{'X-Plex-Token': self._token})
+        body = {'jwk': self._publicJWK._jwk_data}
+        self._query(url, method=self._session.post, headers=headers, json=body)
+
+    def _getPlexNonce(self):
+        """ Gets a nonce from Plex. """
+        url = f'{self.AUTH}/nonce'
+        data = self._query(url, method=self._session.get)
+        return data['nonce']
+
+    def _exchangePlexJWT(self):
+        """ Exchanges the client JWT for a Plex JWT. """
+        url = f'{self.AUTH}/token'
+        body = {'jwt': self._clientJWT}
+        data = self._query(url, method=self._session.post, json=body)
+        return data['auth_token']
+
+    def _getPlexPublicJWK(self):
+        """ Gets the Plex public JWK. """
+        url = f'{self.AUTH}/keys'
+        data = self._query(url, method=self._session.get)
+        return data['keys'][0]
+
+    def registerDevice(self):
+        """ Registers the device with Plex using the provided token and private/public keypair.
+            This must be done once before the Plex JWT can be refreshed.
+
+            Raises:
+                :exc:`~plexapi.exceptions.BadRequest`: when token or keypair is missing.
+        """
+        if not self._token:
+            raise BadRequest('Plex token is required to register device.')
+
+        if not self._privateKey or not self._publicKey:
+            raise BadRequest('ED25519 private and public keys are required to register device. '
+                             'Use generateKeypair() to generate a new keypair.')
+
+        self._registerPlexDevice()
+
+    def refreshJWT(self, scope=None):
+        """ Refreshes the Plex JWT using the existing private/public keypair.
+
+            Parameters:
+                scope (list[str], optional): List of scopes to request in the new token.
+                    Default is all available scopes.
+
+            Returns:
+                str: The new Plex JWT.
+
+            Raises:
+                :exc:`~plexapi.exceptions.BadRequest`: when keypair is missing.
+                :exc:`~plexapi.exceptions.BadRequest`: when the newly obtained JWT cannot be verified.
+        """
+        if not self._privateKey or not self._publicKey:
+            raise BadRequest('ED25519 private and public keys are required to refresh JWT.')
+
+        if scope is None:
+            scope = self.SCOPES
+
+        self._encodeClientJWT(scope)
+        self.jwtToken = self._exchangePlexJWT()
+        if self.verifyJWT():
+            return self.jwtToken
+        raise BadRequest('Failed to verify newly obtained JWT.')
+
+    def verifyJWT(self, refreshWithinDays=1):
+        """ Verifies the existing Plex JWT is valid and not expiring within the specified number of days.
+
+            Parameters:
+                refreshWithinDays (int): Number of days before expiration to consider
+                    the JWT invalid and in need of refresh. Default is 1 day.
+        """
+        try:
+            decoded_jwt = self._decodePlexJWT()
+        except jwt.ExpiredSignatureError:
+            log.warning('Existing JWT has expired')
+            return False
+        except jwt.InvalidSignatureError:
+            log.warning('Existing JWT has invalid signature')
+            return False
+        except jwt.InvalidTokenError as e:
+            log.warning(f'Existing JWT is invalid: {e}')
+            return False
+        else:
+            if decoded_jwt['thumbprint'] != self._keyID:
+                log.warning('Existing JWT was signed with a different key')
+                return False
+            elif decoded_jwt['exp'] < int((datetime.now() + timedelta(days=refreshWithinDays)).timestamp()):
+                log.warning(f'Existing JWT is expiring within {refreshWithinDays} day(s)')
+                return False
+        return True
+
+    @property
+    def decodedJWT(self):
+        """ Returns the decoded Plex JWT. """
+        return self._decodePlexJWT()
+
+    def _headers(self, **kwargs):
+        """ Returns dict containing base headers for all requests for Plex JWT login. """
+        headers = BASE_HEADERS.copy()
+        if self.headers:
+            headers.update(self.headers)
+        headers.update(kwargs)
+        headers['Accept'] = 'application/json'
+        return headers
+
+    def _query(self, url, method=None, headers=None, **kwargs):
+        method = method or self._session.get
+        log.debug('%s %s', method.__name__.upper(), url)
+        headers = headers or self._headers()
+        response = method(url, headers=headers, timeout=self._requestTimeout, **kwargs)
+        if not response.ok:  # pragma: no cover
+            codename = codes.get(response.status_code)[0]
+            errtext = response.text.replace('\n', ' ')
+            raise BadRequest(f'({response.status_code}) {codename} {response.url}; {errtext}')
+        if response.text:
+            return response.json()
 
 
 def _connect(cls, url, token, session, timeout, results, i, job_is_done_event=None):

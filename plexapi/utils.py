@@ -625,6 +625,10 @@ def base64str(text):
     return base64.b64encode(text.encode('utf-8')).decode('utf-8')
 
 
+def base64urlEncode(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).rstrip(b'=').decode('utf-8')
+
+
 def deprecated(message, stacklevel=2):
     def decorator(func):
         """This is a decorator which can be used to mark functions
@@ -667,6 +671,8 @@ def toJson(obj, **kwargs):
 
 
 def openOrRead(file):
+    if isinstance(file, bytes):
+        return file
     if hasattr(file, 'read'):
         return file.read()
     with open(file, 'rb') as f:
