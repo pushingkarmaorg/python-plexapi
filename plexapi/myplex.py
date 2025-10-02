@@ -2,6 +2,7 @@
 import copy
 import hashlib
 import html
+import os
 import threading
 import time
 from datetime import datetime, timedelta
@@ -1693,10 +1694,10 @@ class MyPlexPinLogin:
           :func:`~plexapi.myplex.MyPlexPinLogin.run` and then at a later time call
           :func:`~plexapi.myplex.MyPlexPinLogin.waitForLogin` to wait for and check the result.
         - The callback approach is an extension of the threaded approach and expects the developer
-          to pass the `callback` parameter to the call to :func:`~plexapi.myplex.MyPlexPinLogin.run`.
+          to pass the ``callback`` parameter to the call to :func:`~plexapi.myplex.MyPlexPinLogin.run`.
           The callback will be called when the thread waiting for the PIN login to succeed either
           finishes or expires. The parameter passed to the callback is the received authentication
-          token or `None` if the login expired.
+          token or ``None`` if the login expired.
 
         Parameters:
             session (requests.Session, optional): Use your own session object if you want to
@@ -1707,22 +1708,20 @@ class MyPlexPinLogin:
 
         Attributes:
             PINS (str): 'https://plex.tv/api/v2/pins'
-            CHECKPINS (str): 'https://plex.tv/api/v2/pins/{pinid}'
             POLLINTERVAL (int): 1
             finished (bool): Whether the pin login has finished or not.
             expired (bool): Whether the pin login has expired or not.
             token (str): Token retrieved through the pin login.
             pin (str): Pin to use for the login on https://plex.tv/link.
     """
-    PINS = 'https://plex.tv/api/v2/pins'               # get
-    CHECKPINS = 'https://plex.tv/api/v2/pins/{pinid}'  # get
+    PINS = 'https://plex.tv/api/v2/pins'
     POLLINTERVAL = 1
 
     def __init__(self, session=None, requestTimeout=None, headers=None, oauth=False):
         super(MyPlexPinLogin, self).__init__()
         self._session = session or requests.Session()
         self._requestTimeout = requestTimeout or TIMEOUT
-        self.headers = headers
+        self._customHeaders = headers
 
         self._oauth = oauth
         self._loginTimeout = None
@@ -1731,7 +1730,6 @@ class MyPlexPinLogin:
         self._abort = False
         self._id = None
         self._code = None
-        self._getCode()
 
         self.finished = False
         self.expired = False
@@ -1771,21 +1769,23 @@ class MyPlexPinLogin:
 
         return f'https://app.plex.tv/auth/#!?{urlencode(params)}'
 
-    def run(self, callback=None, timeout=None):
+    def run(self, callback=None, timeout=120):
         """ Starts the thread which monitors the PIN login state.
 
             Parameters:
-                callback (Callable[str]): Callback called with the received authentication token (optional).
-                timeout (int): Timeout in seconds waiting for the PIN login to succeed (optional).
+                callback (Callable[str], optional): Callback called with the received authentication token.
+                timeout (int, optional): Timeout in seconds to wait for user login. Default 120 seconds.
 
             Raises:
-                :class:`RuntimeError`: If the thread is already running.
-                :class:`RuntimeError`: If the PIN login for the current PIN has expired.
+                :exc:`RuntimeError`: If the thread is already running.
+                :exc:`RuntimeError`: If the PIN login for the current PIN has expired.
         """
         if self._thread and not self._abort:
             raise RuntimeError('MyPlexPinLogin thread is already running')
         if self.expired:
             raise RuntimeError('MyPlexPinLogin has expired')
+
+        self._getCode()
 
         self._loginTimeout = timeout
         self._callback = callback
@@ -1797,12 +1797,8 @@ class MyPlexPinLogin:
     def waitForLogin(self):
         """ Waits for the PIN login to succeed or expire.
 
-            Parameters:
-                callback (Callable[str]): Callback called with the received authentication token (optional).
-                timeout (int): Timeout in seconds waiting for the PIN login to succeed (optional).
-
             Returns:
-                `True` if the PIN login succeeded or `False` otherwise.
+                bool: ``True`` if the PIN login succeeded or ``False`` otherwise.
         """
         if not self._thread or self._abort:
             return False
@@ -1822,7 +1818,7 @@ class MyPlexPinLogin:
         self._thread.join()
 
     def checkLogin(self):
-        """ Returns `True` if the PIN login has succeeded. """
+        """ Returns ``True`` if the PIN login has succeeded. """
         if self._thread:
             return False
 
@@ -1858,7 +1854,7 @@ class MyPlexPinLogin:
         if self.token:
             return True
 
-        url = self.CHECKPINS.format(pinid=self._id)
+        url = f'{self.PINS}/{self._id}'
         response = self._query(url)
         if response is None:
             return False
@@ -1894,8 +1890,8 @@ class MyPlexPinLogin:
     def _headers(self, **kwargs):
         """ Returns dict containing base headers for all requests for pin login. """
         headers = BASE_HEADERS.copy()
-        if self.headers:
-            headers.update(self.headers)
+        if self._customHeaders:
+            headers.update(self._customHeaders)
         headers.update(kwargs)
         return headers
 
@@ -1911,9 +1907,11 @@ class MyPlexPinLogin:
         return utils.parseXMLString(response.text)
 
 
-class MyPlexJWTAuth:
-    """ MyPlex JWT authentication class to obtain a Plex JWT (JSON Web Token) which can be used in place of a Plex token
-        when creating a :class:`~plexapi.myplex.MyPlexAccount` instance.
+class MyPlexJWTLogin:
+    """
+        MyPlex JWT login class which supports getting a JWT for authenticating the client and
+        providing an access token to create a :class:`~plexapi.myplex.MyPlexAccount` instance.
+        This helper class supports a polling, threaded and callback approach.
         Requires the ``PyJWT`` with ``cryptography`` packages to be installed (``pyjwt[crypto]``).
         See: https://developer.plex.tv/pms/#section/API-Info/Authenticating-with-Plex
 
@@ -1922,62 +1920,106 @@ class MyPlexJWTAuth:
                 cache the http responses from Plex.
             requestTimeout (int): timeout in seconds on initial connect to plex.tv (default config.TIMEOUT).
             headers (dict): A dict of X-Plex headers to send with requests.
-            token (str): Plex token only required to register the device initially.
+            token (str): Plex token only required to register the device initially if not using OAuth.
             jwtToken (str): Existing Plex JWT to verify or refresh.
             keypair (tuple[str|bytes]): A tuple of the full file paths (str) to the ED25519 private and public key pair
                 or the raw keys themselves (bytes) to use for signing the JWT.
+            scope (list[str]): List of scopes to request in the new token.
+                Default is all available scopes.
 
         Attributes:
+            PINS (str): 'https://plex.tv/api/v2/pins'
             AUTH (str): 'https://clients.plex.tv/api/v2/auth'
+            POLLINTERVAL (int): 1
             SCOPES (list): List of all available scopes to request for the JWT.
-            jwtToken (str): The Plex JWT received after refreshing.
+            finished (bool): Whether the JWT login has finished or not.
+            expired (bool): Whether the JWT login has expired or not.
+            jwtToken (str): The Plex JWT received after login or refreshing.
 
         Example:
 
-                .. code-block:: python
+            .. code-block:: python
 
-                    from plexapi.myplex import MyPlexAccount, MyPlexJWTAuth
+                from plexapi.myplex import MyPlexAccount, MyPlexJWTLogin
 
-                    # Generate a new Plex JWT
-                    jwtauth = MyPlexJWTAuth(token='2ffLuB84dqLswk9skLos')
-                    jwtauth.generateKeypair(keyfiles=('private.key', 'public.key'))
-                    jwtauth.registerDevice()
-                    jwtToken = jwtauth.refreshJWT(scope=['username', 'email', 'friendly_name'])
+                # Method 1: Generate a new Plex JWT using Plex OAuth
+                jwtlogin = MyPlexJWTLogin(
+                    scopes=['username', 'email', 'friendly_name']
+                )
+                jwtlogin.generateKeypair(keyfiles=('private.key', 'public.key'))
+                print(f'Login to Plex at the following url:\\n{jwtlogin.oauthUrl()}')
+                jwtlogin.run()
+                jwtlogin.waitForLogin()
+                jwtToken = jwtlogin.jwtToken
 
-                    account = MyPlexAccount(token=jwtToken)
+                account = MyPlexAccount(token=jwtToken)
 
-                    # Refresh an existing Plex JWT
-                    jwtauth = MyPlexJWTAuth(jwtToken=jwtToken, keypair=('private.key', 'public.key'))
-                    if not jwtauth.verifyJWT():
-                        jwtToken = jwtauth.refreshJWT(scope=['username', 'email', 'friendly_name'])
+                # Method 2: Generate a new Plex JWT using an existing Plex token and keypair
+                jwtlogin = MyPlexJWTLogin(
+                    token='2ffLuB84dqLswk9skLos',
+                    keypair=('private.key', 'public.key'),
+                    scopes=['username', 'email', 'friendly_name']
+                )
+                jwtlogin.registerDevice()
+                jwtToken = jwtlogin.refreshJWT()
 
-                    account = MyPlexAccount(token=jwtToken)
+                account = MyPlexAccount(token=jwtToken)
+
+                # Refresh an existing Plex JWT
+                jwtlogin = MyPlexJWTLogin(
+                    jwtToken=jwtToken,
+                    keypair=('private.key', 'public.key'),
+                    scopes=['username', 'email', 'friendly_name']
+                )
+                if not jwtlogin.verifyJWT():
+                    jwtToken = jwtlogin.refreshJWT()
+
+                account = MyPlexAccount(token=jwtToken)
 
     """
+    PINS = 'https://clients.plex.tv/api/v2/pins'
     AUTH = 'https://clients.plex.tv/api/v2/auth'
+    POLLINTERVAL = 1
     SCOPES = ['username', 'email', 'friendly_name', 'restricted', 'anonymous', 'joinedAt']
 
-    def __init__(self, session=None, requestTimeout=None, headers=None, token=None, jwtToken=None, keypair=(None, None)):
-        super(MyPlexJWTAuth, self).__init__()
+    def __init__(self, session=None, requestTimeout=None, headers=None, oauth=False,
+                 token=None, jwtToken=None, keypair=(None, None), scopes=None):
+        super(MyPlexJWTLogin, self).__init__()
         self._session = session or requests.Session()
         self._requestTimeout = requestTimeout or TIMEOUT
-        self.headers = headers
+        self._customHeaders = headers
         self._token = token
-        self.jwtToken = jwtToken
         self._privateKey = utils.openOrRead(keypair[0]) if keypair[0] else None
         self._publicKey = utils.openOrRead(keypair[1]) if keypair[1] else None
+        self._scopes = scopes or self.SCOPES
         self._clientJWT = None
+
+        self._oauth = oauth
+        self._loginTimeout = None
+        self._callback = None
+        self._thread = None
+        self._abort = False
+        self._id = None
+        self._code = None
+
+        self.finished = False
+        self.expired = False
+        self.jwtToken = jwtToken
 
         if not jwt:
             log.warning('PyJWT package is not installed, cannot use Plex JWT login')
             return
 
-    def generateKeypair(self, keyfiles=(None, None)):
+    def generateKeypair(self, keyfiles=(None, None), overwrite=False):
         """ Generates a new ED25519 private/public keypair for signing the JWT and saves them to files.
             Requires the ``cryptography`` package to be installed.
 
             Parameters:
                 keyfiles (tuple[str]): A tuple of the full file paths to write the private and public keypair to.
+                overwrite (bool): Set to True to overwrite existing keypair files. Default is False.
+
+            Raises:
+                :exc:`FileExistsError`: when keypair files already exist and overwrite is False.
         """
         if not cryptography:
             log.warning('Cryptography package is not installed, cannot generate ED25519 keypair')
@@ -1996,6 +2038,9 @@ class MyPlexJWTAuth:
         )
 
         if keyfiles[0] and keyfiles[1]:
+            if not overwrite and (os.path.exists(keyfiles[0]) or os.path.exists(keyfiles[1])):
+                raise FileExistsError('Keypair files already exist, set overwrite=True to overwrite them.')
+
             with open(keyfiles[0], 'wb') as privateFile, open(keyfiles[1], 'wb') as publicFile:
                 privateFile.write(self._privateKey)
                 publicFile.write(self._publicKey)
@@ -2036,24 +2081,21 @@ class MyPlexJWTAuth:
             'kid': self._keyID,
         })
 
-    def _encodeClientJWT(self, scope):
-        """ Encodes the client JWT using the private JWK.
-
-            Parameters:
-                scope (list[str]): List of scopes to request in the token.
-        """
+    def _encodeClientJWT(self):
+        """ Returns the encoded client JWT using the private JWK. """
         payload = {
-            'nonce': self._getPlexNonce(),
-            'scope': ','.join(scope),
+            'scope': ','.join(self._scopes),
             'aud': 'plex.tv',
             'iss': self._clientIdentifier,
             'iat': int(datetime.now().timestamp()),
             'exp': int((datetime.now() + timedelta(minutes=5)).timestamp()),
         }
+        if self._token:
+            payload['nonce'] = self._getPlexNonce()
         headers = {
             'kid': self._keyID
         }
-        self._clientJWT = jwt.encode(
+        return jwt.encode(
             payload,
             key=self._privateJWK,
             algorithm='EdDSA',
@@ -2061,7 +2103,7 @@ class MyPlexJWTAuth:
         )
 
     def _decodePlexJWT(self):
-        """ Decodes and verifies the Plex JWT using the Plex public JWK. """
+        """ Returns the decoded and verified Plex JWT using the Plex public JWK. """
         return jwt.decode(
             self.jwtToken,
             key=jwt.PyJWK.from_dict(self._getPlexPublicJWK()),
@@ -2072,6 +2114,11 @@ class MyPlexJWTAuth:
             audience=['plex.tv', self._clientIdentifier],
             issuer='plex.tv',
         )
+
+    @property
+    def decodedJWT(self):
+        """ Returns the decoded Plex JWT. """
+        return self._decodePlexJWT()
 
     def _registerPlexDevice(self):
         """ Registers the public JWK with Plex. """
@@ -2101,7 +2148,7 @@ class MyPlexJWTAuth:
 
     def registerDevice(self):
         """ Registers the device with Plex using the provided token and private/public keypair.
-            This must be done once before the Plex JWT can be refreshed.
+            This must be done once if OAuth was not used before the Plex JWT can be refreshed.
 
             Raises:
                 :exc:`~plexapi.exceptions.BadRequest`: when token or keypair is missing.
@@ -2115,12 +2162,8 @@ class MyPlexJWTAuth:
 
         self._registerPlexDevice()
 
-    def refreshJWT(self, scope=None):
+    def refreshJWT(self):
         """ Refreshes the Plex JWT using the existing private/public keypair.
-
-            Parameters:
-                scope (list[str], optional): List of scopes to request in the new token.
-                    Default is all available scopes.
 
             Returns:
                 str: The new Plex JWT.
@@ -2132,10 +2175,7 @@ class MyPlexJWTAuth:
         if not self._privateKey or not self._publicKey:
             raise BadRequest('ED25519 private and public keys are required to refresh JWT.')
 
-        if scope is None:
-            scope = self.SCOPES
-
-        self._encodeClientJWT(scope)
+        self._clientJWT = self._encodeClientJWT()
         self.jwtToken = self._exchangePlexJWT()
         if self.verifyJWT():
             return self.jwtToken
@@ -2149,7 +2189,7 @@ class MyPlexJWTAuth:
                     the JWT invalid and in need of refresh. Default is 1 day.
         """
         try:
-            decoded_jwt = self._decodePlexJWT()
+            decodedJWT = self.decodedJWT
         except jwt.ExpiredSignatureError:
             log.warning('Existing JWT has expired')
             return False
@@ -2160,26 +2200,180 @@ class MyPlexJWTAuth:
             log.warning(f'Existing JWT is invalid: {e}')
             return False
         else:
-            if decoded_jwt['thumbprint'] != self._keyID:
+            if decodedJWT['thumbprint'] != self._keyID:
                 log.warning('Existing JWT was signed with a different key')
                 return False
-            elif decoded_jwt['exp'] < int((datetime.now() + timedelta(days=refreshWithinDays)).timestamp()):
+            elif decodedJWT['exp'] < int((datetime.now() + timedelta(days=refreshWithinDays)).timestamp()):
                 log.warning(f'Existing JWT is expiring within {refreshWithinDays} day(s)')
                 return False
         return True
 
     @property
-    def decodedJWT(self):
-        """ Returns the decoded Plex JWT. """
-        return self._decodePlexJWT()
+    def pin(self):
+        """ Return the 4 character PIN used for linking a device at
+            https://plex.tv/link.
+        """
+        if self._oauth:
+            raise BadRequest('Cannot use PIN for Plex OAuth login')
+        return self._code
+
+    def oauthUrl(self, forwardUrl=None):
+        """ Return the Plex OAuth url for login.
+
+            Parameters:
+                forwardUrl (str, optional): The url to redirect the client to after login.
+        """
+        if not self._oauth:
+            raise BadRequest('Must use "MyPlexJWTLogin(oauth=True)" for Plex OAuth login.')
+
+        headers = self._headers()
+        params = {
+            'clientID': headers['X-Plex-Client-Identifier'],
+            'context[device][product]': headers['X-Plex-Product'],
+            'context[device][version]': headers['X-Plex-Version'],
+            'context[device][platform]': headers['X-Plex-Platform'],
+            'context[device][platformVersion]': headers['X-Plex-Platform-Version'],
+            'context[device][device]': headers['X-Plex-Device'],
+            'context[device][deviceName]': headers['X-Plex-Device-Name'],
+            'code': self._code
+        }
+        if forwardUrl:
+            params['forwardUrl'] = forwardUrl
+
+        return f'https://app.plex.tv/auth/#!?{urlencode(params)}'
+
+    def run(self, callback=None, timeout=120):
+        """ Starts the thread which monitors the PIN login state.
+
+            Parameters:
+                callback (Callable[str], optional): Callback called with the received authentication token.
+                timeout (int, optional): Timeout in seconds to wait for user login. Default 120 seconds.
+
+            Raises:
+                :exc:`RuntimeError`: If the thread is already running.
+                :exc:`RuntimeError`: If the PIN login for the current PIN has expired.
+        """
+        if self._thread and not self._abort:
+            raise RuntimeError('MyPlexJWTLogin thread is already running')
+        if self.expired:
+            raise RuntimeError('MyPlexJWTLogin has expired')
+
+        self._getCode()
+        self._clientJWT = self._encodeClientJWT()
+
+        self._loginTimeout = timeout
+        self._callback = callback
+        self._abort = False
+        self.finished = False
+        self._thread = threading.Thread(target=self._pollLogin, name='plexapi.myplex.MyPlexJWTLogin')
+        self._thread.start()
+
+    def waitForLogin(self):
+        """ Waits for the user login to succeed or expire.
+
+            Returns:
+                bool: ``True`` if the user login succeeded or ``False`` otherwise.
+        """
+        if not self._thread or self._abort:
+            return False
+
+        self._thread.join()
+        if self.expired or not self.jwtToken:
+            return False
+
+        return True
+
+    def stop(self):
+        """ Stops the thread monitoring the user login state. """
+        if not self._thread or self._abort:
+            return
+
+        self._abort = True
+        self._thread.join()
+
+    def checkLogin(self):
+        """ Returns ``True`` if the user login has succeeded. """
+        if self._thread:
+            return False
+
+        try:
+            return self._checkLogin()
+        except Exception:
+            self.expired = True
+            self.finished = True
+
+        return False
+
+    def _getCode(self):
+        url = self.PINS
+
+        if self._oauth:
+            body = {
+                'jwk': self._publicJWK._jwk_data,
+                'strong': True,
+            }
+        else:
+            body = {
+                'jwk': self._publicJWK._jwk_data,
+            }
+
+        response = self._query(url, self._session.post, json=body)
+        if response is None:
+            return None
+
+        self._id = response.attrib.get('id')
+        self._code = response.attrib.get('code')
+
+        return self._code
+
+    def _checkLogin(self):
+        if not self._id:
+            return False
+
+        if self.jwtToken:
+            return True
+
+        url = f'{self.PINS}/{self._id}'
+        params = {'deviceJWT': self._clientJWT}
+        response = self._query(url, params=params)
+        if response is None:
+            return False
+
+        token = response.attrib.get('authToken')
+        if not token:
+            return False
+
+        self.jwtToken = token
+        self.finished = True
+        return True
+
+    def _pollLogin(self):
+        try:
+            start = time.time()
+            while not self._abort and (not self._loginTimeout or (time.time() - start) < self._loginTimeout):
+                try:
+                    result = self._checkLogin()
+                except Exception:
+                    self.expired = True
+                    break
+
+                if result:
+                    break
+
+                time.sleep(self.POLLINTERVAL)
+
+            if self.jwtToken and self._callback:
+                self._callback(self.jwtToken)
+        finally:
+            self.finished = True
 
     def _headers(self, **kwargs):
         """ Returns dict containing base headers for all requests for Plex JWT login. """
         headers = BASE_HEADERS.copy()
-        if self.headers:
-            headers.update(self.headers)
+        if self._customHeaders:
+            headers.update(self._customHeaders)
         headers.update(kwargs)
-        headers['Accept'] = 'application/json'
+        # headers['Accept'] = 'application/json'
         return headers
 
     def _query(self, url, method=None, headers=None, **kwargs):
@@ -2191,8 +2385,7 @@ class MyPlexJWTAuth:
             codename = codes.get(response.status_code)[0]
             errtext = response.text.replace('\n', ' ')
             raise BadRequest(f'({response.status_code}) {codename} {response.url}; {errtext}')
-        if response.text:
-            return response.json()
+        return utils.parseXMLString(response.text)
 
 
 def _connect(cls, url, token, session, timeout, results, i, job_is_done_event=None):
