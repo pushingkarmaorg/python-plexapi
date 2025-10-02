@@ -1683,9 +1683,11 @@ class MyPlexDevice(PlexObject):
 
 class MyPlexPinLogin:
     """
-        MyPlex PIN login class which supports getting the four character PIN which the user must
-        enter on https://plex.tv/link to authenticate the client and provide an access token to
-        create a :class:`~plexapi.myplex.MyPlexAccount` instance.
+        MyPlex PIN login class which supports getting a token for authenticating the client and
+        providing an access token to create a :class:`~plexapi.myplex.MyPlexAccount` instance.
+        The login can be done using the four character PIN which the user must enter at
+        https://plex.tv/link or using Plex OAuth.
+
         This helper class supports a polling, threaded and callback approach.
 
         - The polling approach expects the developer to periodically check if the PIN login was
@@ -1702,17 +1704,32 @@ class MyPlexPinLogin:
         Parameters:
             session (requests.Session, optional): Use your own session object if you want to
                 cache the http responses from Plex.
-            requestTimeout (int): timeout in seconds on initial connect to plex.tv (default config.TIMEOUT).
-            headers (dict): A dict of X-Plex headers to send with requests.
-            oauth (bool): True to use Plex OAuth instead of PIN login.
+            requestTimeout (int, optional): Timeout in seconds on initial connect to plex.tv (default config.TIMEOUT).
+            headers (dict, optional): A dict of X-Plex headers to send with requests.
+            oauth (bool, optional): True to use Plex OAuth instead of PIN login.
 
         Attributes:
             PINS (str): 'https://plex.tv/api/v2/pins'
             POLLINTERVAL (int): 1
+            pin (str): Four character PIN to use for the login at https://plex.tv/link.
             finished (bool): Whether the pin login has finished or not.
             expired (bool): Whether the pin login has expired or not.
-            token (str): Token retrieved through the pin login.
-            pin (str): Pin to use for the login on https://plex.tv/link.
+            token (str): Token retrieved after login.
+
+        Example:
+
+            .. code-block:: python
+
+                from plexapi.myplex import MyPlexAccount, MyPlexPinLogin
+
+                pinlogin = MyPlexPinLogin()
+                pinlogin.run()
+                print(f'Login to Plex at the following url:\\n{pinlogin.oauthUrl()}')
+                pinlogin.waitForLogin()
+                token = pinlogin.token
+
+                account = MyPlexAccount(token=token)
+
     """
     PINS = 'https://plex.tv/api/v2/pins'
     POLLINTERVAL = 1
@@ -1737,7 +1754,7 @@ class MyPlexPinLogin:
 
     @property
     def pin(self):
-        """ Return the 4 character PIN used for linking a device at
+        """ Return the four character PIN used for linking a device at
             https://plex.tv/link.
         """
         if self._oauth:
@@ -1911,20 +1928,40 @@ class MyPlexJWTLogin:
     """
         MyPlex JWT login class which supports getting a JWT for authenticating the client and
         providing an access token to create a :class:`~plexapi.myplex.MyPlexAccount` instance.
-        This helper class supports a polling, threaded and callback approach.
-        Requires the ``PyJWT`` with ``cryptography`` packages to be installed (``pyjwt[crypto]``).
+        The login can be done using the four character PIN which the user must enter at
+        https://plex.tv/link or using Plex OAuth.
+        This class can also be used to refresh or verify an existing JWT.
+
         See: https://developer.plex.tv/pms/#section/API-Info/Authenticating-with-Plex
+
+        Using this class requires the ``PyJWT`` with ``cryptography`` packages to be installed
+        (``pyjwt[crypto]``).
+
+        This helper class supports a polling, threaded and callback approach.
+
+        - The polling approach expects the developer to periodically check if the PIN login was
+          successful using :func:`~plexapi.myplex.MyPlexJWTLogin.checkLogin`.
+        - The threaded approach expects the developer to call
+          :func:`~plexapi.myplex.MyPlexJWTLogin.run` and then at a later time call
+          :func:`~plexapi.myplex.MyPlexJWTLogin.waitForLogin` to wait for and check the result.
+        - The callback approach is an extension of the threaded approach and expects the developer
+          to pass the ``callback`` parameter to the call to :func:`~plexapi.myplex.MyPlexJWTLogin.run`.
+          The callback will be called when the thread waiting for the PIN login to succeed either
+          finishes or expires. The parameter passed to the callback is the received authentication
+          token or ``None`` if the login expired.
 
         Parameters:
             session (requests.Session, optional): Use your own session object if you want to
                 cache the http responses from Plex.
-            requestTimeout (int): timeout in seconds on initial connect to plex.tv (default config.TIMEOUT).
-            headers (dict): A dict of X-Plex headers to send with requests.
-            token (str): Plex token only required to register the device initially if not using OAuth.
-            jwtToken (str): Existing Plex JWT to verify or refresh.
-            keypair (tuple[str|bytes]): A tuple of the full file paths (str) to the ED25519 private and public key pair
-                or the raw keys themselves (bytes) to use for signing the JWT.
-            scope (list[str]): List of scopes to request in the new token.
+            requestTimeout (int, optional): Timeout in seconds on initial connect to plex.tv (default config.TIMEOUT).
+            headers (dict, optional): A dict of X-Plex headers to send with requests.
+            oauth (bool, optional): True to use Plex OAuth instead of PIN login.
+            token (str, optional): Plex token only required to register the device initially if not using OAuth.
+            jwtToken (str, optional): Existing Plex JWT to verify or refresh.
+            keypair (tuple[str|bytes], optional): A tuple of the full file paths (str) to the ED25519 private and public
+                key pair or the raw keys themselves (bytes) to use for signing the JWT.
+                Use :func:`~plexapi.myplex.MyPlexJWTLogin.generateKeypair` to generate a new keypair if not provided.
+            scope (list[str], optional): List of scopes to request in the new token.
                 Default is all available scopes.
 
         Attributes:
@@ -1932,9 +1969,11 @@ class MyPlexJWTLogin:
             AUTH (str): 'https://clients.plex.tv/api/v2/auth'
             POLLINTERVAL (int): 1
             SCOPES (list): List of all available scopes to request for the JWT.
+            pin (str): Four character PIN to use for the login at https://plex.tv/link.
             finished (bool): Whether the JWT login has finished or not.
             expired (bool): Whether the JWT login has expired or not.
             jwtToken (str): The Plex JWT received after login or refreshing.
+            decodedJWT (dict): The decoded Plex JWT payload.
 
         Example:
 
@@ -1947,8 +1986,8 @@ class MyPlexJWTLogin:
                     scopes=['username', 'email', 'friendly_name']
                 )
                 jwtlogin.generateKeypair(keyfiles=('private.key', 'public.key'))
-                print(f'Login to Plex at the following url:\\n{jwtlogin.oauthUrl()}')
                 jwtlogin.run()
+                print(f'Login to Plex at the following url:\\n{jwtlogin.oauthUrl()}')
                 jwtlogin.waitForLogin()
                 jwtToken = jwtlogin.jwtToken
 
@@ -2210,7 +2249,7 @@ class MyPlexJWTLogin:
 
     @property
     def pin(self):
-        """ Return the 4 character PIN used for linking a device at
+        """ Return the four character PIN used for linking a device at
             https://plex.tv/link.
         """
         if self._oauth:
