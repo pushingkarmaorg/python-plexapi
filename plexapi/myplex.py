@@ -1983,6 +1983,7 @@ class MyPlexJWTLogin:
 
                 # Method 1: Generate a new Plex JWT using Plex OAuth
                 jwtlogin = MyPlexJWTLogin(
+                    oauth=True,
                     scopes=['username', 'email', 'friendly_name']
                 )
                 jwtlogin.generateKeypair(keyfiles=('private.key', 'public.key'))
@@ -2123,14 +2124,13 @@ class MyPlexJWTLogin:
     def _encodeClientJWT(self):
         """ Returns the encoded client JWT using the private JWK. """
         payload = {
+            'nonce': self._getPlexNonce(),
             'scope': ','.join(self._scopes),
             'aud': 'plex.tv',
             'iss': self._clientIdentifier,
             'iat': int(datetime.now().timestamp()),
             'exp': int((datetime.now() + timedelta(minutes=5)).timestamp()),
         }
-        if self._token:
-            payload['nonce'] = self._getPlexNonce()
         headers = {
             'kid': self._keyID
         }
@@ -2360,8 +2360,8 @@ class MyPlexJWTLogin:
         if response is None:
             return None
 
-        self._id = response.attrib.get('id')
-        self._code = response.attrib.get('code')
+        self._id = response.get('id')
+        self._code = response.get('code')
 
         return self._code
 
@@ -2378,7 +2378,7 @@ class MyPlexJWTLogin:
         if response is None:
             return False
 
-        token = response.attrib.get('authToken')
+        token = response.get('authToken')
         if not token:
             return False
 
@@ -2412,7 +2412,7 @@ class MyPlexJWTLogin:
         if self._customHeaders:
             headers.update(self._customHeaders)
         headers.update(kwargs)
-        # headers['Accept'] = 'application/json'
+        headers['Accept'] = 'application/json'
         return headers
 
     def _query(self, url, method=None, headers=None, **kwargs):
@@ -2424,6 +2424,8 @@ class MyPlexJWTLogin:
             codename = codes.get(response.status_code)[0]
             errtext = response.text.replace('\n', ' ')
             raise BadRequest(f'({response.status_code}) {codename} {response.url}; {errtext}')
+        if 'application/json' in response.headers.get('Content-Type', ''):
+            return response.json()
         return utils.parseXMLString(response.text)
 
 
