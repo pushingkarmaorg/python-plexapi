@@ -520,6 +520,67 @@ class PosterMixin(PosterUrlMixin, PosterLockMixin):
         return self
 
 
+class SquareArtUrlMixin:
+    """ Mixin for Plex objects that can have a square art url. """
+
+    @property
+    def squareArtUrl(self):
+        """ Return the square art url for the Plex object. """
+        image = next((i for i in self.images if i.type == 'squareArt'), None)
+        return self._server.url(image.url, includeToken=True) if image else None
+
+
+class SquareArtLockMixin:
+    """ Mixin for Plex objects that can have a locked square art. """
+
+    def lockSquareArt(self):
+        """ Lock the square art for a Plex object. """
+        return self._edit(**{'squareArt.locked': 1})
+
+    def unlockSquareArt(self):
+        """ Unlock the square art for a Plex object. """
+        return self._edit(**{'squareArt.locked': 0})
+
+
+class SquareArtMixin(SquareArtUrlMixin, SquareArtLockMixin):
+    """ Mixin for Plex objects that can have square art. """
+
+    def squareArts(self):
+        """ Returns list of available :class:`~plexapi.media.SquareArt` objects. """
+        return self.fetchItems(f'/library/metadata/{self.ratingKey}/squareArts', cls=media.SquareArt)
+
+    def uploadSquareArt(self, url=None, filepath=None):
+        """ Upload a square art from a url or filepath.
+
+            Parameters:
+                url (str): The full URL to the image to upload.
+                filepath (str): The full file path the the image to upload or file-like object.
+        """
+        if url:
+            key = f'/library/metadata/{self.ratingKey}/squareArts?url={quote_plus(url)}'
+            self._server.query(key, method=self._server._session.post)
+        elif filepath:
+            key = f'/library/metadata/{self.ratingKey}/squareArts'
+            data = openOrRead(filepath)
+            self._server.query(key, method=self._server._session.post, data=data)
+        return self
+
+    def setSquareArt(self, squareArt):
+        """ Set the square art for a Plex object.
+
+            Parameters:
+                squareArt (:class:`~plexapi.media.SquareArt`): The square art object to select.
+        """
+        squareArt.select()
+        return self
+
+    def deleteSquareArt(self):
+        """ Delete the square art from a Plex object. """
+        key = f'/library/metadata/{self.ratingKey}/squareArt'
+        self._server.query(key, method=self._server._session.delete)
+        return self
+
+
 class ThemeUrlMixin:
     """ Mixin for Plex objects that can have a theme url. """
 
