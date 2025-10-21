@@ -219,6 +219,10 @@ def lock_art(obj):
     _test_mixins_lock_image(obj, "arts")
 
 
+def lock_logo(obj):
+    _test_mixins_lock_image(obj, "logos")
+
+
 def lock_poster(obj):
     _test_mixins_lock_image(obj, "posters")
 
@@ -228,6 +232,7 @@ def _test_mixins_edit_image(obj, attr):
     get_img_method = getattr(obj, attr)
     set_img_method = getattr(obj, "set" + cap_attr)
     upload_img_method = getattr(obj, "upload" + cap_attr)
+    delete_img_method = getattr(obj, "delete" + cap_attr)
     images = get_img_method()
     if images:
         default_image = images[0]
@@ -270,6 +275,12 @@ def _test_mixins_edit_image(obj, attr):
         ]
         assert file_image
 
+    # Test delete image
+    delete_img_method()
+    images = get_img_method()
+    selected_image = next((i for i in images if i.selected), None)
+    assert selected_image is None
+
     # Reset to default image
     if default_image:
         set_img_method(default_image)
@@ -281,6 +292,10 @@ def _test_mixins_edit_image(obj, attr):
 
 def edit_art(obj):
     _test_mixins_edit_image(obj, "arts")
+
+
+def edit_logo(obj):
+    _test_mixins_edit_image(obj, "logos")
 
 
 def edit_poster(obj):
@@ -330,8 +345,16 @@ def _test_mixins_edit_theme(obj):
     obj.lockTheme()
     obj.reload()
     assert "theme" in _fields()
+
+    # Set the theme
     with pytest.raises(NotImplementedError):
         obj.setTheme(themes[0])
+
+    # Delete the theme
+    obj.deleteTheme()
+    obj.reload()
+    selected_theme = next((t for t in obj.themes() if t.selected), None)
+    assert selected_theme is None
 
 
 def edit_theme(obj):
