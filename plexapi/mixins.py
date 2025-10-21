@@ -418,11 +418,11 @@ class LogoLockMixin:
 
     def lockLogo(self):
         """ Lock the logo for a Plex object. """
-        raise NotImplementedError('Logo cannot be locked through the API.')
+        return self._edit(**{'clearLogo.locked': 1})
 
     def unlockLogo(self):
         """ Unlock the logo for a Plex object. """
-        raise NotImplementedError('Logo cannot be unlocked through the API.')
+        return self._edit(**{'clearLogo.locked': 0})
 
 
 class LogoMixin(LogoUrlMixin, LogoLockMixin):
@@ -451,13 +451,13 @@ class LogoMixin(LogoUrlMixin, LogoLockMixin):
     def setLogo(self, logo):
         """ Set the logo for a Plex object.
 
-            Raises:
-                :exc:`~plexapi.exceptions.NotImplementedError`: Logo cannot be set through the API.
+            Parameters:
+                logo (:class:`~plexapi.media.Logo`): The logo object to select.
         """
-        raise NotImplementedError(
-            'Logo cannot be set through the API. '
-            'Re-upload the logo using "uploadLogo" to set it.'
-        )
+        logo.select()
+        return self
+
+    def deleteLogo(self):
 
 
 class PosterUrlMixin:
