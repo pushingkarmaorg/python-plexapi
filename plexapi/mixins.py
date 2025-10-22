@@ -413,10 +413,14 @@ class LogoUrlMixin:
     """ Mixin for Plex objects that can have a logo url. """
 
     @property
+    def logo(self):
+        """ Return the API path to the logo image. """
+        return next((i.url for i in self.images if i.type == 'clearLogo'), None)
+
+    @property
     def logoUrl(self):
         """ Return the logo url for the Plex object. """
-        image = next((i for i in self.images if i.type == 'clearLogo'), None)
-        return self._server.url(image.url, includeToken=True) if image else None
+        return self._server.url(self.logo, includeToken=True) if self.logo else None
 
 
 class LogoLockMixin:
