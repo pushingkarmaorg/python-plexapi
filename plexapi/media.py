@@ -1386,22 +1386,22 @@ class CommonSenseMedia(PlexObject):
             parentsNeedToKnow (str): A brief description of what parents need to know about the media.
             talkingPoints (List<:class:`~plexapi.media.TalkingPoint`>): List of TalkingPoint objects.
 
-            Example:
+        Example:
 
-                .. code-block:: python
+            .. code-block:: python
 
-                    from plexapi.server import PlexServer
-                    plex = PlexServer('http://localhost:32400', token='xxxxxxxxxxxxxxxxxxxx')
+                from plexapi.server import PlexServer
+                plex = PlexServer('http://localhost:32400', token='xxxxxxxxxxxxxxxxxxxx')
 
-                    # Retrieve the Common Sense Media info for a movie
-                    movie = plex.library.section('Movies').get('Cars')
-                    commonSenseMedia = movie.commonSenseMedia
-                    ageRating = commonSenseMedia.ageRatings[0].age
+                # Retrieve the Common Sense Media info for a movie
+                movie = plex.library.section('Movies').get('Cars')
+                commonSenseMedia = movie.commonSenseMedia
+                ageRating = commonSenseMedia.ageRatings[0].age
 
-                    # Load the Common Sense Media info from Plex Discover (Plex Pass required)
-                    commonSenseMedia.reload()
-                    parentalAdvisoryTopics = commonSenseMedia.parentalAdvisoryTopics
-                    talkingPoints = commonSenseMedia.talkingPoints
+                # Load the Common Sense Media info from Plex Discover (Plex Pass required)
+                commonSenseMedia.reload()
+                parentalAdvisoryTopics = commonSenseMedia.parentalAdvisoryTopics
+                talkingPoints = commonSenseMedia.talkingPoints
 
     """
     TAG = 'CommonSenseMedia'
