@@ -382,7 +382,7 @@ class ArtMixin(ArtUrlMixin, ArtLockMixin):
 
             Parameters:
                 url (str): The full URL to the image to upload.
-                filepath (str): The full file path the the image to upload or file-like object.
+                filepath (str): The full file path to the image to upload or file-like object.
         """
         if url:
             key = f'/library/metadata/{self.ratingKey}/arts?url={quote_plus(url)}'
@@ -437,7 +437,7 @@ class LogoMixin(LogoUrlMixin, LogoLockMixin):
 
             Parameters:
                 url (str): The full URL to the image to upload.
-                filepath (str): The full file path the the image to upload or file-like object.
+                filepath (str): The full file path to the image to upload or file-like object.
         """
         if url:
             key = f'/library/metadata/{self.ratingKey}/clearLogos?url={quote_plus(url)}'
@@ -499,7 +499,7 @@ class PosterMixin(PosterUrlMixin, PosterLockMixin):
 
             Parameters:
                 url (str): The full URL to the image to upload.
-                filepath (str): The full file path the the image to upload or file-like object.
+                filepath (str): The full file path to the image to upload or file-like object.
         """
         if url:
             key = f'/library/metadata/{self.ratingKey}/posters?url={quote_plus(url)}'
@@ -558,7 +558,7 @@ class SquareArtMixin(SquareArtUrlMixin, SquareArtLockMixin):
 
             Parameters:
                 url (str): The full URL to the image to upload.
-                filepath (str): The full file path the the image to upload or file-like object.
+                filepath (str): The full file path to the image to upload or file-like object.
         """
         if url:
             key = f'/library/metadata/{self.ratingKey}/squareArts?url={quote_plus(url)}'
