@@ -1116,6 +1116,11 @@ class Poster(BaseResource):
     TAG = 'Photo'
 
 
+class SquareArt(BaseResource):
+    """ Represents a single Square Art object. """
+    TAG = 'Photo'
+
+
 class Theme(BaseResource):
     """ Represents a single Theme object. """
     TAG = 'Track'

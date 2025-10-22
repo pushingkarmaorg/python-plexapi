@@ -92,6 +92,7 @@ TAGTYPES = {
     'network': 319,
     'showOrdering': 322,
     'clearLogo': 323,
+    'squareArt': 325,
     'place': 400,
 }
 REVERSETAGTYPES = {v: k for k, v in TAGTYPES.items()}
