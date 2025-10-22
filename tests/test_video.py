@@ -1020,7 +1020,7 @@ def test_video_Show_streamingServices(show):
 
 
 def test_video_Show_commonSenseMedia(show):
-    commonSenseMedia = show.commonSenseMedia[0]
+    commonSenseMedia = show.commonSenseMedia
     assert utils.is_int(commonSenseMedia.id)
     assert commonSenseMedia.oneLiner
 
@@ -1032,7 +1032,7 @@ def test_video_Show_commonSenseMedia(show):
 
 @pytest.mark.authenticated
 def test_video_Show_commonSenseMedia_full(account_plexpass, show):
-    commonSenseMedia = show.commonSenseMedia[0]
+    commonSenseMedia = show.commonSenseMedia
     commonSenseMedia.reload()
     assert commonSenseMedia.anyGood
     assert commonSenseMedia.key

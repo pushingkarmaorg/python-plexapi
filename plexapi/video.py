@@ -352,7 +352,7 @@ class Movie(
             chapters (List<:class:`~plexapi.media.Chapter`>): List of chapter objects.
             chapterSource (str): Chapter source (agent; media; mixed).
             collections (List<:class:`~plexapi.media.Collection`>): List of collection objects.
-            commonSenseMedia (List<:class:`~plexapi.media.CommonSenseMedia`>): List of Common Sense Media objects.
+            commonSenseMedia (:class:`~plexapi.media.CommonSenseMedia`): Common Sense Media object.
             contentRating (str) Content rating (PG-13; NR; TV-G).
             countries (List<:class:`~plexapi.media.Country`>): List of country objects.
             directors (List<:class:`~plexapi.media.Director`>): List of director objects.
@@ -429,7 +429,7 @@ class Movie(
 
     @cached_data_property
     def commonSenseMedia(self):
-        return self.findItems(self._data, media.CommonSenseMedia)
+        return self.findItem(self._data, media.CommonSenseMedia)
 
     @cached_data_property
     def countries(self):
@@ -571,7 +571,7 @@ class Show(
                 100 = On next refresh).
             childCount (int): Number of seasons (including Specials) in the show.
             collections (List<:class:`~plexapi.media.Collection`>): List of collection objects.
-            commonSenseMedia (List<:class:`~plexapi.media.CommonSenseMedia`>): List of Common Sense Media objects.
+            commonSenseMedia (:class:`~plexapi.media.CommonSenseMedia`): Common Sense Media object.
             contentRating (str) Content rating (PG-13; NR; TV-G).
             duration (int): Typical duration of the show episodes in milliseconds.
             enableCreditsMarkerGeneration (int): Setting that indicates if credits markers detection is enabled.
@@ -659,7 +659,7 @@ class Show(
 
     @cached_data_property
     def commonSenseMedia(self):
-        return self.findItems(self._data, media.CommonSenseMedia)
+        return self.findItem(self._data, media.CommonSenseMedia)
 
     @cached_data_property
     def genres(self):

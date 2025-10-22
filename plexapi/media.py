@@ -1395,7 +1395,7 @@ class CommonSenseMedia(PlexObject):
 
                     # Retrieve the Common Sense Media info for a movie
                     movie = plex.library.section('Movies').get('Cars')
-                    commonSenseMedia = movie.commonSenseMedia[0]
+                    commonSenseMedia = movie.commonSenseMedia
                     ageRating = commonSenseMedia.ageRatings[0].age
 
                     # Load the Common Sense Media info from Plex Discover (Plex Pass required)
