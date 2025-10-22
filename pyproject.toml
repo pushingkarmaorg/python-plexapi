@@ -17,6 +17,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 alert = ["websocket-client>=1.3.3"]
+jwt = ["pyjwt[crypto]"]
 
 [project.urls]
 Homepage = "https://github.com/pushingkarmaorg/python-plexapi"

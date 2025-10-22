@@ -27,6 +27,8 @@ pyvenv.cfg
 MANIFEST
 venv/
 .venv/
+private.key
+public.key
 
 # path for the test lib.
 plex/
