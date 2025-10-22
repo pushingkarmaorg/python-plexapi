@@ -352,10 +352,13 @@ def test_Collection_art(collection):
 @pytest.mark.xfail(reason="Changing images fails randomly")
 def test_Collection_mixins_images(collection):
     test_mixins.lock_art(collection)
+    test_mixins.lock_logo(collection)
     test_mixins.lock_poster(collection)
     test_mixins.edit_art(collection)
+    test_mixins.edit_logo(collection)
     test_mixins.edit_poster(collection)
     test_mixins.attr_artUrl(collection)
+    test_mixins.attr_logoUrl(collection)
     test_mixins.attr_posterUrl(collection)
 
 
