@@ -969,6 +969,7 @@ def test_video_Show_mixins_images(show):
     test_mixins.edit_logo(show)
     test_mixins.edit_poster(show)
     test_mixins.attr_artUrl(show)
+    test_mixins.attr_logoUrl(show)
     test_mixins.attr_posterUrl(show)
 
 
@@ -1128,6 +1129,7 @@ def test_video_Season_mixins_images(show):
     test_mixins.edit_logo(season)
     test_mixins.edit_poster(season)
     test_mixins.attr_artUrl(season)
+    test_mixins.attr_logoUrl(season)
     test_mixins.attr_posterUrl(season)
 
 
@@ -1348,6 +1350,7 @@ def test_video_Episode_mixins_images(episode):
     test_mixins.edit_logo(episode)
     test_mixins.edit_poster(episode)
     test_mixins.attr_artUrl(episode)
+    test_mixins.attr_logoUrl(episode)
     test_mixins.attr_posterUrl(episode)
 
 
