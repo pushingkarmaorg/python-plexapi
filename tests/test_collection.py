@@ -356,6 +356,7 @@ def test_Collection_mixins_images(collection):
     test_mixins.edit_art(collection)
     test_mixins.edit_poster(collection)
     test_mixins.attr_artUrl(collection)
+    test_mixins.attr_logoUrl(collection)
     test_mixins.attr_posterUrl(collection)
 
 

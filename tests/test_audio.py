@@ -107,6 +107,7 @@ def test_audio_Artist_mixins_images(artist):
     test_mixins.edit_art(artist)
     test_mixins.edit_poster(artist)
     test_mixins.attr_artUrl(artist)
+    test_mixins.attr_logoUrl(artist)
     test_mixins.attr_posterUrl(artist)
 
 
@@ -237,6 +238,7 @@ def test_audio_Album_mixins_images(album):
     test_mixins.edit_art(album)
     test_mixins.edit_poster(album)
     test_mixins.attr_artUrl(album)
+    test_mixins.attr_logoUrl(album)
     test_mixins.attr_posterUrl(album)
 
 
@@ -424,6 +426,7 @@ def test_audio_Track_sonicAdventure(account_plexpass, music):
 
 def test_audio_Track_mixins_images(track):
     test_mixins.attr_artUrl(track)
+    test_mixins.attr_logoUrl(track)
     test_mixins.attr_posterUrl(track)
 
 

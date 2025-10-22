@@ -697,6 +697,9 @@ def test_video_Movie_mixins_images(movie):
     test_mixins.lock_poster(movie)
     test_mixins.edit_art(movie)
     test_mixins.edit_poster(movie)
+    test_mixins.attr_artUrl(movie)
+    test_mixins.attr_logoUrl(movie)
+    test_mixins.attr_posterUrl(movie)
 
 
 def test_video_Movie_mixins_themes(movie):
@@ -965,6 +968,7 @@ def test_video_Show_mixins_images(show):
     test_mixins.edit_art(show)
     test_mixins.edit_poster(show)
     test_mixins.attr_artUrl(show)
+    test_mixins.attr_logoUrl(show)
     test_mixins.attr_posterUrl(show)
 
 
@@ -1122,6 +1126,7 @@ def test_video_Season_mixins_images(show):
     test_mixins.edit_art(season)
     test_mixins.edit_poster(season)
     test_mixins.attr_artUrl(season)
+    test_mixins.attr_logoUrl(season)
     test_mixins.attr_posterUrl(season)
 
 
@@ -1340,6 +1345,7 @@ def test_video_Episode_mixins_images(episode):
     # test_mixins.edit_art(episode)  # Uploading episode artwork is broken in Plex
     test_mixins.edit_poster(episode)
     test_mixins.attr_artUrl(episode)
+    test_mixins.attr_logoUrl(episode)
     test_mixins.attr_posterUrl(episode)
 
 

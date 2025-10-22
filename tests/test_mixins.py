@@ -303,6 +303,10 @@ def attr_artUrl(obj):
     _test_mixins_imageUrl(obj, "art")
 
 
+def attr_logoUrl(obj):
+    _test_mixins_imageUrl(obj, "logo")
+
+
 def attr_posterUrl(obj):
     _test_mixins_imageUrl(obj, "thumb")
 
