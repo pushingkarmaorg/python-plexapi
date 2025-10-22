@@ -8,7 +8,8 @@ from plexapi.base import Playable, PlexPartialObject, PlexHistory, PlexSession, 
 from plexapi.exceptions import BadRequest
 from plexapi.mixins import (
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, PlayedUnplayedMixin, RatingMixin,
-    ArtUrlMixin, ArtMixin, LogoMixin, PosterUrlMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin, ThemeMixin,
+    ArtUrlMixin, ArtMixin, LogoMixin, LogoUrlMixin, PosterUrlMixin, PosterMixin, SquareArtMixin, SquareArtUrlMixin,
+    ThemeUrlMixin, ThemeMixin,
     MovieEditMixins, ShowEditMixins, SeasonEditMixins, EpisodeEditMixins,
     WatchlistMixin
 )
@@ -1250,7 +1251,7 @@ class Episode(
 @utils.registerPlexObject
 class Clip(
     Video, Playable,
-    ArtUrlMixin, PosterUrlMixin
+    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin
 ):
     """ Represents a single Clip.
 
