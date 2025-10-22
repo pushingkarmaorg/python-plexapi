@@ -328,8 +328,10 @@ def test_Playlist_PlexWebURL(plex, show):
 def test_Playlist_mixins_images(playlist):
     test_mixins.lock_art(playlist)
     test_mixins.lock_poster(playlist)
+    test_mixins.lock_square_art(playlist)
     test_mixins.edit_art(playlist)
     test_mixins.edit_poster(playlist)
+    test_mixins.edit_square_art(playlist)
 
 
 def test_Playlist_mixins_fields(playlist):
