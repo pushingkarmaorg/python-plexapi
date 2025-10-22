@@ -524,10 +524,14 @@ class SquareArtUrlMixin:
     """ Mixin for Plex objects that can have a square art url. """
 
     @property
+    def squareArt(self):
+        """ Return the API path to the square art image. """
+        return next((i.url for i in self.images if i.type == 'backgroundSquare'), None)
+
+    @property
     def squareArtUrl(self):
         """ Return the square art url for the Plex object. """
-        image = next((i for i in self.images if i.type == 'squareArt'), None)
-        return self._server.url(image.url, includeToken=True) if image else None
+        return self._server.url(self.squareArt, includeToken=True) if self.squareArt else None
 
 
 class SquareArtLockMixin:
