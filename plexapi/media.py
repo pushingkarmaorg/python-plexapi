@@ -1417,7 +1417,7 @@ class CommonSenseMedia(PlexObject):
         self.talkingPoints = self.findItems(data, TalkingPoint)
 
     def _reload(self, **kwargs):
-        """ Reload the data for the hub. """
+        """ Reload the data for the Common Sense Media object. """
         guid = self._parent().guid
         if not guid.startswith('plex://'):
             return self
