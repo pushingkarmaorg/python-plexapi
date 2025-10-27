@@ -253,7 +253,7 @@ jobs:
         fail-on-cache-miss: true
 
     - name: Download all coverage artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: coverage-${{ matrix.plex }}-${{ steps.python.outputs.python-version }}
         path: coverage-${{ matrix.plex }}-${{ steps.python.outputs.python-version }}
