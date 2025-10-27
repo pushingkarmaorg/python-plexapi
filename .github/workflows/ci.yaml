@@ -202,7 +202,7 @@ jobs:
 
     - name: Upload coverage artifact
       if: always() && (steps.test.outcome == 'success' || steps.test.outcome == 'failure')
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         include-hidden-files: true
         name: coverage-${{ matrix.plex }}-${{ steps.python.outputs.python-version }}
