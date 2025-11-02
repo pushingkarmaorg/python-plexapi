@@ -2094,6 +2094,8 @@ class MyPlexJWTLogin:
     @property
     def _keyID(self):
         """ Returns the key ID (thumbprint) for the ED25519 keypair. """
+        if not self._privateKey or not self._publicKey:
+            return None
         return hashlib.sha256(self._privateKey + self._publicKey).hexdigest()
 
     @property
