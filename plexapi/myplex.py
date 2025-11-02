@@ -5,7 +5,7 @@ import html
 import os
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import requests
@@ -2130,8 +2130,8 @@ class MyPlexJWTLogin:
             'scope': ','.join(self._scopes),
             'aud': 'plex.tv',
             'iss': self._clientIdentifier,
-            'iat': int(datetime.now().timestamp()),
-            'exp': int((datetime.now() + timedelta(minutes=5)).timestamp()),
+            'iat': int(datetime.now(timezone.utc).timestamp()),
+            'exp': int((datetime.now(timezone.utc) + timedelta(minutes=5)).timestamp()),
         }
         headers = {
             'kid': self._keyID
@@ -2244,7 +2244,7 @@ class MyPlexJWTLogin:
             if decodedJWT['thumbprint'] != self._keyID:
                 log.warning('Existing JWT was signed with a different key')
                 return False
-            elif decodedJWT['exp'] < int((datetime.now() + timedelta(days=refreshWithinDays)).timestamp()):
+            elif decodedJWT['exp'] < int((datetime.now(timezone.utc) + timedelta(days=refreshWithinDays)).timestamp()):
                 log.warning(f'Existing JWT is expiring within {refreshWithinDays} day(s)')
                 return False
         return True
