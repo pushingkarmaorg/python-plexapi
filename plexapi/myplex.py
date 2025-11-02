@@ -2085,18 +2085,18 @@ class MyPlexJWTLogin:
                 privateFile.write(self._privateKey)
                 publicFile.write(self._publicKey)
 
-    @cached_data_property
+    @property
     def _clientIdentifier(self):
         """ Returns the client identifier from the headers. """
         headers = self._headers()
         return headers['X-Plex-Client-Identifier']
 
-    @cached_data_property
+    @property
     def _keyID(self):
         """ Returns the key ID (thumbprint) for the ED25519 keypair. """
         return hashlib.sha256(self._privateKey + self._publicKey).hexdigest()
 
-    @cached_data_property
+    @property
     def _privateJWK(self):
         """ Returns the private JWK (JSON Web Key) for the ED25519 keypair."""
         return jwt.PyJWK.from_dict({
@@ -2109,7 +2109,7 @@ class MyPlexJWTLogin:
             'kid': self._keyID,
         })
 
-    @cached_data_property
+    @property
     def _publicJWK(self):
         """ Returns the public JWK (JSON Web Key) for the ED25519 keypair."""
         return jwt.PyJWK.from_dict({
