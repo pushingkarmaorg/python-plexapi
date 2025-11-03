@@ -8,7 +8,8 @@ from plexapi.base import Playable, PlexPartialObject, PlexHistory, PlexSession, 
 from plexapi.exceptions import BadRequest
 from plexapi.mixins import (
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, PlayedUnplayedMixin, RatingMixin,
-    ArtUrlMixin, ArtMixin, LogoMixin, PosterUrlMixin, PosterMixin, ThemeUrlMixin, ThemeMixin,
+    ArtUrlMixin, ArtMixin, LogoMixin, LogoUrlMixin, PosterUrlMixin, PosterMixin, SquareArtMixin, SquareArtUrlMixin,
+    ThemeUrlMixin, ThemeMixin,
     MovieEditMixins, ShowEditMixins, SeasonEditMixins, EpisodeEditMixins,
     WatchlistMixin
 )
@@ -338,7 +339,7 @@ class Video(PlexPartialObject, PlayedUnplayedMixin):
 class Movie(
     Video, Playable,
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, ThemeMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     MovieEditMixins,
     WatchlistMixin
 ):
@@ -550,7 +551,7 @@ class Movie(
 class Show(
     Video,
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, ThemeMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     ShowEditMixins,
     WatchlistMixin
 ):
@@ -802,7 +803,7 @@ class Show(
 class Season(
     Video,
     AdvancedSettingsMixin, ExtrasMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, ThemeUrlMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
     SeasonEditMixins
 ):
     """ Represents a single Season.
@@ -984,7 +985,7 @@ class Season(
 class Episode(
     Video, Playable,
     ExtrasMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, ThemeUrlMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
     EpisodeEditMixins
 ):
     """ Represents a single Episode.
@@ -1260,7 +1261,7 @@ class Episode(
 @utils.registerPlexObject
 class Clip(
     Video, Playable,
-    ArtUrlMixin, PosterUrlMixin
+    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin
 ):
     """ Represents a single Clip.
 

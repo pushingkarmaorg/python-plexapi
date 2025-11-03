@@ -695,8 +695,10 @@ def test_video_Movie_mixins_edit_advanced_settings(movie):
 def test_video_Movie_mixins_images(movie):
     test_mixins.lock_art(movie)
     test_mixins.lock_poster(movie)
+    test_mixins.lock_square_art(movie)
     test_mixins.edit_art(movie)
     test_mixins.edit_poster(movie)
+    test_mixins.edit_square_art(movie)
 
 
 def test_video_Movie_mixins_themes(movie):
@@ -962,10 +964,13 @@ def test_video_Show_mixins_edit_advanced_settings(show):
 def test_video_Show_mixins_images(show):
     test_mixins.lock_art(show)
     test_mixins.lock_poster(show)
+    test_mixins.lock_square_art(show)
     test_mixins.edit_art(show)
     test_mixins.edit_poster(show)
+    test_mixins.edit_square_art(show)
     test_mixins.attr_artUrl(show)
     test_mixins.attr_posterUrl(show)
+    test_mixins.attr_squareArtUrl(show)
 
 
 def test_video_Show_mixins_themes(show):
@@ -1166,10 +1171,13 @@ def test_video_Season_mixins_images(show):
     season = show.season(season=1)
     test_mixins.lock_art(season)
     test_mixins.lock_poster(season)
+    test_mixins.lock_square_art(season)
     test_mixins.edit_art(season)
     test_mixins.edit_poster(season)
+    test_mixins.edit_square_art(season)
     test_mixins.attr_artUrl(season)
     test_mixins.attr_posterUrl(season)
+    test_mixins.attr_squareArtUrl(season)
 
 
 def test_video_Season_mixins_themes(show):
@@ -1384,10 +1392,13 @@ def test_video_Episode_unwatched(tvshows):
 def test_video_Episode_mixins_images(episode):
     test_mixins.lock_art(episode)
     test_mixins.lock_poster(episode)
+    test_mixins.lock_square_art(episode)
     # test_mixins.edit_art(episode)  # Uploading episode artwork is broken in Plex
     test_mixins.edit_poster(episode)
+    test_mixins.edit_square_art(episode)
     test_mixins.attr_artUrl(episode)
     test_mixins.attr_posterUrl(episode)
+    test_mixins.attr_squareArtUrl(episode)
 
 
 def test_video_Episode_mixins_themes(episode):

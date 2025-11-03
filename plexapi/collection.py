@@ -8,7 +8,7 @@ from plexapi.exceptions import BadRequest, NotFound, Unsupported
 from plexapi.library import LibrarySection, ManagedHub
 from plexapi.mixins import (
     AdvancedSettingsMixin, SmartFilterMixin, HubsMixin, RatingMixin,
-    ArtMixin, PosterMixin, ThemeMixin,
+    ArtMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     CollectionEditMixins
 )
 from plexapi.utils import deprecated
@@ -18,7 +18,7 @@ from plexapi.utils import deprecated
 class Collection(
     PlexPartialObject,
     AdvancedSettingsMixin, SmartFilterMixin, HubsMixin, RatingMixin,
-    ArtMixin, PosterMixin, ThemeMixin,
+    ArtMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     CollectionEditMixins
 ):
     """ Represents a single Collection.

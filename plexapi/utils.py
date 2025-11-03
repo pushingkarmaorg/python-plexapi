@@ -95,6 +95,7 @@ TAGTYPES = {
     'showOrdering': 322,
     'clearLogo': 323,
     'commonSenseMedia': 324,
+    'squareArt': 325,
     'place': 400,
     'sharedWidth': 500,
 }
