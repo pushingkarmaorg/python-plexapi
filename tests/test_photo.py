@@ -20,8 +20,10 @@ def test_photo_Photoalbum_mixins_images(photoalbum):
     # test_mixins.lock_art(photoalbum)  # Unlocking photoalbum artwork is broken in Plex
     # test_mixins.lock_poster(photoalbum)  # Unlocking photoalbum poster is broken in Plex
     test_mixins.edit_art(photoalbum)
+    test_mixins.edit_logo(photoalbum)
     test_mixins.edit_poster(photoalbum)
     test_mixins.attr_artUrl(photoalbum)
+    test_mixins.attr_logoUrl(photoalbum)
     test_mixins.attr_posterUrl(photoalbum)
 
 

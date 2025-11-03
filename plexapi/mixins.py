@@ -402,15 +402,25 @@ class ArtMixin(ArtUrlMixin, ArtLockMixin):
         art.select()
         return self
 
+    def deleteArt(self):
+        """ Delete the art from a Plex object. """
+        key = f'/library/metadata/{self.ratingKey}/art'
+        self._server.query(key, method=self._server._session.delete)
+        return self
+
 
 class LogoUrlMixin:
     """ Mixin for Plex objects that can have a logo url. """
 
     @property
+    def logo(self):
+        """ Return the API path to the logo image. """
+        return next((i.url for i in self.images if i.type == 'clearLogo'), None)
+
+    @property
     def logoUrl(self):
         """ Return the logo url for the Plex object. """
-        image = next((i for i in self.images if i.type == 'clearLogo'), None)
-        return self._server.url(image.url, includeToken=True) if image else None
+        return self._server.url(self.logo, includeToken=True) if self.logo else None
 
 
 class LogoLockMixin:
@@ -418,11 +428,11 @@ class LogoLockMixin:
 
     def lockLogo(self):
         """ Lock the logo for a Plex object. """
-        raise NotImplementedError('Logo cannot be locked through the API.')
+        return self._edit(**{'clearLogo.locked': 1})
 
     def unlockLogo(self):
         """ Unlock the logo for a Plex object. """
-        raise NotImplementedError('Logo cannot be unlocked through the API.')
+        return self._edit(**{'clearLogo.locked': 0})
 
 
 class LogoMixin(LogoUrlMixin, LogoLockMixin):
@@ -451,13 +461,17 @@ class LogoMixin(LogoUrlMixin, LogoLockMixin):
     def setLogo(self, logo):
         """ Set the logo for a Plex object.
 
-            Raises:
-                :exc:`~plexapi.exceptions.NotImplementedError`: Logo cannot be set through the API.
+            Parameters:
+                logo (:class:`~plexapi.media.Logo`): The logo object to select.
         """
-        raise NotImplementedError(
-            'Logo cannot be set through the API. '
-            'Re-upload the logo using "uploadLogo" to set it.'
-        )
+        logo.select()
+        return self
+
+    def deleteLogo(self):
+        """ Delete the logo from a Plex object. """
+        key = f'/library/metadata/{self.ratingKey}/clearLogo'
+        self._server.query(key, method=self._server._session.delete)
+        return self
 
 
 class PosterUrlMixin:
@@ -517,6 +531,12 @@ class PosterMixin(PosterUrlMixin, PosterLockMixin):
                 poster (:class:`~plexapi.media.Poster`): The poster object to select.
         """
         poster.select()
+        return self
+
+    def deletePoster(self):
+        """ Delete the poster from a Plex object. """
+        key = f'/library/metadata/{self.ratingKey}/thumb'
+        self._server.query(key, method=self._server._session.delete)
         return self
 
 
@@ -579,6 +599,12 @@ class ThemeMixin(ThemeUrlMixin, ThemeLockMixin):
             'Themes cannot be set through the API. '
             'Re-upload the theme using "uploadTheme" to set it.'
         )
+
+    def deleteTheme(self):
+        """ Delete the theme from a Plex object. """
+        key = f'/library/metadata/{self.ratingKey}/theme'
+        self._server.query(key, method=self._server._session.delete)
+        return self
 
 
 class EditFieldMixin:
