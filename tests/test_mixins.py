@@ -227,6 +227,10 @@ def lock_poster(obj):
     _test_mixins_lock_image(obj, "posters")
 
 
+def lock_square_art(obj):
+    _test_mixins_lock_image(obj, "squareArts")
+
+
 def _test_mixins_edit_image(obj, attr):
     cap_attr = attr[:-1].capitalize()
     get_img_method = getattr(obj, attr)
@@ -302,6 +306,10 @@ def edit_poster(obj):
     _test_mixins_edit_image(obj, "posters")
 
 
+def edit_square_art(obj):
+    _test_mixins_edit_image(obj, "squareArts")
+
+
 def _test_mixins_imageUrl(obj, attr):
     url = getattr(obj, attr + "Url")
     if getattr(obj, attr):
@@ -320,6 +328,10 @@ def attr_artUrl(obj):
 
 def attr_posterUrl(obj):
     _test_mixins_imageUrl(obj, "thumb")
+
+
+def attr_squareArtUrl(obj):
+    _test_mixins_imageUrl(obj, "squareArt")
 
 
 def _test_mixins_edit_theme(obj):

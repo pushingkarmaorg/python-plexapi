@@ -8,7 +8,8 @@ from plexapi.base import Playable, PlexPartialObject, PlexHistory, PlexSession, 
 from plexapi.exceptions import BadRequest
 from plexapi.mixins import (
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, PlayedUnplayedMixin, RatingMixin,
-    ArtUrlMixin, ArtMixin, LogoMixin, PosterUrlMixin, PosterMixin, ThemeUrlMixin, ThemeMixin,
+    ArtUrlMixin, ArtMixin, LogoMixin, LogoUrlMixin, PosterUrlMixin, PosterMixin, SquareArtMixin, SquareArtUrlMixin,
+    ThemeUrlMixin, ThemeMixin,
     MovieEditMixins, ShowEditMixins, SeasonEditMixins, EpisodeEditMixins,
     WatchlistMixin
 )
@@ -338,7 +339,7 @@ class Video(PlexPartialObject, PlayedUnplayedMixin):
 class Movie(
     Video, Playable,
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, ThemeMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     MovieEditMixins,
     WatchlistMixin
 ):
@@ -349,11 +350,12 @@ class Movie(
             TYPE (str): 'movie'
             audienceRating (float): Audience rating (usually from Rotten Tomatoes).
             audienceRatingImage (str): Key to audience rating image (rottentomatoes://image.rating.spilled).
-            chapters (List<:class:`~plexapi.media.Chapter`>): List of Chapter objects.
+            chapters (List<:class:`~plexapi.media.Chapter`>): List of chapter objects.
             chapterSource (str): Chapter source (agent; media; mixed).
             collections (List<:class:`~plexapi.media.Collection`>): List of collection objects.
+            commonSenseMedia (:class:`~plexapi.media.CommonSenseMedia`): Common Sense Media object.
             contentRating (str) Content rating (PG-13; NR; TV-G).
-            countries (List<:class:`~plexapi.media.Country`>): List of countries objects.
+            countries (List<:class:`~plexapi.media.Country`>): List of country objects.
             directors (List<:class:`~plexapi.media.Director`>): List of director objects.
             duration (int): Duration of the movie in milliseconds.
             editionTitle (str): The edition title of the movie (e.g. Director's Cut, Extended Edition, etc.).
@@ -425,6 +427,10 @@ class Movie(
     @cached_data_property
     def collections(self):
         return self.findItems(self._data, media.Collection)
+
+    @cached_data_property
+    def commonSenseMedia(self):
+        return self.findItem(self._data, media.CommonSenseMedia)
 
     @cached_data_property
     def countries(self):
@@ -545,7 +551,7 @@ class Movie(
 class Show(
     Video,
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, ThemeMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     ShowEditMixins,
     WatchlistMixin
 ):
@@ -566,6 +572,7 @@ class Show(
                 100 = On next refresh).
             childCount (int): Number of seasons (including Specials) in the show.
             collections (List<:class:`~plexapi.media.Collection`>): List of collection objects.
+            commonSenseMedia (:class:`~plexapi.media.CommonSenseMedia`): Common Sense Media object.
             contentRating (str) Content rating (PG-13; NR; TV-G).
             duration (int): Typical duration of the show episodes in milliseconds.
             enableCreditsMarkerGeneration (int): Setting that indicates if credits markers detection is enabled.
@@ -650,6 +657,10 @@ class Show(
     @cached_data_property
     def collections(self):
         return self.findItems(self._data, media.Collection)
+
+    @cached_data_property
+    def commonSenseMedia(self):
+        return self.findItem(self._data, media.CommonSenseMedia)
 
     @cached_data_property
     def genres(self):
@@ -792,7 +803,7 @@ class Show(
 class Season(
     Video,
     AdvancedSettingsMixin, ExtrasMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, ThemeUrlMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
     SeasonEditMixins
 ):
     """ Represents a single Season.
@@ -974,7 +985,7 @@ class Season(
 class Episode(
     Video, Playable,
     ExtrasMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, ThemeUrlMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
     EpisodeEditMixins
 ):
     """ Represents a single Episode.
@@ -984,7 +995,7 @@ class Episode(
             TYPE (str): 'episode'
             audienceRating (float): Audience rating (TMDB or TVDB).
             audienceRatingImage (str): Key to audience rating image (tmdb://image.rating).
-            chapters (List<:class:`~plexapi.media.Chapter`>): List of Chapter objects.
+            chapters (List<:class:`~plexapi.media.Chapter`>): List of chapter objects.
             chapterSource (str): Chapter source (agent; media; mixed).
             collections (List<:class:`~plexapi.media.Collection`>): List of collection objects.
             contentRating (str) Content rating (PG-13; NR; TV-G).
@@ -1250,7 +1261,7 @@ class Episode(
 @utils.registerPlexObject
 class Clip(
     Video, Playable,
-    ArtUrlMixin, PosterUrlMixin
+    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin
 ):
     """ Represents a single Clip.
 
