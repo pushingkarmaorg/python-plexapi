@@ -17,12 +17,14 @@ def test_photo_Photoalbum(photoalbum):
 
 @pytest.mark.xfail(reason="Changing images fails randomly")
 def test_photo_Photoalbum_mixins_images(photoalbum):
-    # test_mixins.lock_art(photoalbum)  # Unlocking photoalbum artwork is broken in Plex
-    # test_mixins.lock_poster(photoalbum)  # Unlocking photoalbum poster is broken in Plex
     test_mixins.edit_art(photoalbum)
     test_mixins.edit_poster(photoalbum)
-    test_mixins.lock_square_art(photoalbum)
+    test_mixins.edit_squareArt(photoalbum)
+    test_mixins.lock_art(photoalbum)
+    test_mixins.lock_poster(photoalbum)
+    test_mixins.lock_squareArt(photoalbum)
     test_mixins.attr_artUrl(photoalbum)
+    test_mixins.attr_logoUrl(photoalbum)
     test_mixins.attr_posterUrl(photoalbum)
     test_mixins.attr_squareArtUrl(photoalbum)
 

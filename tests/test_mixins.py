@@ -223,7 +223,7 @@ def lock_poster(obj):
     _test_mixins_lock_image(obj, "posters")
 
 
-def lock_square_art(obj):
+def lock_squareArt(obj):
     _test_mixins_lock_image(obj, "squareArts")
 
 
@@ -298,7 +298,7 @@ def edit_poster(obj):
     _test_mixins_edit_image(obj, "posters")
 
 
-def edit_square_art(obj):
+def edit_squareArt(obj):
     _test_mixins_edit_image(obj, "squareArts")
 
 
@@ -316,6 +316,10 @@ def _test_mixins_imageUrl(obj, attr):
 
 def attr_artUrl(obj):
     _test_mixins_imageUrl(obj, "art")
+
+
+def attr_logoUrl(obj):
+    _test_mixins_imageUrl(obj, "logo")
 
 
 def attr_posterUrl(obj):

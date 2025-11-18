@@ -353,11 +353,12 @@ def test_Collection_art(collection):
 def test_Collection_mixins_images(collection):
     test_mixins.lock_art(collection)
     test_mixins.lock_poster(collection)
-    test_mixins.lock_square_art(collection)
+    test_mixins.lock_squareArt(collection)
     test_mixins.edit_art(collection)
     test_mixins.edit_poster(collection)
-    test_mixins.edit_square_art(collection)
+    test_mixins.edit_squareArt(collection)
     test_mixins.attr_artUrl(collection)
+    test_mixins.attr_logoUrl(collection)
     test_mixins.attr_posterUrl(collection)
     test_mixins.attr_squareArtUrl(collection)
 

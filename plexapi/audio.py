@@ -12,7 +12,8 @@ from plexapi.base import Playable, PlexPartialObject, PlexHistory, PlexSession, 
 from plexapi.exceptions import BadRequest
 from plexapi.mixins import (
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, PlayedUnplayedMixin, RatingMixin,
-    ArtUrlMixin, ArtMixin, PosterUrlMixin, PosterMixin, SquareArtMixin, SquareArtUrlMixin, ThemeMixin, ThemeUrlMixin,
+    ArtUrlMixin, ArtMixin, LogoMixin, LogoUrlMixin, PosterUrlMixin, PosterMixin, SquareArtMixin, SquareArtUrlMixin,
+    ThemeMixin, ThemeUrlMixin,
     ArtistEditMixins, AlbumEditMixins, TrackEditMixins
 )
 from plexapi.playlist import Playlist
@@ -181,7 +182,7 @@ class Audio(PlexPartialObject, PlayedUnplayedMixin):
 class Artist(
     Audio,
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
-    ArtMixin, PosterMixin, SquareArtMixin, ThemeMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     ArtistEditMixins
 ):
     """ Represents a single Artist.
@@ -351,7 +352,7 @@ class Artist(
 class Album(
     Audio,
     SplitMergeMixin, UnmatchMatchMixin, RatingMixin,
-    ArtMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
     AlbumEditMixins
 ):
     """ Represents a single Album.
@@ -504,7 +505,7 @@ class Album(
 class Track(
     Audio, Playable,
     ExtrasMixin, RatingMixin,
-    ArtUrlMixin, PosterUrlMixin, SquareArtUrlMixin, ThemeUrlMixin,
+    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin, ThemeUrlMixin,
     TrackEditMixins
 ):
     """ Represents a single Track.
