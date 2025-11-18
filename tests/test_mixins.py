@@ -219,6 +219,10 @@ def lock_art(obj):
     _test_mixins_lock_image(obj, "arts")
 
 
+def lock_logo(obj):
+    _test_mixins_lock_image(obj, "logos")
+
+
 def lock_poster(obj):
     _test_mixins_lock_image(obj, "posters")
 
@@ -294,6 +298,10 @@ def edit_art(obj):
     _test_mixins_edit_image(obj, "arts")
 
 
+def edit_logo(obj):
+    _test_mixins_edit_image(obj, "logos")
+
+
 def edit_poster(obj):
     _test_mixins_edit_image(obj, "posters")
 
@@ -353,8 +361,16 @@ def _test_mixins_edit_theme(obj):
     obj.lockTheme()
     obj.reload()
     assert "theme" in _fields()
+
+    # Set the theme
     with pytest.raises(NotImplementedError):
         obj.setTheme(themes[0])
+
+    # Delete the theme
+    obj.deleteTheme()
+    obj.reload()
+    selected_theme = next((t for t in obj.themes() if t.selected), None)
+    assert selected_theme is None
 
 
 def edit_theme(obj):

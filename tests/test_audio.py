@@ -103,9 +103,11 @@ def test_audio_Artist_mixins_edit_advanced_settings(artist):
 @pytest.mark.xfail(reason="Changing images fails randomly")
 def test_audio_Artist_mixins_images(artist):
     test_mixins.lock_art(artist)
+    test_mixins.lock_logo(artist)
     test_mixins.lock_poster(artist)
     test_mixins.lock_squareArt(artist)
     test_mixins.edit_art(artist)
+    test_mixins.edit_logo(artist)
     test_mixins.edit_poster(artist)
     test_mixins.edit_squareArt(artist)
     test_mixins.attr_artUrl(artist)
@@ -237,9 +239,11 @@ def test_audio_Album_artist(album):
 @pytest.mark.xfail(reason="Changing images fails randomly")
 def test_audio_Album_mixins_images(album):
     test_mixins.lock_art(album)
+    test_mixins.lock_logo(album)
     test_mixins.lock_poster(album)
     test_mixins.lock_squareArt(album)
     test_mixins.edit_art(album)
+    test_mixins.edit_logo(album)
     test_mixins.edit_poster(album)
     test_mixins.edit_squareArt(album)
     test_mixins.attr_artUrl(album)
