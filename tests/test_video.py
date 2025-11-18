@@ -695,8 +695,10 @@ def test_video_Movie_mixins_edit_advanced_settings(movie):
 def test_video_Movie_mixins_images(movie):
     test_mixins.lock_art(movie)
     test_mixins.lock_poster(movie)
+    test_mixins.lock_square_art(movie)
     test_mixins.edit_art(movie)
     test_mixins.edit_poster(movie)
+    test_mixins.edit_square_art(movie)
     test_mixins.attr_artUrl(movie)
     test_mixins.attr_logoUrl(movie)
     test_mixins.attr_posterUrl(movie)
@@ -965,11 +967,14 @@ def test_video_Show_mixins_edit_advanced_settings(show):
 def test_video_Show_mixins_images(show):
     test_mixins.lock_art(show)
     test_mixins.lock_poster(show)
+    test_mixins.lock_square_art(show)
     test_mixins.edit_art(show)
     test_mixins.edit_poster(show)
+    test_mixins.edit_square_art(show)
     test_mixins.attr_artUrl(show)
     test_mixins.attr_logoUrl(show)
     test_mixins.attr_posterUrl(show)
+    test_mixins.attr_squareArtUrl(show)
 
 
 def test_video_Show_mixins_themes(show):
@@ -1021,6 +1026,53 @@ def test_video_Show_PlexWebURL(plex, show):
 @pytest.mark.authenticated
 def test_video_Show_streamingServices(show):
     assert show.streamingServices()
+
+
+def test_video_Show_commonSenseMedia(show):
+    commonSenseMedia = show.commonSenseMedia
+    assert utils.is_int(commonSenseMedia.id)
+    assert commonSenseMedia.oneLiner
+
+    ageRating = commonSenseMedia.ageRatings[0]
+    assert ageRating.type == 'official'
+    assert utils.is_float(ageRating.age, gte=0.0)
+    assert utils.is_float(ageRating.rating, gte=0.0)
+
+
+@pytest.mark.authenticated
+def test_video_Show_commonSenseMedia_full(account_plexpass, show):
+    commonSenseMedia = show.commonSenseMedia
+    commonSenseMedia.reload()
+    assert commonSenseMedia.anyGood
+    assert commonSenseMedia.key
+    assert commonSenseMedia.oneLiner
+    assert commonSenseMedia.parentsNeedToKnow
+
+    ageRatings = commonSenseMedia.ageRatings
+    assert len(ageRatings) == 3
+    types = {r.type for r in ageRatings}
+    assert types == {'official', 'child', 'adult'}
+    ageRating = next(r for r in ageRatings if r.type == 'official')
+    assert utils.is_float(ageRating.age, gte=0.0)
+    if ageRating.ageGroup is not None:
+        assert ageRating.ageGroup
+    assert utils.is_float(ageRating.rating, gte=0.0)
+    if ageRating.ratingCount is not None:
+        assert utils.is_int(ageRating.ratingCount, gte=0)
+
+    talkingPoints = commonSenseMedia.talkingPoints
+    assert len(talkingPoints)
+    talkingPoint = talkingPoints[0]
+    assert talkingPoint.tag
+
+    parentalAdvisoryTopics = commonSenseMedia.parentalAdvisoryTopics
+    assert len(parentalAdvisoryTopics)
+    parentalAdvisoryTopic = parentalAdvisoryTopics[0]
+    assert parentalAdvisoryTopic.id
+    assert parentalAdvisoryTopic.label
+    assert utils.is_bool(parentalAdvisoryTopic.positive)
+    assert utils.is_float(parentalAdvisoryTopic.rating, gte=0.0)
+    assert parentalAdvisoryTopic.tag
 
 
 def test_video_Season(show):
@@ -1123,11 +1175,14 @@ def test_video_Season_mixins_images(show):
     season = show.season(season=1)
     test_mixins.lock_art(season)
     test_mixins.lock_poster(season)
+    test_mixins.lock_square_art(season)
     test_mixins.edit_art(season)
     test_mixins.edit_poster(season)
+    test_mixins.edit_square_art(season)
     test_mixins.attr_artUrl(season)
     test_mixins.attr_logoUrl(season)
     test_mixins.attr_posterUrl(season)
+    test_mixins.attr_squareArtUrl(season)
 
 
 def test_video_Season_mixins_themes(show):
@@ -1342,11 +1397,14 @@ def test_video_Episode_unwatched(tvshows):
 def test_video_Episode_mixins_images(episode):
     test_mixins.lock_art(episode)
     test_mixins.lock_poster(episode)
+    test_mixins.lock_square_art(episode)
     # test_mixins.edit_art(episode)  # Uploading episode artwork is broken in Plex
     test_mixins.edit_poster(episode)
+    test_mixins.edit_square_art(episode)
     test_mixins.attr_artUrl(episode)
     test_mixins.attr_logoUrl(episode)
     test_mixins.attr_posterUrl(episode)
+    test_mixins.attr_squareArtUrl(episode)
 
 
 def test_video_Episode_mixins_themes(episode):

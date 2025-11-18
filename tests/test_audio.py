@@ -104,11 +104,14 @@ def test_audio_Artist_mixins_edit_advanced_settings(artist):
 def test_audio_Artist_mixins_images(artist):
     test_mixins.lock_art(artist)
     test_mixins.lock_poster(artist)
+    test_mixins.lock_square_art(artist)
     test_mixins.edit_art(artist)
     test_mixins.edit_poster(artist)
+    test_mixins.edit_square_art(artist)
     test_mixins.attr_artUrl(artist)
     test_mixins.attr_logoUrl(artist)
     test_mixins.attr_posterUrl(artist)
+    test_mixins.attr_squareArtUrl(artist)
 
 
 def test_audio_Artist_mixins_themes(artist):
@@ -235,11 +238,14 @@ def test_audio_Album_artist(album):
 def test_audio_Album_mixins_images(album):
     test_mixins.lock_art(album)
     test_mixins.lock_poster(album)
+    test_mixins.lock_square_art(album)
     test_mixins.edit_art(album)
     test_mixins.edit_poster(album)
+    test_mixins.edit_square_art(album)
     test_mixins.attr_artUrl(album)
     test_mixins.attr_logoUrl(album)
     test_mixins.attr_posterUrl(album)
+    test_mixins.attr_squareArtUrl(album)
 
 
 def test_audio_Album_mixins_themes(album):
@@ -428,6 +434,7 @@ def test_audio_Track_mixins_images(track):
     test_mixins.attr_artUrl(track)
     test_mixins.attr_logoUrl(track)
     test_mixins.attr_posterUrl(track)
+    test_mixins.attr_squareArtUrl(track)
 
 
 def test_audio_Track_mixins_themes(track):

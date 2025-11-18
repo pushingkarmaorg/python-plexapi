@@ -382,7 +382,7 @@ class ArtMixin(ArtUrlMixin, ArtLockMixin):
 
             Parameters:
                 url (str): The full URL to the image to upload.
-                filepath (str): The full file path the the image to upload or file-like object.
+                filepath (str): The full file path to the image to upload or file-like object.
         """
         if url:
             key = f'/library/metadata/{self.ratingKey}/arts?url={quote_plus(url)}'
@@ -437,7 +437,7 @@ class LogoMixin(LogoUrlMixin, LogoLockMixin):
 
             Parameters:
                 url (str): The full URL to the image to upload.
-                filepath (str): The full file path the the image to upload or file-like object.
+                filepath (str): The full file path to the image to upload or file-like object.
         """
         if url:
             key = f'/library/metadata/{self.ratingKey}/clearLogos?url={quote_plus(url)}'
@@ -499,7 +499,7 @@ class PosterMixin(PosterUrlMixin, PosterLockMixin):
 
             Parameters:
                 url (str): The full URL to the image to upload.
-                filepath (str): The full file path the the image to upload or file-like object.
+                filepath (str): The full file path to the image to upload or file-like object.
         """
         if url:
             key = f'/library/metadata/{self.ratingKey}/posters?url={quote_plus(url)}'
@@ -517,6 +517,71 @@ class PosterMixin(PosterUrlMixin, PosterLockMixin):
                 poster (:class:`~plexapi.media.Poster`): The poster object to select.
         """
         poster.select()
+        return self
+
+
+class SquareArtUrlMixin:
+    """ Mixin for Plex objects that can have a square art url. """
+
+    @property
+    def squareArt(self):
+        """ Return the API path to the square art image. """
+        return next((i.url for i in self.images if i.type == 'backgroundSquare'), None)
+
+    @property
+    def squareArtUrl(self):
+        """ Return the square art url for the Plex object. """
+        return self._server.url(self.squareArt, includeToken=True) if self.squareArt else None
+
+
+class SquareArtLockMixin:
+    """ Mixin for Plex objects that can have a locked square art. """
+
+    def lockSquareArt(self):
+        """ Lock the square art for a Plex object. """
+        return self._edit(**{'squareArt.locked': 1})
+
+    def unlockSquareArt(self):
+        """ Unlock the square art for a Plex object. """
+        return self._edit(**{'squareArt.locked': 0})
+
+
+class SquareArtMixin(SquareArtUrlMixin, SquareArtLockMixin):
+    """ Mixin for Plex objects that can have square art. """
+
+    def squareArts(self):
+        """ Returns list of available :class:`~plexapi.media.SquareArt` objects. """
+        return self.fetchItems(f'/library/metadata/{self.ratingKey}/squareArts', cls=media.SquareArt)
+
+    def uploadSquareArt(self, url=None, filepath=None):
+        """ Upload a square art from a url or filepath.
+
+            Parameters:
+                url (str): The full URL to the image to upload.
+                filepath (str): The full file path to the image to upload or file-like object.
+        """
+        if url:
+            key = f'/library/metadata/{self.ratingKey}/squareArts?url={quote_plus(url)}'
+            self._server.query(key, method=self._server._session.post)
+        elif filepath:
+            key = f'/library/metadata/{self.ratingKey}/squareArts'
+            data = openOrRead(filepath)
+            self._server.query(key, method=self._server._session.post, data=data)
+        return self
+
+    def setSquareArt(self, squareArt):
+        """ Set the square art for a Plex object.
+
+            Parameters:
+                squareArt (:class:`~plexapi.media.SquareArt`): The square art object to select.
+        """
+        squareArt.select()
+        return self
+
+    def deleteSquareArt(self):
+        """ Delete the square art from a Plex object. """
+        key = f'/library/metadata/{self.ratingKey}/squareArt'
+        self._server.query(key, method=self._server._session.delete)
         return self
 
 
