@@ -1414,3 +1414,99 @@ class PlaylistEditMixins(
     SortTitleMixin, SummaryMixin, TitleMixin
 ):
     pass
+
+
+class MovieMixins(
+    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
+    MovieEditMixins,
+    WatchlistMixin
+):
+    pass
+
+
+class ShowMixins(
+    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
+    ShowEditMixins,
+    WatchlistMixin
+):
+    pass
+
+
+class SeasonMixins(
+    AdvancedSettingsMixin, ExtrasMixin, RatingMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
+    SeasonEditMixins
+):
+    pass
+
+
+class EpisodeMixins(
+    ExtrasMixin, RatingMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
+    EpisodeEditMixins
+):
+    pass
+
+
+class ClipMixins(
+    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin
+):
+    pass
+
+
+class ArtistMixins(
+    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
+    ArtistEditMixins
+):
+    pass
+
+
+class AlbumMixins(
+    SplitMergeMixin, UnmatchMatchMixin, RatingMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
+    AlbumEditMixins
+):
+    pass
+
+
+class TrackMixins(
+    ExtrasMixin, RatingMixin,
+    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin, ThemeUrlMixin,
+    TrackEditMixins
+):
+    pass
+
+
+class PhotoalbumMixins(
+    RatingMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin,
+    PhotoalbumEditMixins
+):
+    pass
+
+
+class PhotoMixins(
+    RatingMixin,
+    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin,
+    PhotoEditMixins
+):
+    pass
+
+
+class CollectionMixins(
+    AdvancedSettingsMixin, SmartFilterMixin, HubsMixin, RatingMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
+    CollectionEditMixins
+):
+    pass
+
+
+class PlaylistMixins(
+    SmartFilterMixin,
+    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin,
+    PlaylistEditMixins
+):
+    pass
