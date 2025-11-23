@@ -111,7 +111,7 @@ class SmartFilterMixin:
 
     def _parseQueryFeed(self, feed: "deque[Tuple[str, str]]") -> dict:
         """ Parse the query string into a dict. """
-        filtersDict = {}
+        filtersDict: dict[str, Union[str, int, list, dict]] = {}
         special_keys = {"type", "sort"}
         integer_keys = {"includeGuids", "limit"}
         as_is_keys = {"group", "having"}
