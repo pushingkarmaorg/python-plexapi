@@ -6,13 +6,7 @@ from urllib.parse import quote_plus
 from plexapi import media, utils
 from plexapi.base import Playable, PlexPartialObject, PlexHistory, PlexSession, cached_data_property
 from plexapi.exceptions import BadRequest
-from plexapi.mixins import (
-    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, PlayedUnplayedMixin, RatingMixin,
-    ArtUrlMixin, ArtMixin, LogoMixin, LogoUrlMixin, PosterUrlMixin, PosterMixin, SquareArtMixin, SquareArtUrlMixin,
-    ThemeUrlMixin, ThemeMixin,
-    MovieEditMixins, ShowEditMixins, SeasonEditMixins, EpisodeEditMixins,
-    WatchlistMixin
-)
+from plexapi.mixins import MovieMixins, ShowMixins, SeasonMixins, EpisodeMixins, ClipMixins, PlayedUnplayedMixin
 
 
 class Video(PlexPartialObject, PlayedUnplayedMixin):
@@ -337,11 +331,7 @@ class Video(PlexPartialObject, PlayedUnplayedMixin):
 
 @utils.registerPlexObject
 class Movie(
-    Video, Playable,
-    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
-    MovieEditMixins,
-    WatchlistMixin
+    Video, Playable, MovieMixins
 ):
     """ Represents a single Movie.
 
@@ -549,11 +539,7 @@ class Movie(
 
 @utils.registerPlexObject
 class Show(
-    Video,
-    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
-    ShowEditMixins,
-    WatchlistMixin
+    Video, ShowMixins
 ):
     """ Represents a single Show (including all seasons and episodes).
 
@@ -801,10 +787,7 @@ class Show(
 
 @utils.registerPlexObject
 class Season(
-    Video,
-    AdvancedSettingsMixin, ExtrasMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
-    SeasonEditMixins
+    Video, SeasonMixins
 ):
     """ Represents a single Season.
 
@@ -983,10 +966,7 @@ class Season(
 
 @utils.registerPlexObject
 class Episode(
-    Video, Playable,
-    ExtrasMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
-    EpisodeEditMixins
+    Video, Playable, EpisodeMixins
 ):
     """ Represents a single Episode.
 
@@ -1260,8 +1240,7 @@ class Episode(
 
 @utils.registerPlexObject
 class Clip(
-    Video, Playable,
-    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin
+    Video, Playable, ClipMixins
 ):
     """ Represents a single Clip.
 
