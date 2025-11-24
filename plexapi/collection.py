@@ -11,7 +11,6 @@ from plexapi.mixins import (
     ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     CollectionEditMixins
 )
-from plexapi.utils import deprecated
 
 
 @utils.registerPlexObject
@@ -165,11 +164,6 @@ class Collection(
     def isPhoto(self):
         """ Returns True if this is a photo collection. """
         return self.subtype in {'photoalbum', 'photo'}
-
-    @property
-    @deprecated('use "items" instead', stacklevel=3)
-    def children(self):
-        return self.items()
 
     @cached_data_property
     def _filters(self):
@@ -421,33 +415,6 @@ class Collection(
         key = f"{self.key}/items{utils.joinArgs(args)}"
         self._server.query(key, method=self._server._session.put)
         return self
-
-    @deprecated('use editTitle, editSortTitle, editContentRating, and editSummary instead')
-    def edit(self, title=None, titleSort=None, contentRating=None, summary=None, **kwargs):
-        """ Edit the collection.
-
-            Parameters:
-                title (str, optional): The title of the collection.
-                titleSort (str, optional): The sort title of the collection.
-                contentRating (str, optional): The summary of the collection.
-                summary (str, optional): The summary of the collection.
-        """
-        args = {}
-        if title is not None:
-            args['title.value'] = title
-            args['title.locked'] = 1
-        if titleSort is not None:
-            args['titleSort.value'] = titleSort
-            args['titleSort.locked'] = 1
-        if contentRating is not None:
-            args['contentRating.value'] = contentRating
-            args['contentRating.locked'] = 1
-        if summary is not None:
-            args['summary.value'] = summary
-            args['summary.locked'] = 1
-
-        args.update(kwargs)
-        self._edit(**args)
 
     def delete(self):
         """ Delete the collection. """
