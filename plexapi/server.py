@@ -16,7 +16,6 @@ from plexapi.media import Conversion, Optimized
 from plexapi.playlist import Playlist
 from plexapi.playqueue import PlayQueue
 from plexapi.settings import Settings
-from plexapi.utils import deprecated
 from requests.status_codes import _codes as codes
 
 # Need these imports to populate utils.PLEXOBJECTS
@@ -613,10 +612,6 @@ class PlexServer(PlexObject):
         self.query(f'/butler/{task}', method=self._session.post)
         return self
 
-    @deprecated('use "checkForUpdate" instead')
-    def check_for_update(self, force=True, download=False):
-        return self.checkForUpdate(force=force, download=download)
-
     def checkForUpdate(self, force=True, download=False):
         """ Returns a :class:`~plexapi.server.Release` object containing release info
             if an update is available or None if no update is available.
@@ -727,15 +722,6 @@ class PlexServer(PlexObject):
         else:
             backgroundProcessing = self.fetchItem('/playlists?type=42')
             return self.fetchItems(f'{backgroundProcessing.key}/items', cls=Optimized)
-
-    @deprecated('use "plexapi.media.Optimized.items()" instead')
-    def optimizedItem(self, optimizedID):
-        """ Returns single queued optimized item :class:`~plexapi.media.Video` object.
-            Allows for using optimized item ID to connect back to source item.
-        """
-
-        backgroundProcessing = self.fetchItem('/playlists?type=42')
-        return self.fetchItem(f'{backgroundProcessing.key}/items/{optimizedID}/items')
 
     def conversions(self, pause=None):
         """ Returns list of all :class:`~plexapi.media.Conversion` objects connected to server. """
