@@ -1779,7 +1779,7 @@ class MyPlexPinLogin:
             'context[device][platformVersion]': headers['X-Plex-Platform-Version'],
             'context[device][device]': headers['X-Plex-Device'],
             'context[device][deviceName]': headers['X-Plex-Device-Name'],
-            'code': self._code
+            'code': self._getCode()
         }
         if forwardUrl:
             params['forwardUrl'] = forwardUrl
