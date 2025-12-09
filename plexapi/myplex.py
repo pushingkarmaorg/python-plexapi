@@ -1722,7 +1722,7 @@ class MyPlexPinLogin:
 
                 from plexapi.myplex import MyPlexAccount, MyPlexPinLogin
 
-                pinlogin = MyPlexPinLogin()
+                pinlogin = MyPlexPinLogin(oauth=True)
                 pinlogin.run()
                 print(f'Login to Plex at the following url:\\n{pinlogin.oauthUrl()}')
                 pinlogin.waitForLogin()
