@@ -1759,7 +1759,7 @@ class MyPlexPinLogin:
         """
         if self._oauth:
             raise BadRequest('Cannot use PIN for Plex OAuth login')
-        return self._code
+        return self._getCode()
 
     def oauthUrl(self, forwardUrl=None):
         """ Return the Plex OAuth url for login.
@@ -1848,6 +1848,9 @@ class MyPlexPinLogin:
         return False
 
     def _getCode(self):
+        if self._code:
+            return self._code
+
         url = self.PINS
 
         if self._oauth:
