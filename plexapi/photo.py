@@ -6,19 +6,12 @@ from urllib.parse import quote_plus
 from plexapi import media, utils, video
 from plexapi.base import Playable, PlexPartialObject, PlexSession, cached_data_property
 from plexapi.exceptions import BadRequest
-from plexapi.mixins import (
-    RatingMixin,
-    ArtUrlMixin, ArtMixin, LogoMixin, LogoUrlMixin, PosterUrlMixin, PosterMixin, SquareArtMixin, SquareArtUrlMixin,
-    PhotoalbumEditMixins, PhotoEditMixins
-)
+from plexapi.mixins import PhotoalbumMixins, PhotoMixins
 
 
 @utils.registerPlexObject
 class Photoalbum(
-    PlexPartialObject,
-    RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin,
-    PhotoalbumEditMixins
+    PlexPartialObject, PhotoalbumMixins
 ):
     """ Represents a single Photoalbum (collection of photos).
 
@@ -157,10 +150,7 @@ class Photoalbum(
 
 @utils.registerPlexObject
 class Photo(
-    PlexPartialObject, Playable,
-    RatingMixin,
-    ArtUrlMixin, LogoUrlMixin, PosterUrlMixin, SquareArtUrlMixin,
-    PhotoEditMixins
+    PlexPartialObject, Playable, PhotoMixins
 ):
     """ Represents a single Photo.
 
