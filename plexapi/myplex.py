@@ -1722,7 +1722,7 @@ class MyPlexPinLogin:
 
                 from plexapi.myplex import MyPlexAccount, MyPlexPinLogin
 
-                pinlogin = MyPlexPinLogin()
+                pinlogin = MyPlexPinLogin(oauth=True)
                 pinlogin.run()
                 print(f'Login to Plex at the following url:\\n{pinlogin.oauthUrl()}')
                 pinlogin.waitForLogin()
@@ -1759,7 +1759,7 @@ class MyPlexPinLogin:
         """
         if self._oauth:
             raise BadRequest('Cannot use PIN for Plex OAuth login')
-        return self._code
+        return self._getCode()
 
     def oauthUrl(self, forwardUrl=None):
         """ Return the Plex OAuth url for login.
@@ -1779,7 +1779,7 @@ class MyPlexPinLogin:
             'context[device][platformVersion]': headers['X-Plex-Platform-Version'],
             'context[device][device]': headers['X-Plex-Device'],
             'context[device][deviceName]': headers['X-Plex-Device-Name'],
-            'code': self._code
+            'code': self._getCode()
         }
         if forwardUrl:
             params['forwardUrl'] = forwardUrl
@@ -1848,6 +1848,9 @@ class MyPlexPinLogin:
         return False
 
     def _getCode(self):
+        if self._code:
+            return self._code
+
         url = self.PINS
 
         if self._oauth:
