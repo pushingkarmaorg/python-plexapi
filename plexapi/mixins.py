@@ -6,7 +6,7 @@ from urllib.parse import parse_qsl, quote, quote_plus, unquote, urlencode, urlsp
 
 from plexapi import media, settings, utils
 from plexapi.exceptions import BadRequest, NotFound
-from plexapi.utils import deprecated, openOrRead
+from plexapi.utils import openOrRead
 
 
 class AdvancedSettingsMixin:
@@ -936,10 +936,6 @@ class UserRatingMixin(EditFieldMixin):
 
 class EditTagsMixin:
     """ Mixin for editing Plex object tags. """
-
-    @deprecated('use "editTags" instead')
-    def _edit_tags(self, tag, items, locked=True, remove=False):
-        return self.editTags(tag, items, locked, remove)
 
     def editTags(self, tag, items, locked=True, remove=False, **kwargs):
         """ Edit the tags of a Plex object. All tag editing methods can be chained together.
