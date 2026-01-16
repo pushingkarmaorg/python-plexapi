@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from .payloads import SONOS_RESOURCES
 
 

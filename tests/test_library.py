@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import namedtuple
 from datetime import datetime, timedelta
 from urllib.parse import quote_plus

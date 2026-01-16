@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Plex-RefreshToken is a simple method to refresh a Plex account token by pinging Plex.tv.
 """

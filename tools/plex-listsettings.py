@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Plex-ListSettings is used during development of PlexAPI and loops through available
 setting items and separates them by group as well as display the variable type. The

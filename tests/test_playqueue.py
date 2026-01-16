@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plexapi.exceptions import BadRequest
 from plexapi.playqueue import PlayQueue
 import pytest

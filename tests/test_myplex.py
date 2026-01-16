@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 from plexapi.exceptions import BadRequest, NotFound, Unauthorized
 from plexapi.myplex import MyPlexInvite
