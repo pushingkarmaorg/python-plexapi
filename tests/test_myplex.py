@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from plexapi.exceptions import BadRequest, NotFound, Unauthorized
-from plexapi.myplex import MyPlexInvite
+from plexapi.myplex import MyPlexAccount, MyPlexInvite, MyPlexJWTLogin
 
 from . import conftest as utils
 from .payloads import MYPLEX_INVITE
@@ -366,3 +366,29 @@ def test_myplex_geoip(account):
 
 def test_myplex_ping(account):
     assert account.ping()
+
+
+def test_myplex_jwt_login(account):
+    jwtlogin = MyPlexJWTLogin(
+        token=account.authToken,
+        scopes=['username', 'email', 'friendly_name']
+    )
+    jwtlogin.generateKeypair(keyfiles=('private.key', 'public.key'), overwrite=True)
+    with pytest.raises(FileExistsError):
+        jwtlogin.generateKeypair(keyfiles=('private.key', 'public.key'))
+    jwtlogin.registerDevice()
+    jwtToken = jwtlogin.refreshJWT()
+    assert jwtlogin.decodePlexJWT()
+    assert jwtlogin.decodedJWT['user']['username'] == account.username
+    assert MyPlexAccount(token=jwtToken) == account
+
+    jwtlogin = MyPlexJWTLogin(
+        jwtToken=jwtToken,
+        keypair=('private.key', 'public.key'),
+        scopes=['username', 'email', 'friendly_name']
+    )
+    assert jwtlogin.verifyJWT()
+    newjwtToken = jwtlogin.refreshJWT()
+    assert newjwtToken != jwtToken
+    assert jwtlogin.decodePlexJWT()
+    assert MyPlexAccount(token=newjwtToken) == account
