@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import jwt
+
 import pytest
 from plexapi.exceptions import BadRequest, NotFound, Unauthorized
 from plexapi.myplex import MyPlexAccount, MyPlexInvite, MyPlexJWTLogin
@@ -368,7 +370,7 @@ def test_myplex_ping(account):
     assert account.ping()
 
 
-def test_myplex_jwt_login(account, tmp_path):
+def test_myplex_jwt_login(account, tmp_path, monkeypatch):
     jwtlogin = MyPlexJWTLogin(
         token=account.authToken,
         scopes=['username', 'email', 'friendly_name']
@@ -378,7 +380,6 @@ def test_myplex_jwt_login(account, tmp_path):
         jwtlogin.generateKeypair(keyfiles=(tmp_path / 'private.key', tmp_path / 'public.key'))
     jwtlogin.registerDevice()
     jwtToken = jwtlogin.refreshJWT()
-    assert jwtlogin.decodePlexJWT()
     assert jwtlogin.decodedJWT['user']['username'] == account.username
     assert MyPlexAccount(token=jwtToken) == account
 
@@ -390,5 +391,14 @@ def test_myplex_jwt_login(account, tmp_path):
     assert jwtlogin.verifyJWT()
     newjwtToken = jwtlogin.refreshJWT()
     assert newjwtToken != jwtToken
-    assert jwtlogin.decodePlexJWT()
     assert MyPlexAccount(token=newjwtToken) == account
+
+    plexPublicJWKs = jwtlogin._getPlexPublicJWK()
+    invalidJWK = plexPublicJWKs[0].copy()
+    invalidJWK['x'] += b'0'
+    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda: [invalidJWK] + plexPublicJWKs)
+    assert jwtlogin.decodePlexJWT()
+
+    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda: [invalidJWK])
+    with pytest.raises(jwt.InvalidSignatureError):
+        jwtlogin.decodePlexJWT()
