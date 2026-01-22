@@ -2166,7 +2166,7 @@ class MyPlexJWTLogin:
 
         kwargs['options']['require'] = ['aud', 'iss', 'exp', 'iat', 'thumbprint']
 
-        for plexJWK in self._getPlexPublicJWK():
+        for plexJWK in reversed(self._getPlexPublicJWK()):
             try:
                 return jwt.decode(
                     key=jwt.PyJWK.from_dict(plexJWK),
@@ -2183,8 +2183,8 @@ class MyPlexJWTLogin:
 
     @property
     def decodedJWT(self):
-        """ Returns the decoded Plex JWT without any signature verification. """
-        return self.decodePlexJWT(verify_signature=False)
+        """ Returns the decoded Plex JWT with signature verification and required-claim enforcement. """
+        return self.decodePlexJWT()
 
     def _registerPlexDevice(self):
         """ Registers the public JWK with Plex. """
@@ -2210,7 +2210,7 @@ class MyPlexJWTLogin:
         """ Gets the Plex public JWKs. """
         url = f'{self.AUTH}/keys'
         data = self._query(url, method=self._session.get)
-        return reversed(data['keys'])
+        return data['keys']
 
     def registerDevice(self):
         """ Registers the device with Plex using the provided token and private/public keypair.
@@ -2255,7 +2255,7 @@ class MyPlexJWTLogin:
                     the JWT invalid and in need of refresh. Default is 1 day.
         """
         try:
-            decodedJWT = self.decodePlexJWT()
+            decodedJWT = self.decodedJWT
         except jwt.InvalidTokenError:
             return False
         else:
