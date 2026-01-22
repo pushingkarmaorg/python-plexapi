@@ -2147,10 +2147,11 @@ class MyPlexJWTLogin:
         )
 
     def decodePlexJWT(self, verify_signature=True):
-        """ Returns the decoded and verified Plex JWT using the Plex public JWK.
+        """ Returns the decoded Plex JWT with optional signature verification using the Plex public JWK.
 
             Parameters:
-                verify_signature (bool): Set to False to skip signature verification.
+                verify_signature (bool): Whether to verify the JWT signature and required claims.
+                    Defaults to True. Set to False to skip signature verification and required-claim enforcement.
         """
         kwargs = {
             'jwt': self.jwtToken,
