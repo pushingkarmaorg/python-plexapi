@@ -396,9 +396,9 @@ def test_myplex_jwt_login(account, tmp_path, monkeypatch):
     plexPublicJWKs = jwtlogin._getPlexPublicJWK()
     invalidJWK = plexPublicJWKs[0].copy()
     invalidJWK['x'] += 'invalid'
-    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda: plexPublicJWKs + [invalidJWK])
+    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda self: plexPublicJWKs + [invalidJWK])
     assert jwtlogin.decodePlexJWT()
 
-    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda: [invalidJWK])
+    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda self: [invalidJWK])
     with pytest.raises(jwt.InvalidSignatureError):
         jwtlogin.decodePlexJWT()
