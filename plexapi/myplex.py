@@ -2177,9 +2177,9 @@ class MyPlexJWTLogin:
             except jwt.InvalidTokenError as e:
                 log.warning('Invalid Plex JWT: %s', str(e))
                 raise
-        else:
-            log.warning('Plex JWT signature could not be verified with any known Plex JWKs')
-            raise jwt.InvalidSignatureError
+
+        log.warning('Plex JWT signature could not be verified with any known Plex JWKs')
+        raise jwt.InvalidSignatureError
 
     @property
     def decodedJWT(self):
