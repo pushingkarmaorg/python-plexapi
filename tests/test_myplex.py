@@ -368,14 +368,14 @@ def test_myplex_ping(account):
     assert account.ping()
 
 
-def test_myplex_jwt_login(account):
+def test_myplex_jwt_login(account, tmp_path):
     jwtlogin = MyPlexJWTLogin(
         token=account.authToken,
         scopes=['username', 'email', 'friendly_name']
     )
-    jwtlogin.generateKeypair(keyfiles=('private.key', 'public.key'), overwrite=True)
+    jwtlogin.generateKeypair(keyfiles=(tmp_path / 'private.key', tmp_path / 'public.key'), overwrite=True)
     with pytest.raises(FileExistsError):
-        jwtlogin.generateKeypair(keyfiles=('private.key', 'public.key'))
+        jwtlogin.generateKeypair(keyfiles=(tmp_path / 'private.key', tmp_path / 'public.key'))
     jwtlogin.registerDevice()
     jwtToken = jwtlogin.refreshJWT()
     assert jwtlogin.decodePlexJWT()
