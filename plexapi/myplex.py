@@ -2443,7 +2443,7 @@ class MyPlexJWTLogin:
             codename = codes.get(response.status_code)[0]
             errtext = response.text.replace('\n', ' ')
             raise BadRequest(f'({response.status_code}) {codename} {response.url}; {errtext}')
-        if 'application/json' in response.headers.get('Content-Type', ''):
+        if 'application/json' in response.headers.get('Content-Type', '') and len(response.content):
             return response.json()
         return utils.parseXMLString(response.text)
 
