@@ -395,8 +395,8 @@ def test_myplex_jwt_login(account, tmp_path, monkeypatch):
 
     plexPublicJWKs = jwtlogin._getPlexPublicJWK()
     invalidJWK = plexPublicJWKs[0].copy()
-    invalidJWK['x'] += b'0'
-    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda: [invalidJWK] + plexPublicJWKs)
+    invalidJWK['x'] += 'invalid'
+    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda: plexPublicJWKs + [invalidJWK])
     assert jwtlogin.decodePlexJWT()
 
     monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda: [invalidJWK])
