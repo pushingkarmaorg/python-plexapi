@@ -385,7 +385,7 @@ def test_myplex_jwt_login(account, tmp_path, monkeypatch):
 
     jwtlogin = MyPlexJWTLogin(
         jwtToken=jwtToken,
-        keypair=('private.key', 'public.key'),
+        keypair=(tmp_path / 'private.key', tmp_path / 'public.key'),
         scopes=['username', 'email', 'friendly_name']
     )
     assert jwtlogin.verifyJWT()
