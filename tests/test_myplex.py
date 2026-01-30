@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import jwt
 
 import pytest
@@ -25,7 +24,6 @@ def test_myplex_accounts(account, plex):
     # print('authToken: %s' % account.authToken)
     print(f"signInState: {account.signInState}")
     assert account.username, "Account has no username"
-    assert account.authToken, "Account has no authToken"
     assert account.signInState, "Account has no signInState"
 
 

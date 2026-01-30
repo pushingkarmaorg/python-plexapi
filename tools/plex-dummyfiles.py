@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Plex-DummyFiles creates dummy files for testing with the proper
 Plex folder and file naming structure.

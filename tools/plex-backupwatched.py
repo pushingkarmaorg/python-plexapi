@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Backup and restore the watched status of Plex libraries to a json file.
 """
