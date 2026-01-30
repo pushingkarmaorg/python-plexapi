@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Helper script to bump the current version."""
 import argparse
 import re

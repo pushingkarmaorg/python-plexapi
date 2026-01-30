@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from urllib.parse import urlencode
 
@@ -1060,7 +1059,6 @@ class Account(PlexObject):
             data (ElementTree): Response from PlexServer used to build this object (optional).
 
         Attributes:
-            authToken (str): Plex authentication token to access the server.
             mappingError (str): Unknown
             mappingErrorMessage (str): Unknown
             mappingState (str): Unknown
@@ -1082,7 +1080,6 @@ class Account(PlexObject):
 
     def _loadData(self, data):
         """ Load attribute values from Plex XML response. """
-        self.authToken = data.attrib.get('authToken')
         self.username = data.attrib.get('username')
         self.mappingState = data.attrib.get('mappingState')
         self.mappingError = data.attrib.get('mappingError')

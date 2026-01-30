@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Python PlexAPI documentation build configuration file, created by
 # sphinx-quickstart on Sun Jan  8 23:50:18 2017.

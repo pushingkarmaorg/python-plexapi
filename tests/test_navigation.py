@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 def test_navigate_around_show(account, plex):
     show = plex.library.section("TV Shows").get("The 100")
     seasons = show.seasons()

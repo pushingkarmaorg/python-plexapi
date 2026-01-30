@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 The script is used to bootstrap a the test environment for plexapi
 with all the libraries required for testing.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import shlex
 import subprocess
 from os.path import abspath, dirname, join
