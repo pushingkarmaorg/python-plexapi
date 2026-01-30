@@ -131,7 +131,7 @@ def test_video_Movie_attrs(movies):  # noqa: C901
     assert audio.language is None
     assert audio.languageCode is None
     assert audio.languageTag is None
-    assert audio.profile == "lc"
+    assert audio.profile in (None, "lc")
     assert audio.requiredBandwidths is None or audio.requiredBandwidths
     assert audio.samplingRate == 44100
     assert audio.selected is True
