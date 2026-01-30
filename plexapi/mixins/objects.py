@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 class ExtrasMixin:
     """ Mixin for Plex objects that can have extras. """
 

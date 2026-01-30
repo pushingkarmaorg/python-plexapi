@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 class WatchlistMixin:
     """ Mixin for Plex objects that can be added to a user's watchlist. """
 

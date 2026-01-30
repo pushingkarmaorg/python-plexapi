@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 PlexAPI Mixins Module
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import deque
 from typing import Deque, Set, Tuple, Union
 from urllib.parse import parse_qsl, unquote, urlsplit

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 class SplitMergeMixin:
     """ Mixin for Plex objects that can be split and merged. """
 

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 class PlayedUnplayedMixin:
     """ Mixin for Plex objects that can be marked played and unplayed. """
 
