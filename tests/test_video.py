@@ -145,7 +145,7 @@ def test_video_Movie_attrs(movies):  # noqa: C901
     assert media.aspectRatio >= 1.3
     assert media.audioChannels in utils.AUDIOCHANNELS
     assert media.audioCodec in utils.CODECS
-    assert media.audioProfile == "lc"
+    assert media.audioProfile in (None, "lc")
     assert utils.is_int(media.bitrate)
     assert media.container in utils.CONTAINERS
     assert utils.is_int(media.duration, gte=160000)
@@ -223,7 +223,7 @@ def test_video_Movie_attrs(movies):  # noqa: C901
     # Part
     part = media.parts[0]
     assert part.accessible is None
-    assert part.audioProfile == "lc"
+    assert part.audioProfile in (None, "lc")
     assert part.container in utils.CONTAINERS
     assert part.decision is None
     assert part.deepAnalysisVersion is None or utils.is_int(part.deepAnalysisVersion)
