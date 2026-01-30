@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 def test_history_Movie(movie):
     movie.markPlayed()
     history = movie.history()

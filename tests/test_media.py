@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 def _test_media_tag(obj, attr):
     tags = getattr(obj, attr)
     if tags:
