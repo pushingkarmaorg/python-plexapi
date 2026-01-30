@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Plex-AutoDelete is a useful to delete all but the last X episodes of a show.
 This comes in handy when you have a show you keep downloaded, but do not

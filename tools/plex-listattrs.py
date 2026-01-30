@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Plex-ListAttrs is used during development of PlexAPI and loops through all media
 items to build a collection of attributes on each media type. The resulting list

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Plex-GetToken is a simple method to retrieve a Plex account token.
 """
