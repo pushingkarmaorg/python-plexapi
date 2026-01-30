@@ -982,8 +982,13 @@ def test_video_Show_mixins_images(show):
     test_mixins.attr_squareArtUrl(show)
 
 
-def test_video_Show_mixins_themes(show):
+def test_video_Show_mixins_themes(show, plex):
     test_mixins.edit_theme(show)
+
+    # Need to re-upload theme for future season/episode tests
+    if themes := show.themes():
+        if theme := next((t for t in themes if t.ratingKey.startswith("metadata://")), None):
+            show.uploadTheme(url=plex.url(theme.key, includeToken=True)).unlockTheme()
 
 
 def test_video_Show_mixins_rating(show):
