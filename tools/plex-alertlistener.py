@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Listen to plex alerts and print them to the console.
 Because we're using print as a function, example only works in Python3.

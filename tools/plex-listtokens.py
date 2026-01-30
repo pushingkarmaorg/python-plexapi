@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Plex-ListTokens is a simple utility to fetch and list all known Plex
 Server tokens your plex.tv account has access to. Because this information

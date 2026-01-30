@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
+import jwt
+
 import pytest
 from plexapi.exceptions import BadRequest, NotFound, Unauthorized
-from plexapi.myplex import MyPlexInvite
+from plexapi.myplex import MyPlexAccount, MyPlexInvite, MyPlexJWTLogin
 
 from . import conftest as utils
 from .payloads import MYPLEX_INVITE
@@ -23,7 +24,6 @@ def test_myplex_accounts(account, plex):
     # print('authToken: %s' % account.authToken)
     print(f"signInState: {account.signInState}")
     assert account.username, "Account has no username"
-    assert account.authToken, "Account has no authToken"
     assert account.signInState, "Account has no signInState"
 
 
@@ -366,3 +366,37 @@ def test_myplex_geoip(account):
 
 def test_myplex_ping(account):
     assert account.ping()
+
+
+def test_myplex_jwt_login(account, tmp_path, monkeypatch):
+    jwtlogin = MyPlexJWTLogin(
+        token=account.authToken,
+        scopes=['username', 'email', 'friendly_name']
+    )
+    jwtlogin.generateKeypair(keyfiles=(tmp_path / 'private.key', tmp_path / 'public.key'), overwrite=True)
+    with pytest.raises(FileExistsError):
+        jwtlogin.generateKeypair(keyfiles=(tmp_path / 'private.key', tmp_path / 'public.key'))
+    jwtlogin.registerDevice()
+    jwtToken = jwtlogin.refreshJWT()
+    assert jwtlogin.decodedJWT['user']['username'] == account.username
+    assert MyPlexAccount(token=jwtToken) == account
+
+    jwtlogin = MyPlexJWTLogin(
+        jwtToken=jwtToken,
+        keypair=(tmp_path / 'private.key', tmp_path / 'public.key'),
+        scopes=['username', 'email', 'friendly_name']
+    )
+    assert jwtlogin.verifyJWT()
+    newjwtToken = jwtlogin.refreshJWT()
+    assert newjwtToken != jwtToken
+    assert MyPlexAccount(token=newjwtToken) == account
+
+    plexPublicJWKs = jwtlogin._getPlexPublicJWK()
+    invalidJWK = plexPublicJWKs[0].copy()
+    invalidJWK['x'] += 'invalid'
+    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda self: plexPublicJWKs + [invalidJWK])
+    assert jwtlogin.decodePlexJWT()
+
+    monkeypatch.setattr(MyPlexJWTLogin, "_getPlexPublicJWK", lambda self: [invalidJWK])
+    with pytest.raises(jwt.InvalidSignatureError):
+        jwtlogin.decodePlexJWT()

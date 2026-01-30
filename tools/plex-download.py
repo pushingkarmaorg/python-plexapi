@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Allows downloading a Plex media item from a local or shared library. You
 may specify the item by the PlexWeb url (everything after !) or by

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Plex-ListDocAttrs is used during development of PlexAPI.
 Example usage: AttDS(dict or object).write()
