@@ -5,7 +5,6 @@ from xml.etree import ElementTree
 from plexapi import log, settings, utils
 from plexapi.base import PlexObject, cached_data_property
 from plexapi.exceptions import BadRequest
-from plexapi.utils import deprecated
 
 
 @utils.registerPlexObject
@@ -230,18 +229,6 @@ class MediaPart(PlexObject):
         self._server.query(key, method=self._server._session.put, params=params)
         return self
 
-    @deprecated('Use "setSelectedAudioStream" instead.')
-    def setDefaultAudioStream(self, stream):
-        return self.setSelectedAudioStream(stream)
-
-    @deprecated('Use "setSelectedSubtitleStream" instead.')
-    def setDefaultSubtitleStream(self, stream):
-        return self.setSelectedSubtitleStream(stream)
-
-    @deprecated('Use "resetSelectedSubtitleStream" instead.')
-    def resetDefaultSubtitleStream(self):
-        return self.resetSelectedSubtitleStream()
-
 
 class MediaPartStream(PlexObject):
     """ Base class for media streams. These consist of video, audio, subtitles, and lyrics.
@@ -443,10 +430,6 @@ class AudioStream(MediaPartStream):
         params = {'subsample': subSample}
         return self.fetchItems(key, params=params)
 
-    @deprecated('Use "setSelected" instead.')
-    def setDefault(self):
-        return self.setSelected()
-
 
 @utils.registerPlexObject
 class SubtitleStream(MediaPartStream):
@@ -492,10 +475,6 @@ class SubtitleStream(MediaPartStream):
             Alias for :func:`~plexapi.media.MediaPart.setSelectedSubtitleStream`.
         """
         return self._parent().setSelectedSubtitleStream(self)
-
-    @deprecated('Use "setSelected" instead.')
-    def setDefault(self):
-        return self.setSelected()
 
 
 @utils.registerPlexObject
@@ -1280,19 +1259,10 @@ class Agent(PlexObject):
             return self.findItems(self._data, cls=AgentMediaType)
         return []
 
-    @property
-    @deprecated('use "languageCodes" instead')
-    def languageCode(self):
-        return self.languageCodes
-
     def settings(self):
         key = f'/:/plugins/{self.identifier}/prefs'
         data = self._server.query(key)
         return self.findItems(data, cls=settings.Setting)
-
-    @deprecated('use "settings" instead')
-    def _settings(self):
-        return self.settings()
 
 
 class AgentMediaType(Agent):
@@ -1315,11 +1285,6 @@ class AgentMediaType(Agent):
     @cached_data_property
     def languageCodes(self):
         return self.listAttrs(self._data, 'code', etag='Language')
-
-    @property
-    @deprecated('use "languageCodes" instead')
-    def languageCode(self):
-        return self.languageCodes
 
 
 @utils.registerPlexObject

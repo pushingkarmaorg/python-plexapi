@@ -179,12 +179,11 @@ def test_Collection_edit(collection, movies):
     newTitleSort = "New Title Sort"
     newContentRating = "New Content Rating"
     newSummary = "New Summary"
-    collection.edit(
-        title=newTitle,
-        titleSort=newTitleSort,
-        contentRating=newContentRating,
-        summary=newSummary
-    )
+    collection \
+        .editTitle(newTitle) \
+        .editSortTitle(newTitleSort) \
+        .editContentRating(newContentRating) \
+        .editSummary(newSummary)
     collection.reload()
     assert collection.title == newTitle
     assert collection.titleSort == newTitleSort
@@ -195,18 +194,11 @@ def test_Collection_edit(collection, movies):
     for f in fields:
         assert collection.isLocked(field=f)
 
-    collection.edit(
-        title=title,
-        titleSort=titleSort,
-        contentRating=contentRating or "",
-        summary=summary,
-        **{
-            "title.locked": 0,
-            "titleSort.locked": 0,
-            "contentRating.locked": 0,
-            "summary.locked": 0
-        }
-    )
+    collection \
+        .editTitle(title, locked=False) \
+        .editSortTitle(titleSort, locked=False) \
+        .editContentRating(contentRating or "", locked=False) \
+        .editSummary(summary, locked=False)
     collection.reload()
     assert collection.title == title
     assert collection.titleSort == titleSort
