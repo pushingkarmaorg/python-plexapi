@@ -5,19 +5,12 @@ from plexapi import media, utils
 from plexapi.base import PlexPartialObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound, Unsupported
 from plexapi.library import LibrarySection, ManagedHub
-from plexapi.mixins import (
-    AdvancedSettingsMixin, SmartFilterMixin, HubsMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
-    CollectionEditMixins
-)
+from plexapi.mixins import CollectionMixins
 
 
 @utils.registerPlexObject
 class Collection(
-    PlexPartialObject,
-    AdvancedSettingsMixin, SmartFilterMixin, HubsMixin, RatingMixin,
-    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
-    CollectionEditMixins
+    PlexPartialObject, CollectionMixins
 ):
     """ Represents a single Collection.
 

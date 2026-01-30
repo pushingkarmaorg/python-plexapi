@@ -7,15 +7,12 @@ from plexapi import media, utils
 from plexapi.base import Playable, PlexPartialObject, cached_data_property
 from plexapi.exceptions import BadRequest, NotFound, Unsupported
 from plexapi.library import LibrarySection, MusicSection
-from plexapi.mixins import SmartFilterMixin, ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, PlaylistEditMixins
+from plexapi.mixins import PlaylistMixins
 
 
 @utils.registerPlexObject
 class Playlist(
-    PlexPartialObject, Playable,
-    SmartFilterMixin,
-    ArtMixin, LogoMixin, PosterMixin, SquareArtMixin,
-    PlaylistEditMixins
+    PlexPartialObject, Playable, PlaylistMixins
 ):
     """ Represents a single Playlist.
 
