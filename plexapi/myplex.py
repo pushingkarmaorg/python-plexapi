@@ -2069,12 +2069,12 @@ class MyPlexJWTLogin:
 
         privateKey = ed25519.Ed25519PrivateKey.generate()
         publicKey = privateKey.public_key()
-        self._privateKey = privateKey.private_bytes(
+        _privateKey = privateKey.private_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PrivateFormat.Raw,
             encryption_algorithm=serialization.NoEncryption()
         )
-        self._publicKey = publicKey.public_bytes(
+        _publicKey = publicKey.public_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PublicFormat.Raw
         )
@@ -2084,8 +2084,11 @@ class MyPlexJWTLogin:
                 raise FileExistsError('Keypair files already exist, set overwrite=True to overwrite them.')
 
             with open(keyfiles[0], 'wb') as privateFile, open(keyfiles[1], 'wb') as publicFile:
-                privateFile.write(self._privateKey)
-                publicFile.write(self._publicKey)
+                privateFile.write(_privateKey)
+                publicFile.write(_publicKey)
+
+        self._privateKey = _privateKey
+        self._publicKey = _publicKey
 
     @property
     def _clientIdentifier(self):
