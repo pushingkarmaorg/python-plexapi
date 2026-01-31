@@ -442,6 +442,7 @@ def test_video_Movie_upload_select_remove_subtitle(movie, subtitle):
         pass
 
 
+@pytest.mark.xfail(reason="Plex's OpenSubtitles times out occasionally")
 def test_video_Movie_on_demand_subtitles(movie, account):
     movie_subtitles = movie.subtitleStreams()
     subtitles = movie.searchSubtitles()
