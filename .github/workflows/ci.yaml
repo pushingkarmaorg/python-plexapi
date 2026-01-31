@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out code from Github
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Set up Python ${{ env.DEFAULT_PYTHON }}
       id: python
@@ -84,7 +84,7 @@ jobs:
             plex: claimed
     steps:
     - name: Check out code from Github
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Set up Python ${{ env.DEFAULT_PYTHON }}
       id: python
@@ -230,7 +230,7 @@ jobs:
             plex: claimed
     steps:
     - name: Check out code from GitHub
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Set up Python ${{ env.DEFAULT_PYTHON }}
       id: python
