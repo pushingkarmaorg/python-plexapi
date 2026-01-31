@@ -450,7 +450,7 @@ def detect_color_image(file, thumb_size=150, MSE_cutoff=22, adjust_color_bias=Tr
         if adjust_color_bias:
             bias = ImageStat.Stat(thumb).mean[:3]
             bias = [b - sum(bias) / 3 for b in bias]
-        for pixel in thumb.getdata():
+        for pixel in thumb.get_flattened_data():
             mu = sum(pixel) / 3
             sse += sum(
                 (pixel[i] - mu - bias[i]) * (pixel[i] - mu - bias[i]) for i in [0, 1, 2]
