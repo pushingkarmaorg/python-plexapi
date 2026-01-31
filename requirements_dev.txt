@@ -15,4 +15,4 @@ requests-mock==1.12.1
 sphinx==7.4.7
 sphinx-rtd-theme==3.0.2
 tqdm==4.67.1
-websocket-client==1.8.0
+websocket-client==1.9.0
