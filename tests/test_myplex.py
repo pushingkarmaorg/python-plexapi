@@ -2,8 +2,8 @@ import jwt
 
 import pytest
 from plexapi.exceptions import BadRequest, NotFound, Unauthorized
-from plexapi.myplex import MyPlexAccount, MyPlexInvite, MyPlexJWTLogin
-from plexapi.utils import createMyPlexDevice
+from plexapi.myplex import MyPlexAccount, MyPlexInvite, MyPlexPinLogin, MyPlexJWTLogin
+from plexapi.utils import generateUUID
 
 from . import conftest as utils
 from .payloads import MYPLEX_INVITE
@@ -371,14 +371,19 @@ def test_myplex_ping(account):
 
 def test_myplex_jwt_login(account, tmp_path, monkeypatch):
     # Create a new MyPlexDevice for JWT tests
-    device = createMyPlexDevice(account=account)
+    clientIdentifier = generateUUID()
+    headers = {'X-Plex-Client-Identifier': clientIdentifier}
+    pinlogin = MyPlexPinLogin(headers=headers)
+    pinlogin.run()
+    account.link(pinlogin.pin)
+    pinlogin.waitForLogin()
 
     privkey = tmp_path / 'private.key'
     pubkey = tmp_path / 'public.key'
 
     jwtlogin = MyPlexJWTLogin(
-        headers={'X-Plex-Client-Identifier': device.clientIdentifier},
-        token=device.token,
+        headers=headers,
+        token=pinlogin.token,
         scopes=['username', 'email', 'friendly_name']
     )
     jwtlogin.generateKeypair(keyfiles=(privkey, pubkey), overwrite=True)
@@ -391,7 +396,7 @@ def test_myplex_jwt_login(account, tmp_path, monkeypatch):
     assert new_account.username == account.username
 
     jwtlogin = MyPlexJWTLogin(
-        headers={'X-Plex-Client-Identifier': device.clientIdentifier},
+        headers=headers,
         jwtToken=jwtToken,
         keypair=(privkey, pubkey),
         scopes=['username', 'email', 'friendly_name']
@@ -411,4 +416,4 @@ def test_myplex_jwt_login(account, tmp_path, monkeypatch):
     with pytest.raises(jwt.InvalidSignatureError):
         jwtlogin.decodePlexJWT()
 
-    device.delete()
+    account.device(clientId=clientIdentifier).delete()
