@@ -710,7 +710,7 @@ class Show(
             Raises:
                 :exc:`~plexapi.exceptions.BadRequest`: If title or season parameter is missing.
         """
-        key = f'{self.key}/children?excludeAllLeaves=1'
+        key = f'{self.key}/children?excludeAllLeaves=1&includeGuids=1'
         if title is not None and not isinstance(title, int):
             return self.fetchItem(key, Season, title__iexact=title)
         elif season is not None or isinstance(title, int):
@@ -723,7 +723,7 @@ class Show(
 
     def seasons(self, **kwargs):
         """ Returns a list of :class:`~plexapi.video.Season` objects in the show. """
-        key = f'{self.key}/children?excludeAllLeaves=1'
+        key = f'{self.key}/children?excludeAllLeaves=1&includeGuids=1'
         return self.fetchItems(key, Season, container_size=self.childCount, **kwargs)
 
     def episode(self, title=None, season=None, episode=None):
@@ -737,7 +737,7 @@ class Show(
             Raises:
                 :exc:`~plexapi.exceptions.BadRequest`: If title or season and episode parameters are missing.
         """
-        key = f'{self.key}/allLeaves'
+        key = f'{self.key}/allLeaves?includeGuids=1'
         if title is not None:
             return self.fetchItem(key, Episode, title__iexact=title)
         elif season is not None and episode is not None:
@@ -746,7 +746,7 @@ class Show(
 
     def episodes(self, **kwargs):
         """ Returns a list of :class:`~plexapi.video.Episode` objects in the show. """
-        key = f'{self.key}/allLeaves'
+        key = f'{self.key}/allLeaves?includeGuids=1'
         return self.fetchItems(key, Episode, **kwargs)
 
     def get(self, title=None, season=None, episode=None):
@@ -906,7 +906,7 @@ class Season(
             Raises:
                 :exc:`~plexapi.exceptions.BadRequest`: If title or episode parameter is missing.
         """
-        key = f'{self.key}/children'
+        key = f'{self.key}/children?includeGuids=1'
         if title is not None and not isinstance(title, int):
             return self.fetchItem(key, Episode, title__iexact=title)
         elif episode is not None or isinstance(title, int):
