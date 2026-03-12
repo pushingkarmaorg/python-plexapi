@@ -348,18 +348,17 @@ def setDatetimeTimezone(value):
     if value is None or value is False:
         tzinfo = None
     # Use local timezone if value is True or "local"
-    elif value is True or (isinstance(value, str) and value.strip().lower() == 'local'):
+    elif value is True or str(value).strip().lower() == 'local':
         tzinfo = datetime.now().astimezone().tzinfo
-    # Attempt to resolve value as an IANA timezone string or boolean-like string
+    # Attempt to resolve value as a boolean-like string or IANA timezone string
     else:
         setting = str(value).strip()
-        lower = setting.lower()
-        # Handle common boolean-like strings from config/environment
-        if lower in ('true', '1'):
-            tzinfo = datetime.now().astimezone().tzinfo
-        elif lower in ('false', '0'):
-            tzinfo = None
-        else:
+        # Try to cast as boolean first (normalize to lowercase for case-insensitive matching)
+        try:
+            is_enabled = cast(bool, setting.lower())
+            tzinfo = datetime.now().astimezone().tzinfo if is_enabled else None
+        except ValueError:
+            # Not a boolean string, try parsing as IANA timezone
             try:
                 tzinfo = ZoneInfo(setting)
             except ZoneInfoNotFoundError:
