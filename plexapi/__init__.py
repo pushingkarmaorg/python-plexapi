@@ -6,7 +6,7 @@ from uuid import getnode
 
 from plexapi.config import PlexConfig, reset_base_headers
 import plexapi.const as const
-from plexapi.utils import SecretsFilter, setDatetimeTimezone
+from plexapi.utils import SecretsFilter, setDatetimeTimezone, DATETIME_TIMEZONE  # noqa: F401 # Re-export DATETIME_TIMEZONE
 
 # Load User Defined Config
 DEFAULT_CONFIG_PATH = os.path.expanduser('~/.config/plexapi/config.ini')
