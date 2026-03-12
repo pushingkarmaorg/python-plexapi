@@ -17,7 +17,7 @@ CONFIG = PlexConfig(CONFIG_PATH)
 PROJECT = 'PlexAPI'
 VERSION = __version__ = const.__version__
 TIMEOUT = CONFIG.get('plexapi.timeout', 30, int)
-DATETIME_TIMEZONE = setDatetimeTimezone(CONFIG.get('plexapi.timezone', False))
+setDatetimeTimezone(CONFIG.get('plexapi.timezone', False))
 
 X_PLEX_CONTAINER_SIZE = CONFIG.get('plexapi.container_size', 100, int)
 X_PLEX_ENABLE_FAST_CONNECT = CONFIG.get('plexapi.enable_fast_connect', False, bool)
