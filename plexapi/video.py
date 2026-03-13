@@ -1137,8 +1137,8 @@ class Episode(
         """ Returns the :class:`~plexapi.video.Season` object by querying for the show's children. """
         if self.grandparentKey and self.parentIndex is not None:
             key = self._buildRelationKey(
-                f'{self.grandparentKey}/children', 
-                excludeAllLeaves=1, 
+                f'{self.grandparentKey}/children',
+                excludeAllLeaves=1,
                 index=self.parentIndex
             )
             return self.fetchItem(key)
