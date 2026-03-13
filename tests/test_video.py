@@ -1204,7 +1204,7 @@ def test_video_Season_episode(show):
 def test_video_Season_episodes(show):
     episodes = show.season("Season 2").episodes()
     assert len(episodes) >= 1
-    
+
 
 def test_video_Season_episode_guids(show):
     plexapi.base.USER_DONT_RELOAD_FOR_KEYS.add('guids')
@@ -1224,7 +1224,7 @@ def test_video_Season_show_guids(show):
     try:
         a_show = show.season("Season 1").show()
         assert a_show
-        assert 'tmdb://1399' in  [i.id for i in a_show.guids]
+        assert 'tmdb://1399' in [i.id for i in a_show.guids]
     finally:
         plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
 
