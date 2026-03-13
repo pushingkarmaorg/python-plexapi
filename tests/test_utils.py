@@ -1,7 +1,9 @@
 import time
 
-import plexapi.utils as utils
 import pytest
+
+import plexapi
+import plexapi.utils as utils
 from plexapi.exceptions import NotFound
 
 
@@ -37,6 +39,21 @@ def test_utils_setDatetimeTimezone_local_and_invalid():
 
         assert utils.setDatetimeTimezone("Not/A_Real_Timezone") is None
         assert utils.toDatetime("0").tzinfo is None
+    finally:  # Restore for other tests
+        utils.DATETIME_TIMEZONE = original_tz
+
+
+def test_utils_package_datetime_timezone_stays_synced():
+    original_tz = utils.DATETIME_TIMEZONE
+    try:
+        tzinfo = utils.setDatetimeTimezone("UTC")
+        assert tzinfo is not None
+        assert plexapi.DATETIME_TIMEZONE is tzinfo
+
+        assert plexapi.DATETIME_TIMEZONE is utils.DATETIME_TIMEZONE
+        utils.setDatetimeTimezone(False)
+        assert plexapi.DATETIME_TIMEZONE is None
+        assert plexapi.DATETIME_TIMEZONE is utils.DATETIME_TIMEZONE
     finally:  # Restore for other tests
         utils.DATETIME_TIMEZONE = original_tz
 
