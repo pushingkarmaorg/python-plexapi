@@ -29,7 +29,7 @@ from .smart_filter import SmartFilterMixin
 from .split_merge import SplitMergeMixin
 from .unmatch_match import UnmatchMatchMixin
 from .watchlist import WatchlistMixin
-
+from .tv_parent_child import TvParentChildMixin
 
 class MovieEditMixins(
     ArtLockMixin, PosterLockMixin, ThemeLockMixin,
@@ -140,7 +140,8 @@ class ShowMixins(
     AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
     ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     ShowEditMixins,
-    WatchlistMixin
+    WatchlistMixin,
+    TvParentChildMixin
 ):
     pass
 
@@ -148,7 +149,8 @@ class ShowMixins(
 class SeasonMixins(
     AdvancedSettingsMixin, ExtrasMixin, RatingMixin,
     ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
-    SeasonEditMixins
+    SeasonEditMixins,
+    TvParentChildMixin
 ):
     pass
 
@@ -156,7 +158,8 @@ class SeasonMixins(
 class EpisodeMixins(
     ExtrasMixin, RatingMixin,
     ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
-    EpisodeEditMixins
+    EpisodeEditMixins,
+    TvParentChildMixin
 ):
     pass
 
