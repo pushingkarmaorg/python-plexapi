@@ -4,9 +4,10 @@ from logging.handlers import RotatingFileHandler
 from platform import uname
 from uuid import getnode
 
-from plexapi.config import PlexConfig, reset_base_headers
 import plexapi.const as const
-from plexapi.utils import SecretsFilter, setDatetimeTimezone, DATETIME_TIMEZONE  # noqa: F401 # Re-export DATETIME_TIMEZONE
+import plexapi.utils as utils
+from plexapi.config import PlexConfig, reset_base_headers
+from plexapi.utils import SecretsFilter, setDatetimeTimezone
 
 # Load User Defined Config
 DEFAULT_CONFIG_PATH = os.path.expanduser('~/.config/plexapi/config.ini')
@@ -52,3 +53,10 @@ log.setLevel(loglevel)
 logfilter = SecretsFilter()
 if CONFIG.get('log.show_secrets', '').lower() != 'true':
     log.addFilter(logfilter)
+
+
+def __getattr__(name):
+    """ Dynamic module attribute access for aliased values. """
+    if name == 'DATETIME_TIMEZONE':
+        return utils.DATETIME_TIMEZONE
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
