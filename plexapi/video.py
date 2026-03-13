@@ -710,7 +710,7 @@ class Show(
             Raises:
                 :exc:`~plexapi.exceptions.BadRequest`: If title or season parameter is missing.
         """
-        key = self._buildRelationKey(f'{self.key}/children)', excludeAllLeaves=1)
+        key = self._buildRelationKey(f'{self.key}/children', excludeAllLeaves=1)
         if title is not None and not isinstance(title, int):
             return self.fetchItem(key, Season, title__iexact=title)
         elif season is not None or isinstance(title, int):
@@ -1136,12 +1136,12 @@ class Episode(
     def _season(self):
         """ Returns the :class:`~plexapi.video.Season` object by querying for the show's children. """
         if self.grandparentKey and self.parentIndex is not None:
-            key = f'{self.grandparentKey}/children'
-            params = {
-                'excludeAllLeaves': 1,
-                'index': self.parentIndex
-            }
-            return self.fetchItem(self._buildRelationKey(key, params))
+            key = self._buildRelationKey(
+                f'{self.grandparentKey}/children', 
+                excludeAllLeaves=1, 
+                index=self.parentIndex
+            )
+            return self.fetchItem(key)
         return None
 
     def __repr__(self):
