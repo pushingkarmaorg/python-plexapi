@@ -4,6 +4,7 @@ from time import sleep
 from urllib.parse import quote_plus
 
 import pytest
+import plexapi.base
 from plexapi.exceptions import BadRequest, NotFound
 from plexapi.sync import VIDEO_QUALITY_3_MBPS_720p
 
@@ -957,6 +958,30 @@ def test_video_Show_isPlayed(show):
     assert not show.isPlayed
 
 
+def test_video_Show_season_guids(show):
+    plexapi.base.USER_DONT_RELOAD_FOR_KEYS.add('guids')
+    try:
+        season = show.season("Season 1")
+        assert season.guids
+        seasons = show.seasons()
+        assert len(seasons) > 0
+        assert seasons[0].guids
+    finally:
+        plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
+
+
+def test_video_Show_episode_guids(show):
+    plexapi.base.USER_DONT_RELOAD_FOR_KEYS.add('guids')
+    try:
+        episode = show.episode("Winter Is Coming")
+        assert episode.guids
+        episodes = show.episodes()
+        assert len(episodes) > 0
+        assert episodes[0].guids
+    finally:
+        plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
+
+
 def test_video_Show_section(show):
     section = show.section()
     assert section.title == "TV Shows"
@@ -1142,6 +1167,7 @@ def test_video_Season_show(show):
     season_by_name = show.season("Season 1")
     assert show.ratingKey == season.parentRatingKey and season_by_name.parentRatingKey
     assert season.ratingKey == season_by_name.ratingKey
+    assert season.guids
 
 
 def test_video_Season_watched(show):
@@ -1178,6 +1204,29 @@ def test_video_Season_episode(show):
 def test_video_Season_episodes(show):
     episodes = show.season("Season 2").episodes()
     assert len(episodes) >= 1
+    
+
+def test_video_Season_episode_guids(show):
+    plexapi.base.USER_DONT_RELOAD_FOR_KEYS.add('guids')
+    try:
+        season = show.season("Season 1")
+        episode = season.episode("Winter Is Coming")
+        assert episode.guids
+        episodes = season.episodes()
+        assert len(episodes) > 0
+        assert episodes[0].guids
+    finally:
+        plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
+
+
+def test_video_Season_show_guids(show):
+    plexapi.base.USER_DONT_RELOAD_FOR_KEYS.add('guids')
+    try:
+        a_show = show.season("Season 1").show()
+        assert a_show
+        assert 'tmdb://1399' in  [i.id for i in a_show.guids]
+    finally:
+        plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
 
 
 @pytest.mark.xfail(reason="Changing images fails randomly")
@@ -1248,6 +1297,31 @@ def test_video_Episode(show):
         show.episode()
     with pytest.raises(NotFound):
         show.episode(season=1337, episode=1337)
+
+
+def test_video_Episode_parent_guids(show):
+    plexapi.base.USER_DONT_RELOAD_FOR_KEYS.add('guids')
+    try:
+        episodes = show.episodes()
+        assert episodes
+        episode = episodes[0]
+        assert episode
+        assert episode.isPartialObject()
+        season = episode._season
+        assert season
+        assert season.isPartialObject()
+        assert season.guids
+        season = episode.season()
+        assert season
+        assert season.isPartialObject()
+        assert season.guids
+        show = episode.show()
+        assert show
+        assert show.isPartialObject()
+        assert show.guids
+    finally:
+        plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
+
 
 
 def test_video_Episode_hidden_season(episode):
