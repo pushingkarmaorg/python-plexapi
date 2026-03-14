@@ -1,7 +1,9 @@
 import time
 
-import plexapi.utils as utils
 import pytest
+
+import plexapi
+import plexapi.utils as utils
 from plexapi.exceptions import NotFound
 
 
@@ -10,6 +12,50 @@ def test_utils_toDatetime():
         str(utils.toDatetime("2006-03-03", format="%Y-%m-%d")) == "2006-03-03 00:00:00"
     )
     # assert str(utils.toDatetime('0'))[:-9] in ['1970-01-01', '1969-12-31']
+
+
+def test_utils_setDatetimeTimezone_disabled_and_utc():
+    original_tz = utils.DATETIME_TIMEZONE
+    try:
+        assert utils.setDatetimeTimezone(False) is None
+        assert utils.toDatetime("0").tzinfo is None
+
+        tzinfo = utils.setDatetimeTimezone("UTC")
+        assert tzinfo is not None
+        assert utils.toDatetime("0").tzinfo == tzinfo
+        assert utils.toDatetime("2026-01-01", format="%Y-%m-%d").tzinfo == tzinfo
+    finally:  # Restore for other tests
+        utils.DATETIME_TIMEZONE = original_tz
+
+
+def test_utils_setDatetimeTimezone_local_and_invalid():
+    original_tz = utils.DATETIME_TIMEZONE
+    try:
+        assert utils.setDatetimeTimezone(True) is not None
+        assert utils.toDatetime("0").tzinfo is not None
+
+        assert utils.setDatetimeTimezone("local") is not None
+        assert utils.toDatetime("0").tzinfo is not None
+
+        assert utils.setDatetimeTimezone("Not/A_Real_Timezone") is None
+        assert utils.toDatetime("0").tzinfo is None
+    finally:  # Restore for other tests
+        utils.DATETIME_TIMEZONE = original_tz
+
+
+def test_utils_package_datetime_timezone_stays_synced():
+    original_tz = utils.DATETIME_TIMEZONE
+    try:
+        tzinfo = utils.setDatetimeTimezone("UTC")
+        assert tzinfo is not None
+        assert plexapi.DATETIME_TIMEZONE is tzinfo
+
+        assert plexapi.DATETIME_TIMEZONE is utils.DATETIME_TIMEZONE
+        utils.setDatetimeTimezone(False)
+        assert plexapi.DATETIME_TIMEZONE is None
+        assert plexapi.DATETIME_TIMEZONE is utils.DATETIME_TIMEZONE
+    finally:  # Restore for other tests
+        utils.DATETIME_TIMEZONE = original_tz
 
 
 def test_utils_threaded():

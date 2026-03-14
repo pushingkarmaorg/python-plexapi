@@ -1,10 +1,12 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import sleep
 from urllib.parse import quote_plus
 
 import pytest
+import plexapi.utils as plexutils
 from plexapi.exceptions import BadRequest, NotFound
+from plexapi.utils import setDatetimeTimezone
 from plexapi.sync import VIDEO_QUALITY_3_MBPS_720p
 
 from . import conftest as utils
@@ -19,6 +21,37 @@ def test_video_Movie(movies, movie):
 def test_video_Movie_attributeerror(movie):
     with pytest.raises(AttributeError):
         movie.asshat
+
+
+def test_video_Movie_datetime_timezone(movie):
+    original_tz = plexutils.DATETIME_TIMEZONE
+    try:
+        # no timezone configured, should be naive
+        setDatetimeTimezone(False)
+        movie.reload()
+        dt_naive = movie.updatedAt
+        assert dt_naive.tzinfo is None
+
+        # local timezone configured, should be aware
+        setDatetimeTimezone(True)
+        movie.reload()
+        dt_local = movie.updatedAt
+        assert dt_local.tzinfo is not None
+
+        # explicit IANA zones. Check that the offset is correct too
+        setDatetimeTimezone("UTC")
+        movie.reload()
+        dt = movie.updatedAt
+        assert dt.tzinfo is not None
+        assert dt.tzinfo.utcoffset(dt) == timedelta(0)
+
+        setDatetimeTimezone("Asia/Dubai")
+        movie.reload()
+        dt = movie.updatedAt
+        assert dt.tzinfo is not None
+        assert dt.tzinfo.utcoffset(dt) == timedelta(hours=4)
+    finally:  # Restore for other tests
+        plexutils.DATETIME_TIMEZONE = original_tz
 
 
 def test_video_ne(movies):
