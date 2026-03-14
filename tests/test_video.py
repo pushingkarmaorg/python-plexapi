@@ -1323,7 +1323,6 @@ def test_video_Episode_parent_guids(show):
         plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
 
 
-
 def test_video_Episode_hidden_season(episode):
     assert episode.skipParent is False
     assert episode.parentRatingKey

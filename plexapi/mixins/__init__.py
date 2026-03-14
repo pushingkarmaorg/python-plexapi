@@ -31,6 +31,7 @@ from .unmatch_match import UnmatchMatchMixin
 from .watchlist import WatchlistMixin
 from .tv_parent_child import TvParentChildMixin
 
+
 class MovieEditMixins(
     ArtLockMixin, PosterLockMixin, ThemeLockMixin,
     AddedAtMixin, AudienceRatingMixin, ContentRatingMixin, CriticRatingMixin, EditionTitleMixin,

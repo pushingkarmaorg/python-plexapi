@@ -1,5 +1,6 @@
 from plexapi import utils
 
+
 class TvParentChildMixin:
     """ Mixin for Plex objects that have parent/child relationships (episode/season/show). """
 
