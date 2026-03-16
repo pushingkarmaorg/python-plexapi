@@ -1138,9 +1138,10 @@ class Episode(
         if self.grandparentKey and self.parentIndex is not None:
             key = self._buildRelationalKey(
                 f'{self.grandparentKey}/children',
-                excludeAllLeaves=1
+                excludeAllLeaves=1,
+                index=self.parentIndex
             )
-            return self.fetchItem(key, index=self.parentIndex)
+            return self.fetchItem(key)
         return None
 
     def __repr__(self):
