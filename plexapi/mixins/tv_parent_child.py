@@ -4,15 +4,15 @@ from plexapi import utils
 class TvParentChildMixin:
     """ Mixin for Plex objects that have parent/child relationships (episode/season/show). """
 
-    def _buildRelationKey(self, key, **kwargs):
+    def _buildRelationalKey(self, key, **kwargs):
         """ Returns a key suitable for fetching parent/child TV items
 
             Parameters:
-                key (str): The relational key being fetched, such as '/children' (may be
-                    empty).
-                **kwargs (dict): Custom XML attribute filters to apply to add to the
-                    query. See :func:`~plexapi.base.PlexObject.fetchItems` for more
-                    details on how this is used.
+                key (str): The relational key to be fetched.
+                **kwargs (dict): Optional relational selection parameters to apply to the
+                    key, for example 'excludeAllLeaves=1'. Additional options (such as XML
+                    filters) should be passed into search functions. See :func:`~plexapi.base.PlexObject.fetchItems`
+                    for details.
 
         """
         if not key:
