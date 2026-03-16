@@ -266,5 +266,5 @@ __all__ = [
     # Composite Mixins
     'AlbumMixins', 'ArtistMixins', 'ClipMixins', 'CollectionMixins', 'EpisodeMixins',
     'MovieMixins', 'PhotoMixins', 'PhotoalbumMixins', 'PlaylistMixins',
-    'SeasonMixins', 'ShowMixins', 'TrackMixins',
+    'SeasonMixins', 'ShowMixins', 'TrackMixins', 'TvParentChildMixin'
 ]
