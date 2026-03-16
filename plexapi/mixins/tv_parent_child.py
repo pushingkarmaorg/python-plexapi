@@ -6,6 +6,9 @@ class TvParentChildMixin:
 
     def _buildRelationKey(self, key, **kwargs):
         """ Returns a key suitable for fetching parent/child TV items """
+        if not key:
+            return None
+
         args = {}
 
         args['includeGuids'] = int(bool(kwargs.pop('includeGuids', True)))
