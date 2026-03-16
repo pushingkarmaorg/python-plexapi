@@ -1196,11 +1196,15 @@ def test_video_Season_attrs(show):
 
 
 def test_video_Season_show(show):
-    season = show.seasons()[0]
-    season_by_name = show.season("Season 1")
-    assert show.ratingKey == season.parentRatingKey and season_by_name.parentRatingKey
-    assert season.ratingKey == season_by_name.ratingKey
-    assert season.guids
+    plexapi.base.USER_DONT_RELOAD_FOR_KEYS.add('guids')
+    try:
+        season = show.seasons()[0]
+        season_by_name = show.season("Season 1")
+        assert show.ratingKey == season.parentRatingKey and season_by_name.parentRatingKey
+        assert season.ratingKey == season_by_name.ratingKey
+        assert season.guids
+    finally:
+        plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
 
 
 def test_video_Season_watched(show):
