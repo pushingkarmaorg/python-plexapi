@@ -1352,10 +1352,10 @@ def test_video_Episode_parent_guids(show):
         assert season
         assert season.isPartialObject()
         assert season.guids
-        show = episode.show()
-        assert show
-        assert show.isPartialObject()
-        assert show.guids
+        parent_show = episode.show()
+        assert parent_show
+        assert parent_show.isPartialObject()
+        assert parent_show.guids
     finally:
         plexapi.base.USER_DONT_RELOAD_FOR_KEYS.remove('guids')
 
