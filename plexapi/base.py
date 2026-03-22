@@ -191,9 +191,10 @@ class PlexObject(metaclass=PlexObjectMeta):
             return None
 
         args = {'includeGuids': 1, **kwargs}
-        params = utils.joinArgs(args)
+        params = utils.joinArgs(args).lstrip('?')
+        delim = '&' if '?' in key else '?'
 
-        return f"{key}{params}"
+        return f"{key}{delim}{params}"
 
     def _isChildOf(self, **kwargs):
         """ Returns True if this object is a child of the given attributes.

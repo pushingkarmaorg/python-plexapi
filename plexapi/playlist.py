@@ -187,7 +187,7 @@ class Playlist(
         if self.radio:
             return []
 
-        key = f'{self.key}/items'
+        key = self._buildQueryKey(f'{self.key}/items')
         items = self.fetchItems(key)
 
         # Cache server connections to avoid reconnecting for each item
