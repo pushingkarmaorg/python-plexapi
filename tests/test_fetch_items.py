@@ -39,3 +39,25 @@ def test_find_items_empty_data(plex):
     assert len(result) == 0
     result = plex.findItems(Element("MediaContainer"))
     assert isinstance(result, MediaContainer)
+
+
+def test_buildQueryKey(plex):
+    key = '/test/key'
+    key_with_query = f'{key}?foo=bar'
+    kwargs = {'index': 1, 'type': 2}
+
+    query_key = plex._buildQueryKey(key)
+    assert query_key.startswith(key)
+    assert '?includeGuids=1' in query_key
+
+    query_key = plex._buildQueryKey(key, **kwargs)
+    query_params = []
+    for k, v in kwargs.items():
+        query_param = f'{k}={v}'
+        assert query_param in query_key
+        query_params.append(query_param)
+
+    query_key = plex._buildQueryKey(key_with_query, **kwargs)
+    assert query_key.startswith(key_with_query)
+    assert '&includeGuids=1' in query_key
+    assert f'&{"&".join(query_params)}' in query_key
