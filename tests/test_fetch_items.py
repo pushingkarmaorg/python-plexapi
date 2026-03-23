@@ -41,7 +41,7 @@ def test_find_items_empty_data(plex):
     assert isinstance(result, MediaContainer)
 
 
-def test_buildQueryKey(plex):
+def test_build_query_key(plex):
     key = '/test/key'
     key_with_query = f'{key}?foo=bar'
     kwargs = {'index': 1, 'type': 2}
