@@ -447,7 +447,7 @@ class Playlist(
 
             Parameters:
                 user (:class:`~plexapi.myplex.MyPlexUser` or str): `MyPlexUser` object, username,
-                    email, or user id of the Plex Home user to copy the playlist to.
+                    or email of the Plex Home user to copy the playlist to.
         """
         userServer = self._server.switchHomeUser(user)
         return self.create(server=userServer, title=self.title, items=self.items())
