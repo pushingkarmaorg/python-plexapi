@@ -290,6 +290,10 @@ class PlexServer(PlexObject):
         """
         from plexapi.myplex import MyPlexUser
         user = user if isinstance(user, MyPlexUser) else self.myPlexAccount().user(user)
+        if session is None:
+            session = self._session
+        if timeout is None:
+            timeout = self._timeout
         userAccount = self.myPlexAccount().switchHomeUser(user, pin=pin, session=session, timeout=timeout)
         userToken = userAccount.resource(self.machineIdentifier).accessToken
         return PlexServer(self._baseurl, token=userToken, session=session, timeout=timeout)
