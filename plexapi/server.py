@@ -249,17 +249,6 @@ class PlexServer(PlexObject):
                 timeout (int, optional): Timeout in seconds on initial connection to the server.
                     This will default to the same timeout as the admin account if no new timeout
                     is provided.
-
-            Example:
-
-                .. code-block:: python
-
-                    from plexapi.server import PlexServer
-                    # Login to the Plex server using the admin token
-                    plex = PlexServer('http://plexserver:32400', token='2ffLuB84dqLswk9skLos')
-                    # Login to the same Plex server using a different account
-                    userPlex = plex.switchUser("Username")
-
         """
         return self.switchHomeUser(user, session=session, timeout=timeout)
 
