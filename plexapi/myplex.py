@@ -526,12 +526,12 @@ class MyPlexAccount(PlexObject):
         params = {}
         if pin:
             params['pin'] = pin
-        data = self.query(url, self._session.post, params=params)
-        userToken = data.attrib.get('authenticationToken')
         if session is None:
             session = self._session
         if timeout is None:
             timeout = self._timeout
+        data = self.query(url, session.post, params=params, timeout=timeout)
+        userToken = data.attrib.get('authenticationToken')
         return MyPlexAccount(token=userToken, session=session, timeout=timeout)
 
     def setPin(self, newPin, currentPin=None):
