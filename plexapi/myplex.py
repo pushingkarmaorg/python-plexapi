@@ -689,7 +689,6 @@ class MyPlexAccount(PlexObject):
         """
         username = str(username)
         for user in self.users():
-            # Home users don't have email, username etc.
             if username.lower() == user.title.lower():
                 return user
 
