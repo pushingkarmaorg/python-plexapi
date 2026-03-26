@@ -234,8 +234,10 @@ class PlexServer(PlexObject):
         q = self.query(f'/security/token?type={type}&scope={scope}')
         return q.attrib.get('token')
 
+    @utils.deprecated('switchUser is deprecated, use switchHomeUser instead')
     def switchUser(self, user, session=None, timeout=None):
-        """ Returns a new :class:`~plexapi.server.PlexServer` object logged in as the given username.
+        """ Deprecated. Use :meth:`~plexapi.server.PlexServer.switchHomeUser` instead.
+            Returns a new :class:`~plexapi.server.PlexServer` object logged in as the given username.
             Note: Only the admin account can switch to other users.
 
             Parameters:
@@ -259,13 +261,37 @@ class PlexServer(PlexObject):
                     userPlex = plex.switchUser("Username")
 
         """
+        return self.switchHomeUser(user, session=session, timeout=timeout)
+
+    def switchHomeUser(self, user, pin=None, session=None, timeout=None):
+        """ Returns a new :class:`~plexapi.server.PlexServer` object logged in as the given Plex Home user.
+            Note: Only the admin account can switch to other users.
+
+            Parameters:
+                user (:class:`~plexapi.myplex.MyPlexUser` or str): :class:`~plexapi.myplex.MyPlexUser`,
+                    username, or email of the Plex Home user to switch to.
+                pin (str): PIN for the Plex Home user (required if the Plex Home user has a PIN set).
+                session (requests.Session, optional): Use your own session object if you want to
+                    cache the http responses from the server. This will default to the same
+                    session as the current account if no new session is provided.
+                timeout (int, optional): Timeout in seconds on initial connection to the server.
+                    This will default to the same timeout as the current account if no new timeout is provided.
+
+            Example:
+
+                .. code-block:: python
+
+                    from plexapi.server import PlexServer
+                    # Login to the Plex server using the admin token
+                    plex = PlexServer('http://plexserver:32400', token='2ffLuB84dqLswk9skLos')
+                    # Login to the same Plex server using a different Plex Home user account
+                    userPlex = plex.switchHomeUser("Username")
+
+        """
         from plexapi.myplex import MyPlexUser
         user = user if isinstance(user, MyPlexUser) else self.myPlexAccount().user(user)
-        userToken = user.get_token(self.machineIdentifier)
-        if session is None:
-            session = self._session
-        if timeout is None:
-            timeout = self._timeout
+        userAccount = self.myPlexAccount().switchHomeUser(user, pin=pin, session=session, timeout=timeout)
+        userToken = userAccount.resource(self.machineIdentifier).accessToken
         return PlexServer(self._baseurl, token=userToken, session=session, timeout=timeout)
 
     @cached_data_property

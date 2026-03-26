@@ -443,13 +443,13 @@ class Playlist(
             return cls._create(server, title, items)
 
     def copyToUser(self, user):
-        """ Copy playlist to another user account.
+        """ Copy playlist to another Plex Home user account.
 
             Parameters:
                 user (:class:`~plexapi.myplex.MyPlexUser` or str): `MyPlexUser` object, username,
-                    email, or user id of the user to copy the playlist to.
+                    email, or user id of the Plex Home user to copy the playlist to.
         """
-        userServer = self._server.switchUser(user)
+        userServer = self._server.switchHomeUser(user)
         return self.create(server=userServer, title=self.title, items=self.items())
 
     def sync(self, videoQuality=None, photoResolution=None, audioBitrate=None, client=None, clientId=None, limit=None,

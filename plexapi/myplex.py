@@ -497,13 +497,18 @@ class MyPlexAccount(PlexObject):
         url = self.HOMEUSER.format(userId=user.id)
         return self.query(url, self._session.delete)
 
-    def switchHomeUser(self, user, pin=None):
-        """ Returns a new :class:`~plexapi.myplex.MyPlexAccount` object switched to the given home user.
+    def switchHomeUser(self, user, pin=None, session=None, timeout=None):
+        """ Returns a new :class:`~plexapi.myplex.MyPlexAccount` object switched to the given Plex Home user.
 
             Parameters:
                 user (:class:`~plexapi.myplex.MyPlexUser` or str): :class:`~plexapi.myplex.MyPlexUser`,
-                    username, or email of the home user to switch to.
-                pin (str): PIN for the home user (required if the home user has a PIN set).
+                    username, or email of the Plex Home user to switch to.
+                pin (str): PIN for the Plex Home user (required if the Plex Home user has a PIN set).
+                session (requests.Session, optional): Use your own session object if you want to
+                    cache the http responses from the server. This will default to the same
+                    session as the current account if no new session is provided.
+                timeout (int, optional): Timeout in seconds on initial connection to the server.
+                    This will default to the same timeout as the current account if no new timeout is provided.
 
             Example:
 
@@ -523,7 +528,11 @@ class MyPlexAccount(PlexObject):
             params['pin'] = pin
         data = self.query(url, self._session.post, params=params)
         userToken = data.attrib.get('authenticationToken')
-        return MyPlexAccount(token=userToken, session=self._session)
+        if session is None:
+            session = self._session
+        if timeout is None:
+            timeout = self._timeout
+        return MyPlexAccount(token=userToken, session=session, timeout=timeout)
 
     def setPin(self, newPin, currentPin=None):
         """ Set a new Plex Home PIN for the account.
