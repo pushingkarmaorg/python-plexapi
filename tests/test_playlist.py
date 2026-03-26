@@ -154,7 +154,9 @@ def test_Playlist_copyToUser(plex, show, shared_username):
     playlist = plex.createPlaylist('shared_from_test_plexapi', items=episodes)
     try:
         playlist.copyToUser(shared_username)
-        user_plex = plex.switchHomeUser(shared_username)
+        user = plex.myPlexAccount().user(shared_username)
+        assert user.home is True
+        user_plex = plex.switchHomeUser(user)
         assert playlist.title in [p.title for p in user_plex.playlists()]
     finally:
         playlist.delete()
