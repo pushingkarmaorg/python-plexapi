@@ -149,13 +149,12 @@ def test_Play_photos(plex, client, photoalbum):
         time.sleep(2)
 
 
-def test_Playlist_copyToUser(plex, show, fresh_plex, shared_username):
+def test_Playlist_copyToUser(plex, show, shared_username):
     episodes = show.episodes()
     playlist = plex.createPlaylist('shared_from_test_plexapi', items=episodes)
     try:
         playlist.copyToUser(shared_username)
-        user = plex.myPlexAccount().user(shared_username)
-        user_plex = fresh_plex(plex._baseurl, user.get_token(plex.machineIdentifier))
+        user_plex = plex.switchHomeUser(shared_username)
         assert playlist.title in [p.title for p in user_plex.playlists()]
     finally:
         playlist.delete()
