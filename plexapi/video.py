@@ -697,7 +697,7 @@ class Show(
         """ Returns show's On Deck :class:`~plexapi.video.Video` object or `None`.
             If show is unwatched, return will likely be the first episode.
         """
-        key = f'{self.key}?includeOnDeck=1'
+        key = self._buildQueryKey(f'{self.key}', includeOnDeck=1)
         return next(iter(self.fetchItems(key, cls=Episode, rtag='OnDeck')), None)
 
     def season(self, title=None, season=None):
@@ -893,7 +893,7 @@ class Season(
         """ Returns season's On Deck :class:`~plexapi.video.Video` object or `None`.
             Will only return a match if the show's On Deck episode is in this season.
         """
-        key = f'{self.key}?includeOnDeck=1'
+        key = self._buildQueryKey(f'{self.key}', includeOnDeck=1)
         return next(iter(self.fetchItems(key, cls=Episode, rtag='OnDeck')), None)
 
     def episode(self, title=None, episode=None):
@@ -928,7 +928,8 @@ class Season(
 
     def show(self):
         """ Return the season's :class:`~plexapi.video.Show`. """
-        return self.fetchItem(self._buildQueryKey(self.parentKey))
+        key = self._buildQueryKey(self.parentKey)
+        return self.fetchItem(key)
 
     def watched(self):
         """ Returns list of watched :class:`~plexapi.video.Episode` objects. """
@@ -1218,11 +1219,13 @@ class Episode(
 
     def season(self):
         """" Return the episode's :class:`~plexapi.video.Season`. """
-        return self.fetchItem(self._buildQueryKey(self.parentKey))
+        key = self._buildQueryKey(self.parentKey)
+        return self.fetchItem(key)
 
     def show(self):
         """" Return the episode's :class:`~plexapi.video.Show`. """
-        return self.fetchItem(self._buildQueryKey(self.grandparentKey))
+        key = self._buildQueryKey(self.grandparentKey)
+        return self.fetchItem(key)
 
     def _defaultSyncTitle(self):
         """ Returns str, default title for a new syncItem. """
