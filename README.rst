@@ -1,7 +1,7 @@
 Python-PlexAPI
 ==============
-.. image:: https://github.com/pushingkarmaorg/python-plexapi/workflows/CI/badge.svg
-    :target: https://github.com/pushingkarmaorg/python-plexapi/actions?query=workflow%3ACI
+.. image:: https://github.com/pushingkarmaorg/python-plexapi/actions/workflows/ci.yaml/badge.svg
+    :target: https://github.com/pushingkarmaorg/python-plexapi/actions/workflows/ci.yaml
 .. image:: https://readthedocs.org/projects/python-plexapi/badge/?version=latest
     :target: http://python-plexapi.readthedocs.io/en/latest/?badge=latest
 .. image:: https://codecov.io/gh/pushingkarmaorg/python-plexapi/branch/master/graph/badge.svg?token=fOECznuMtw
