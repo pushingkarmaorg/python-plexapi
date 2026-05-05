@@ -87,7 +87,7 @@ jobs:
       matrix:
         plex: ['unclaimed', 'claimed']
         release:
-          - ${{ inputs.release }}
+          - ${{ inputs.release || 'public' }}
         is-master:
           - ${{ github.ref == 'refs/heads/master' }}
         exclude:
@@ -237,7 +237,7 @@ jobs:
       matrix:
         plex: ['unclaimed', 'claimed']
         release:
-          - ${{ inputs.release }}
+          - ${{ inputs.release || 'public' }}
         is-master:
           - ${{ github.ref == 'refs/heads/master' }}
         exclude:
