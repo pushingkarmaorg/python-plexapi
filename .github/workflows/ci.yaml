@@ -4,7 +4,16 @@
 name: CI
 
 on:
-  workflow_dispatch: ~
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'PMS Release Channel'
+        required: false
+        default: 'public'
+        type: choice
+        options:
+          - public
+          - beta
   pull_request: ~
   push:
     branches:
@@ -71,17 +80,21 @@ jobs:
       PLEXAPI_AUTH_SERVER_BASEURL: http://127.0.0.1:32400
       PLEXAPI_PLEXAPI_TIMEOUT: "60"
       PLEX_CONTAINER: plexinc/pms-docker
-      PLEX_CONTAINER_TAG: latest
+      PLEX_CONTAINER_TAG: ${{ matrix.release == 'beta' && 'plexpass' || 'latest'}}
     strategy:
       fail-fast: false
       max-parallel: 3
       matrix:
         plex: ['unclaimed', 'claimed']
+        release:
+          - ${{ inputs.release }}
         is-master:
           - ${{ github.ref == 'refs/heads/master' }}
         exclude:
           - is-master: false
             plex: claimed
+          - release: beta
+            plex: unclaimed
     steps:
     - name: Check out code from Github
       uses: actions/checkout@v6
@@ -223,11 +236,15 @@ jobs:
     strategy:
       matrix:
         plex: ['unclaimed', 'claimed']
+        release:
+          - ${{ inputs.release }}
         is-master:
           - ${{ github.ref == 'refs/heads/master' }}
         exclude:
           - is-master: false
             plex: claimed
+          - release: beta
+            plex: unclaimed
     steps:
     - name: Check out code from GitHub
       uses: actions/checkout@v6
@@ -270,4 +287,4 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }} 
       with:
-        flags: ${{ matrix.plex }}
+        flags: ${{ join(fromJSON(format('["{0}", "{1}"]', matrix.plex, matrix.release)), ',') }}
