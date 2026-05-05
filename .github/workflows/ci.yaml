@@ -90,9 +90,14 @@ jobs:
           - ${{ inputs.release || 'public' }}
         is-master:
           - ${{ github.ref == 'refs/heads/master' }}
+        is-workflow-dispatch:
+          - ${{ github.event_name == 'workflow_dispatch' }}
         exclude:
+          # For PRs, skip claimed tests unless manually triggered
           - is-master: false
             plex: claimed
+            is-workflow-dispatch: false
+          # Always skip unclaimed beta tests (even for manual triggers)
           - release: beta
             plex: unclaimed
     steps:
@@ -240,9 +245,14 @@ jobs:
           - ${{ inputs.release || 'public' }}
         is-master:
           - ${{ github.ref == 'refs/heads/master' }}
+        is-workflow-dispatch:
+          - ${{ github.event_name == 'workflow_dispatch' }}
         exclude:
+          # For PRs, skip claimed tests unless manually triggered
           - is-master: false
             plex: claimed
+            is-workflow-dispatch: false
+          # Always skip unclaimed beta tests (even for manual triggers)
           - release: beta
             plex: unclaimed
     steps:
