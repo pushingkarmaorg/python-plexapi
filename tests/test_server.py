@@ -247,11 +247,11 @@ def test_server_isLatest(plex, mocker):
     from os import environ
 
     is_latest = plex.isLatest()
-    if environ.get("PLEX_CONTAINER_TAG") and environ["PLEX_CONTAINER_TAG"] != "latest":
+    if environ.get("PLEX_CONTAINER_TAG") and environ["PLEX_CONTAINER_TAG"] not in ("latest", "plexpass", "public"):
         assert not is_latest
     else:
         return pytest.skip(
-            "Do not forget to run with PLEX_CONTAINER_TAG != latest to ensure that update is available"
+            "Run with PLEX_CONTAINER_TAG != latest, plexpass, or public to ensure that update is available"
         )
 
 
