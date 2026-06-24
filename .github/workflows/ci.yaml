@@ -39,7 +39,7 @@ jobs:
 
     - name: Restore Python ${{ steps.python.outputs.python-version }} virtual environment
       id: cache-venv
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: venv
         key: >-
@@ -112,7 +112,7 @@ jobs:
 
     - name: Restore Python ${{ steps.python.outputs.python-version }} virtual environment
       id: cache-venv
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: venv
         key: >-
@@ -153,7 +153,7 @@ jobs:
 
     - name: Restore cached PMS Docker image
       id: docker-cache
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: ~/.cache/docker/plexinc
         key: ${{ runner.os }}-docker-pms-${{ steps.docker-digest.outputs.digest }}
@@ -228,7 +228,7 @@ jobs:
 
     - name: Save PMS Docker image cache
       if: always() && steps.docker-cache.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.docker-cache.outputs.cache-primary-key }}
         path: ~/.cache/docker/plexinc
@@ -267,7 +267,7 @@ jobs:
 
     - name: Restore Python ${{ steps.python.outputs.python-version }} virtual environment
       id: cache-venv
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: venv
         key: >-
