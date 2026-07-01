@@ -45,8 +45,8 @@ class cached_data_property(cached_property):
     automatic invalidation on data changes.
     """
 
-    def __new__(cls, *_, **__) -> cached_property:
-        return super().__new__(cls)
+    def __new__(cls, *args, **kwargs) -> cached_property:
+        return super().__new__(cls, *args, **kwargs)
 
     def __set_name__(self, owner, name):
         """Register the annotated property in the parent class's _cached_data_properties set."""
