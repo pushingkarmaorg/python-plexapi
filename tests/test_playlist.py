@@ -38,8 +38,8 @@ def test_Playlist_attrs(playlist):
 def test_Playlist_centroid(plex, music, requests_mock):
     # 'Mix For You' playlists cannot be generated on the bootstrap server,
     # so serve a representative hubs response and parse it through the normal path.
-    requests_mock.get(plex.url(f"/hubs/sections/{music.key}"), text=MUSIC_MIXES_HUB)
-    hubs = music.hubs(includeMyMixes=1)
+    requests_mock.get(plex.url(f"/hubs/sections/{music.key}?includeMyMixes=1"), text=MUSIC_MIXES_HUB)
+    hubs = music.hubs(includeMyMixes=True)
     mix = next(h for h in hubs if h.context == "hub.music.mixes").items()[0]
     assert mix.smart is True
     centroid = mix.centroid

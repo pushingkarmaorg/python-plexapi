@@ -396,6 +396,8 @@ def test_library_MusicSection_hubs_kwargs(music):
     assert hubs
     for hub in hubs:
         assert len(hub._partialItems) <= 5
+    hubs = music.hubs(includeStations=False)
+    assert not any(h.context == "hub.music.stations" for h in hubs)
 
 
 def test_library_ShowSection_all(tvshows):

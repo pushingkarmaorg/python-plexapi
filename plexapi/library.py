@@ -716,10 +716,12 @@ class LibrarySection(PlexObject):
             Parameters:
                 **kwargs (dict): Optional query parameters to add to the request
                     (e.g. ``count=10`` to limit the number of items per hub or
-                    ``includeMyMixes=1`` to include the personalized "Mixes For You" hub).
-                    ``includeStations=1`` is included by default and may be overridden.
+                    ``includeMyMixes=True`` to include the personalized "Mixes For You" hub).
+                    ``includeStations`` is included by default and may be overridden
+                    with ``includeStations=False``.
         """
         kwargs.setdefault('includeStations', 1)
+        kwargs = {k: 1 if v is True else 0 if v is False else v for k, v in kwargs.items()}
         key = self._buildQueryKey(f'/hubs/sections/{self.key}', **kwargs)
         return self.fetchItems(key)
 
