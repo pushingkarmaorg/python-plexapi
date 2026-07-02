@@ -44,3 +44,15 @@ MYPLEX_INVITE = """<MediaContainer friendlyName="myPlex" identifier="com.plexapp
 </Invite>
 </MediaContainer>
 """
+
+MUSIC_MIXES_HUB = """<MediaContainer size="2" identifier="com.plexapp.plugins.library" librarySectionID="1" librarySectionTitle="Music">
+<Hub hubIdentifier="music.mixes.1" context="hub.music.mixes" type="playlist" title="Mixes For You" size="1" more="0" style="shelf">
+<Playlist guid="" type="playlist" title="Centroid Mix" summary="" smart="1" playlistType="" icon="playlist://image.smart" leafCount="0" key="/library/sections/1/all?artist.id=&amp;or=1&amp;album.id=1,2,3">
+<Directory centroid="1" ratingKey="100" key="/library/metadata/100/children" guid="plex://artist/abc" type="artist" title="Centroid Artist" librarySectionTitle="Music" librarySectionID="1" librarySectionKey="/library/sections/1" thumb="/library/metadata/100/thumb/1"/>
+</Playlist>
+</Hub>
+<Hub hubIdentifier="music.playlists.1" context="hub.music.playlists" type="playlist" title="Playlists" size="1" more="0" style="shelf">
+<Playlist ratingKey="200" guid="com.plexapp.agents.none://xxx" type="playlist" title="Ordinary Playlist" summary="" smart="0" playlistType="audio" composite="/playlists/200/composite/1" leafCount="5" key="/playlists/200/items"/>
+</Hub>
+</MediaContainer>
+"""

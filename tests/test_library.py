@@ -391,6 +391,13 @@ def test_library_MovieSection_PlexWebURL_hub(plex, movies):
     assert quote_plus(hub.key) in url
 
 
+def test_library_MusicSection_hubs_kwargs(music):
+    hubs = music.hubs(count=5)
+    assert hubs
+    for hub in hubs:
+        assert len(hub._partialItems) <= 5
+
+
 def test_library_ShowSection_all(tvshows):
     assert len(tvshows.all(title__iexact="The 100"))
 

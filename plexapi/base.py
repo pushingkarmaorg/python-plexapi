@@ -16,7 +16,7 @@ PlexObjectT = TypeVar("PlexObjectT", bound='PlexObject')
 MediaContainerT = TypeVar("MediaContainerT", bound="MediaContainer")
 
 USER_DONT_RELOAD_FOR_KEYS = set()
-_DONT_RELOAD_FOR_KEYS = {'key', 'sourceURI'}
+_DONT_RELOAD_FOR_KEYS = {'centroid', 'key', 'sourceURI'}
 OPERATORS = {
     'exact': lambda v, q: v == q,
     'iexact': lambda v, q: v.lower() == q.lower(),
