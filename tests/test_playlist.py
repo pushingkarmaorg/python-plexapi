@@ -101,7 +101,7 @@ def test_Playlist_edit(plex, movie):
         playlist.delete()
 
 
-def test_Playlist_item(plex, show):
+def test_Playlist_items(plex, show):
     title = 'test_playlist_item'
     episodes = show.episodes()
     try:
@@ -113,6 +113,24 @@ def test_Playlist_item(plex, show):
         assert item1 == item2
         with pytest.raises(NotFound):
             playlist.item("Does not exist")
+    finally:
+        playlist.delete()
+
+
+def test_Playlist_items_libtype(plex, show):
+    title = 'test_playlist_group_items'
+    episodes = show.episodes()
+    try:
+        playlist = plex.createPlaylist(title, items=episodes[:3])
+        playlist_shows = playlist.items(libtype='show')
+        assert len(playlist_shows) == 1
+        assert playlist_shows[0] == show
+        playlist_seasons = playlist.items(libtype='season')
+        assert len(playlist_seasons) == 1
+        assert playlist_seasons[0] == show.season(1)
+        playlist_episodes = playlist.items(libtype='episode')
+        assert len(playlist_episodes) == 3
+        assert playlist_episodes == episodes[:3]
     finally:
         playlist.delete()
 

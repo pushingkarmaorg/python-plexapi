@@ -184,17 +184,22 @@ class Playlist(
     @cached_data_property
     def _items(self):
         """ Cache for items. """
+        return self._fetchItems()
+
+    def _fetchItems(self, libtype=None):
+        """ Returns a list of all items in the playlist, optionally filtered by library type. """
         if self.radio:
             return []
 
-        key = self._buildQueryKey(f'{self.key}/items')
+        params = {'type': utils.searchType(libtype)} if libtype else {}
+        key = self._buildQueryKey(f'{self.key}/items', **params)
         items = self.fetchItems(key)
 
         # Cache server connections to avoid reconnecting for each item
         _servers = {}
         for item in items:
-            if item.sourceURI:
-                serverID = item.sourceURI.split('/')[2]
+            if sourceURI := getattr(item, 'sourceURI', None):
+                serverID = sourceURI.split('/')[2]
                 if serverID not in _servers:
                     try:
                         _servers[serverID] = self._server.myPlexAccount().resource(serverID).connect()
@@ -205,8 +210,16 @@ class Playlist(
 
         return items
 
-    def items(self):
-        """ Returns a list of all items in the playlist. """
+    def items(self, libtype=None):
+        """ Returns a list of all items in the playlist.
+
+            Parameters:
+                libtype (str): Optional filter to return items grouped by a specific library type
+                    (movie, show, season, episode, artist, album, track, photoalbum, photo).
+                    (e.g. shows in a playlist, or albums in a playlist)
+        """
+        if libtype:
+            return self._fetchItems(libtype=libtype)
         return self._items
 
     def get(self, title):
