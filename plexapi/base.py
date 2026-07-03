@@ -89,11 +89,6 @@ class PlexObjectMeta(type):
         return super().__new__(mcs, name, bases, attrs)
 
 
-class MediaContainerMeta(PlexObjectMeta, type(List)):
-    """Metaclass for MediaContainer that combines PlexObjectMeta with Generic/List metaclass."""
-    pass
-
-
 class PlexObject(metaclass=PlexObjectMeta):
     """ Base class for all Plex objects.
 
@@ -1161,8 +1156,7 @@ class PlexHistory:
 class MediaContainer(
     Generic[PlexObjectT],
     List[PlexObjectT],
-    PlexObject,
-    metaclass=PlexObjectMeta,
+    PlexObject
 ):
     """ Represents a single MediaContainer.
 
