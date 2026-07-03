@@ -710,10 +710,19 @@ class LibrarySection(PlexObject):
         key = f'/hubs/sections/{self.key}/manage'
         self._server.query(key, method=self._server._session.delete)
 
-    def hubs(self):
+    def hubs(self, **kwargs):
         """ Returns a list of available :class:`~plexapi.library.Hub` for this library section.
+
+            Parameters:
+                **kwargs (dict): Optional query parameters to add to the request
+                    (e.g. ``count=10`` to limit the number of items per hub or
+                    ``includeMyMixes=True`` to include the personalized "Mixes For You" hub).
+                    ``includeStations`` is included by default and may be overridden
+                    with ``includeStations=False``.
         """
-        key = self._buildQueryKey(f'/hubs/sections/{self.key}', includeStations=1)
+        kwargs.setdefault('includeStations', 1)
+        kwargs = {k: 1 if v is True else 0 if v is False else v for k, v in kwargs.items()}
+        key = self._buildQueryKey(f'/hubs/sections/{self.key}', **kwargs)
         return self.fetchItems(key)
 
     def agents(self):

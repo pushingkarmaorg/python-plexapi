@@ -21,6 +21,8 @@ class Playlist(
             TYPE (str): 'playlist'
             addedAt (datetime): Datetime the playlist was added to the server.
             allowSync (bool): True if you allow syncing playlists.
+            centroid (:class:`~plexapi.audio.Artist`): The centroid artist a personalized
+                'Mix For You' playlist is built around, or None for regular playlists.
             composite (str): URL to composite image (/playlist/<ratingKey>/composite/<compositeid>)
             content (str): The filter URI string for smart playlists.
             duration (int): Duration of the playlist in milliseconds.
@@ -75,6 +77,11 @@ class Playlist(
     @cached_data_property
     def fields(self):
         return self.findItems(self._data, media.Field)
+
+    @cached_data_property
+    def centroid(self):
+        from plexapi.audio import Artist
+        return self.findItem(self._data, cls=Artist, centroid='1')
 
     def __len__(self):  # pragma: no cover
         return len(self.items())

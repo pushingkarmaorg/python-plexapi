@@ -6,6 +6,7 @@ from plexapi.exceptions import BadRequest, NotFound, Unsupported
 
 from . import conftest as utils
 from . import test_mixins
+from .payloads import MUSIC_MIXES_HUB
 
 
 def test_Playlist_attrs(playlist):
@@ -31,6 +32,25 @@ def test_Playlist_attrs(playlist):
     assert playlist.isVideo is True
     assert playlist.isAudio is False
     assert playlist.isPhoto is False
+    assert playlist.centroid is None
+
+
+def test_Playlist_centroid(plex, music, requests_mock):
+    # 'Mix For You' playlists cannot be generated on the bootstrap server,
+    # so serve a representative hubs response and parse it through the normal path.
+    requests_mock.get(plex.url(f"/hubs/sections/{music.key}?includeMyMixes=1"), text=MUSIC_MIXES_HUB)
+    hubs = music.hubs(includeMyMixes=True)
+    mix = next(h for h in hubs if h.context == "hub.music.mixes").items()[0]
+    assert mix.smart is True
+    centroid = mix.centroid
+    assert centroid.type == "artist"
+    assert centroid.title == "Centroid Artist"
+    assert centroid.thumb == "/library/metadata/100/thumb/1"
+    # accessing centroid on a partial playlist without one must not trigger a reload
+    other = next(h for h in hubs if h.context == "hub.music.playlists").items()[0]
+    assert other.isPartialObject()
+    assert other.centroid is None
+    assert len(requests_mock.request_history) == 1
 
 
 def test_Playlist_create(plex, show):
