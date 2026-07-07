@@ -136,9 +136,8 @@ class PlayQueue(PlexObject):
         c._server = server
         return c
 
-    @classmethod
-    def create(
-        cls,
+    @staticmethod
+    def _createArgs(
         server,
         items,
         startItem=None,
@@ -147,28 +146,15 @@ class PlayQueue(PlexObject):
         includeChapters=1,
         includeRelated=1,
         continuous=0,
+        **kwargs
     ):
-        """Create and return a new :class:`~plexapi.playqueue.PlayQueue`.
-
-        Parameters:
-            server (:class:`~plexapi.server.PlexServer`): Server you are connected to.
-            items (:class:`~plexapi.base.PlexPartialObject`):
-                A media item or a list of media items.
-            startItem (:class:`~plexapi.base.Playable`, optional):
-                Media item in the PlayQueue where playback should begin.
-            shuffle (int, optional): Start the playqueue shuffled.
-            repeat (int, optional): Start the playqueue shuffled.
-            includeChapters (int, optional): include Chapters.
-            includeRelated (int, optional): include Related.
-            continuous (int, optional): include additional items after the initial item.
-                For a show this would be the next episodes, for a movie it does nothing.
-        """
         args = {
             "includeChapters": includeChapters,
             "includeRelated": includeRelated,
             "repeat": repeat,
             "shuffle": shuffle,
             "continuous": continuous,
+            **kwargs
         }
 
         if isinstance(items, list):
@@ -187,6 +173,48 @@ class PlayQueue(PlexObject):
         if startItem:
             args["key"] = startItem.key
 
+        return args
+
+    @classmethod
+    def create(
+        cls,
+        server,
+        items,
+        startItem=None,
+        shuffle=0,
+        repeat=0,
+        includeChapters=1,
+        includeRelated=1,
+        continuous=0,
+        **kwargs
+    ):
+        """Create and return a new :class:`~plexapi.playqueue.PlayQueue`.
+
+        Parameters:
+            server (:class:`~plexapi.server.PlexServer`): Server you are connected to.
+            items (:class:`~plexapi.base.PlexPartialObject`):
+                A media item or a list of media items.
+            startItem (:class:`~plexapi.base.Playable`, optional):
+                Media item in the PlayQueue where playback should begin.
+            shuffle (int, optional): Start the playqueue shuffled.
+            repeat (int, optional): Start the playqueue shuffled.
+            includeChapters (int, optional): include Chapters.
+            includeRelated (int, optional): include Related.
+            continuous (int, optional): include additional items after the initial item.
+                For a show this would be the next episodes, for a movie it does nothing.
+            **kwargs (dict): Additional options to apply to the playqueue.
+        """
+        args = cls._createArgs(
+            server=server,
+            items=items,
+            startItem=startItem,
+            shuffle=shuffle,
+            repeat=repeat,
+            includeChapters=includeChapters,
+            includeRelated=includeRelated,
+            continuous=continuous,
+            **kwargs
+        )
         path = f"/playQueues{utils.joinArgs(args)}"
         data = server.query(path, method=server._session.post)
         c = cls(server, data, initpath=path)
