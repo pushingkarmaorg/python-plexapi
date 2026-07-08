@@ -149,6 +149,7 @@ class PlayQueue(PlexObject):
         **kwargs
     ):
         args = {
+            "machineIdentifier": server.machineIdentifier,
             "includeChapters": includeChapters,
             "includeRelated": includeRelated,
             "repeat": repeat,
