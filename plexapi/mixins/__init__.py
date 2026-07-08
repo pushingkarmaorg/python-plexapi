@@ -44,7 +44,7 @@ class MovieEditMixins(
 
 class ShowEditMixins(
     ArtLockMixin, PosterLockMixin, ThemeLockMixin,
-    AddedAtMixin, AudienceRatingMixin, ContentRatingMixin, CriticRatingMixin,
+    AddedAtMixin, AudienceRatingMixin, ContentRatingMixin, CriticRatingMixin, EditionTitleMixin,
     OriginallyAvailableMixin, OriginalTitleMixin, SortTitleMixin, StudioMixin,
     SummaryMixin, TaglineMixin, TitleMixin, UserRatingMixin,
     CollectionMixin, GenreMixin, LabelMixin,
