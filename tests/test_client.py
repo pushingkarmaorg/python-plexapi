@@ -139,3 +139,20 @@ def test_client_timeline(plex, client, movies, proxy):
         print("movie.markPlayed()")
         movie.markPlayed()
         time.sleep(2)
+
+
+@pytest.mark.client
+def test_client_createPlayQueue(client, plex, movie, mocker):
+    client.sendCommand = mocker.MagicMock(return_value=None)
+
+    client.createPlayQueue(plex, movie, paused=True)
+
+    client.sendCommand.assert_called_once()
+    args = client.sendCommand.call_args[0]
+    kwargs = client.sendCommand.call_args[1]
+
+    assert args[0] == "playback/createPlayQueue"
+    assert kwargs["paused"] == 1
+    assert kwargs["type"] == movie.listType
+    assert kwargs["uri"].startswith(f"server://{plex.machineIdentifier}/")
+    assert movie.key in kwargs["uri"]
