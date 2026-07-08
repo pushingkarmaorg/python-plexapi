@@ -835,6 +835,7 @@ def test_video_Show_attrs(show):
     assert show.audioLanguage == ''
     assert show.autoDeletionItemPolicyUnwatchedLibrary == 0
     assert show.autoDeletionItemPolicyWatchedLibrary == 0
+    assert show.editionTitle is None
     assert show.enableCreditsMarkerGeneration == -1
     assert show.episodeSort == -1
     assert show.flattenSeasons == -1
@@ -885,6 +886,10 @@ def test_video_Show_attrs(show):
     assert utils.is_int(show.viewedLeafCount, gte=0)
     assert show.year == 2011
     assert show.url(None) is None
+
+
+def test_video_Show_editions(show):
+    assert len(show.editions()) == 0
 
 
 def test_video_Show_episode(show):
@@ -1301,6 +1306,29 @@ def test_video_Season_mixins_fields(show):
     test_mixins.edit_summary(season)
     test_mixins.edit_title(season)
     test_mixins.edit_user_rating(season)
+
+
+@pytest.mark.anonymously
+def test_video_Show_mixins_fields_edition(show):
+    with pytest.raises(BadRequest):
+        test_mixins.edit_edition_title(show)
+
+
+@pytest.mark.authenticated
+def test_video_Show_mixins_fields_edition_authenticated(account_plexpass, show):
+    test_mixins.edit_edition_title(show)
+
+    # Manually edit edition title to check season and episode
+    editionTitle = "Test Edition"
+    show.editEditionTitle(editionTitle).reload()
+    assert show.editionTitle == editionTitle
+    season = show.season(1)
+    assert season.editionTitle == editionTitle
+    episode = season.episode(1)
+    assert episode.editionTitle == editionTitle
+
+    show.editEditionTitle("", locked=False).reload()
+    assert show.editionTitle is None
 
 
 def test_video_Season_mixins_tags(show):
