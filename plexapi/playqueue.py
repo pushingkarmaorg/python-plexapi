@@ -141,20 +141,20 @@ class PlayQueue(PlexObject):
         server,
         items,
         startItem=None,
-        shuffle=0,
-        repeat=0,
-        includeChapters=1,
-        includeRelated=1,
-        continuous=0,
+        shuffle=False,
+        repeat=False,
+        includeChapters=True,
+        includeRelated=True,
+        continuous=False,
         **kwargs
     ):
         args = {
             "machineIdentifier": server.machineIdentifier,
-            "includeChapters": includeChapters,
-            "includeRelated": includeRelated,
-            "repeat": repeat,
-            "shuffle": shuffle,
-            "continuous": continuous,
+            "includeChapters": int(bool(includeChapters)),
+            "includeRelated": int(bool(includeRelated)),
+            "repeat": int(bool(repeat)),
+            "shuffle": int(bool(shuffle)),
+            "continuous": int(bool(continuous)),
             **kwargs
         }
 
@@ -182,11 +182,11 @@ class PlayQueue(PlexObject):
         server,
         items,
         startItem=None,
-        shuffle=0,
-        repeat=0,
-        includeChapters=1,
-        includeRelated=1,
-        continuous=0,
+        shuffle=False,
+        repeat=False,
+        includeChapters=True,
+        includeRelated=True,
+        continuous=False,
         **kwargs
     ):
         """Create and return a new :class:`~plexapi.playqueue.PlayQueue`.
@@ -197,11 +197,11 @@ class PlayQueue(PlexObject):
                 A media item or a list of media items.
             startItem (:class:`~plexapi.base.Playable`, optional):
                 Media item in the PlayQueue where playback should begin.
-            shuffle (int, optional): Start the playqueue shuffled.
-            repeat (int, optional): Start the playqueue shuffled.
-            includeChapters (int, optional): include Chapters.
-            includeRelated (int, optional): include Related.
-            continuous (int, optional): include additional items after the initial item.
+            shuffle (bool, optional): Start the playqueue shuffled.
+            repeat (bool, optional): Start the playqueue shuffled.
+            includeChapters (bool, optional): include Chapters.
+            includeRelated (bool, optional): include Related.
+            continuous (bool, optional): include additional items after the initial item.
                 For a show this would be the next episodes, for a movie it does nothing.
             **kwargs (dict): Additional options to apply to the playqueue.
         """
