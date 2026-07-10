@@ -15,6 +15,7 @@ from .edit import (
     TrackArtistMixin, TrackDiscNumberMixin, TrackNumberMixin,
     UserRatingMixin, WriterMixin
 )
+from .editions import EditionsMixin
 from .objects import ExtrasMixin, HubsMixin
 from .played_unplayed import PlayedUnplayedMixin
 from .rating import RatingMixin
@@ -128,7 +129,7 @@ class PlaylistEditMixins(
 
 
 class MovieMixins(
-    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
+    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin, EditionsMixin,
     ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     MovieEditMixins,
     WatchlistMixin
@@ -137,7 +138,7 @@ class MovieMixins(
 
 
 class ShowMixins(
-    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin,
+    AdvancedSettingsMixin, SplitMergeMixin, UnmatchMatchMixin, ExtrasMixin, HubsMixin, RatingMixin, EditionsMixin,
     ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeMixin,
     ShowEditMixins,
     WatchlistMixin
@@ -146,7 +147,7 @@ class ShowMixins(
 
 
 class SeasonMixins(
-    AdvancedSettingsMixin, ExtrasMixin, RatingMixin,
+    AdvancedSettingsMixin, ExtrasMixin, RatingMixin, EditionsMixin,
     ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
     SeasonEditMixins
 ):
@@ -154,7 +155,7 @@ class SeasonMixins(
 
 
 class EpisodeMixins(
-    ExtrasMixin, RatingMixin,
+    ExtrasMixin, RatingMixin, EditionsMixin,
     ArtMixin, LogoMixin, PosterMixin, SquareArtMixin, ThemeUrlMixin,
     EpisodeEditMixins
 ):
