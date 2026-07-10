@@ -149,7 +149,6 @@ class PlayQueue(PlexObject):
         **kwargs
     ):
         args = {
-            "machineIdentifier": server.machineIdentifier,
             "includeChapters": int(bool(includeChapters)),
             "includeRelated": int(bool(includeRelated)),
             "repeat": int(bool(repeat)),
