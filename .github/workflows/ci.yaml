@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out code from Github
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Set up Python ${{ env.DEFAULT_PYTHON }}
       id: python
@@ -39,7 +39,7 @@ jobs:
 
     - name: Restore Python ${{ steps.python.outputs.python-version }} virtual environment
       id: cache-venv
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: venv
         key: >-
@@ -102,7 +102,7 @@ jobs:
             plex: unclaimed
     steps:
     - name: Check out code from Github
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Set up Python ${{ env.DEFAULT_PYTHON }}
       id: python
@@ -112,7 +112,7 @@ jobs:
 
     - name: Restore Python ${{ steps.python.outputs.python-version }} virtual environment
       id: cache-venv
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: venv
         key: >-
@@ -153,7 +153,7 @@ jobs:
 
     - name: Restore cached PMS Docker image
       id: docker-cache
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: ~/.cache/docker/plexinc
         key: ${{ runner.os }}-docker-pms-${{ steps.docker-digest.outputs.digest }}
@@ -228,7 +228,7 @@ jobs:
 
     - name: Save PMS Docker image cache
       if: always() && steps.docker-cache.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.docker-cache.outputs.cache-primary-key }}
         path: ~/.cache/docker/plexinc
@@ -257,7 +257,7 @@ jobs:
             plex: unclaimed
     steps:
     - name: Check out code from GitHub
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Set up Python ${{ env.DEFAULT_PYTHON }}
       id: python
@@ -267,7 +267,7 @@ jobs:
 
     - name: Restore Python ${{ steps.python.outputs.python-version }} virtual environment
       id: cache-venv
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: venv
         key: >-
@@ -293,7 +293,7 @@ jobs:
         coverage xml
 
     - name: Upload ${{ matrix.plex }} coverage to Codecov
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }} 
       with:
