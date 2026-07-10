@@ -1489,7 +1489,7 @@ class MyPlexResource(PlexObject):
     def connections(self):
         return self.findItems(self._data, ResourceConnection, rtag='connections')
 
-    def preferred_connections(
+    def preferred_connections(  # noqa: C901
         self,
         ssl=None,
         ipv6=None,
