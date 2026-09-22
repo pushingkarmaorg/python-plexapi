@@ -367,6 +367,7 @@ class AudioStream(MediaPartStream):
             audioChannelLayout (str): The audio channel layout of the audio stream (ex: 5.1(side)).
             bitDepth (int): The bit depth of the audio stream (ex: 16).
             bitrateMode (str): The bitrate mode of the audio stream (ex: cbr).
+            canNormalizeLoudness (bool): True if the audio stream can be normalized for loudness.
             channels (int): The number of audio channels of the audio stream (ex: 6).
             duration (int): The duration of audio stream in milliseconds.
             profile (str): The profile of the audio stream.
@@ -395,6 +396,7 @@ class AudioStream(MediaPartStream):
         self.audioChannelLayout = data.attrib.get('audioChannelLayout')
         self.bitDepth = utils.cast(int, data.attrib.get('bitDepth'))
         self.bitrateMode = data.attrib.get('bitrateMode')
+        self.canNormalizeLoudness = utils.cast(bool, data.attrib.get('canNormalizeLoudness', '0'))
         self.channels = utils.cast(int, data.attrib.get('channels'))
         self.duration = utils.cast(int, data.attrib.get('duration'))
         self.profile = data.attrib.get('profile')
