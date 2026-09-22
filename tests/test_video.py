@@ -152,6 +152,7 @@ def test_video_Movie_attrs(movies):  # noqa: C901
     assert audio.bitDepth is None
     assert utils.is_int(audio.bitrate)
     assert audio.bitrateMode is None
+    assert audio.canNormalizeLoudness in (None, False)
     assert audio.channels in utils.AUDIOCHANNELS
     assert audio.codec in utils.CODECS
     assert audio.default is True
