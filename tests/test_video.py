@@ -114,6 +114,7 @@ def test_video_Movie_attrs(movies):  # noqa: C901
     assert movie.guid == "plex://movie/5d776846880197001ec967c6"
     assert movie.hasVoiceActivity is False
     assert movie.hasPreviewThumbnails is False
+    assert movie.canNormalizeLoudness is False
     assert utils.is_metadata(movie._initpath)
     assert utils.is_metadata(movie.key)
     assert movie.languageOverride is None
@@ -152,6 +153,7 @@ def test_video_Movie_attrs(movies):  # noqa: C901
     assert audio.bitDepth is None
     assert utils.is_int(audio.bitrate)
     assert audio.bitrateMode is None
+    assert audio.canNormalizeLoudness in (None, False)
     assert audio.channels in utils.AUDIOCHANNELS
     assert audio.codec in utils.CODECS
     assert audio.default is True
@@ -1444,6 +1446,7 @@ def test_video_Episode_attrs(episode):
     assert "tvdb://3254641" in [i.id for i in episode.guids]
     assert episode.hasVoiceActivity is False
     assert episode.hasPreviewThumbnails is False
+    assert episode.canNormalizeLoudness is False
     assert episode.index == 1
     assert episode.episodeNumber == episode.index
     assert utils.is_metadata(episode._initpath)
