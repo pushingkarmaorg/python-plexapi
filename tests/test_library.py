@@ -896,7 +896,7 @@ def _do_test_library_search(library, obj, field, operator, searchValue):
     results = library.search(libtype=obj.type, filters=searchFilter)
 
     if operator.key.startswith("!") or operator.key.startswith(">>") and (searchValue == 1 or searchValue == "0s"):
-        assert obj not in results
+        assert obj not in results, f"Unable to search {obj.type} by {field.key} using {operator.key} and value {searchValue}."
     else:
         assert obj in results, f"Unable to search {obj.type} by {field.key} using {operator.key} and value {searchValue}."
 
