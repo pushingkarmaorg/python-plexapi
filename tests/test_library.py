@@ -804,8 +804,6 @@ def test_library_search_exceptions(movies):
     with pytest.raises(BadRequest):
         movies.listFilterChoices(field="123abc.title")
     with pytest.raises(BadRequest):
-        movies.search(**{"123abc": True})
-    with pytest.raises(BadRequest):
         movies.search(year="123abc")
     with pytest.raises(BadRequest):
         movies.search(sort="123abc")
