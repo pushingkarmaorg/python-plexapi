@@ -21,7 +21,7 @@ on:
 
 env:
   CACHE_VERSION: 1
-  DEFAULT_PYTHON: '3.10'
+  DEFAULT_PYTHON: '3.11'
 
 jobs:
   lint-flake8:
